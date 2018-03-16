@@ -1,14 +1,14 @@
-package com.yhh.csap.core;
+package com.mybank.pc.core;
+
+import java.util.List;
 
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.ValueFilter;
 import com.jfinal.core.Controller;
-import com.yhh.csap.Consts;
-import com.yhh.csap.admin.model.Role;
-import com.yhh.csap.admin.model.User;
-
-import java.util.List;
+import com.mybank.pc.Consts;
+import com.mybank.pc.admin.model.Role;
+import com.mybank.pc.admin.model.User;
 
 /**
  * Created by 于海慧（125227112@qq.com） on 2016/12/1.

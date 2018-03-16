@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.yhh.csap.kits;
+package com.mybank.pc.kits;
 
+import java.math.BigInteger;
 
 import com.jfinal.core.Controller;
 import com.jfinal.kit.HashKit;
 import com.jfinal.kit.LogKit;
 import com.jfinal.kit.StrKit;
-import com.yhh.csap.Consts;
-
-import java.math.BigInteger;
+import com.mybank.pc.Consts;
 
 /**
- * 参考：spring-security 
- * https://github.com/spring-projects/spring-security/
+ * 参考：spring-security https://github.com/spring-projects/spring-security/
  * blob/master/web/src/main/java/org/springframework/security/
  * web/authentication/rememberme/TokenBasedRememberMeServices.java
  * ....AbstractRememberMeServices.java
@@ -42,9 +40,9 @@ public class CookieKit {
 	public static void put(Controller ctr, String key, BigInteger value) {
 		put(ctr, key, value.toString());
 	}
-	
+
 	public static void put(Controller ctr, String key, long value) {
-		put(ctr, key, value+"");
+		put(ctr, key, value + "");
 	}
 
 	public static void put(Controller ctr, String key, String value, int maxAgeInSeconds) {
@@ -54,9 +52,9 @@ public class CookieKit {
 
 		String cookieValue = encrypt_value + COOKIE_SEPARATOR + saveTime + COOKIE_SEPARATOR + maxAgeInSeconds
 				+ COOKIE_SEPARATOR + value;
-		LogKit.info("put cookie"+cookieValue);
+		LogKit.info("put cookie" + cookieValue);
 
-		ctr.setCookie(key, cookieValue, maxAgeInSeconds,null, null,true);
+		ctr.setCookie(key, cookieValue, maxAgeInSeconds, null, null, true);
 
 	}
 
@@ -72,7 +70,7 @@ public class CookieKit {
 
 		String encrypt_key = Consts.ENCRYPT_KEY;
 		String cookieValue = ctr.getCookie(key);
-		LogKit.info("get cookie"+cookieValue);
+		LogKit.info("get cookie" + cookieValue);
 		return getFromCookieInfo(encrypt_key, cookieValue);
 	}
 

@@ -1,19 +1,19 @@
-package com.yhh.csap;
-
-import com.jfinal.kit.LogKit;
-import com.jfinal.plugin.ehcache.CacheKit;
-import com.jfinal.upload.UploadFile;
-import com.qiniu.common.QiniuException;
-import com.xiaoleilu.hutool.util.StrUtil;
-import com.yhh.csap.core.CoreController;
-import com.yhh.csap.core.CoreException;
-import com.yhh.csap.kits.DateKit;
-import com.yhh.csap.kits.QiNiuKit;
-import com.yhh.csap.kits._StrKit;
+package com.mybank.pc;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+
+import com.jfinal.kit.LogKit;
+import com.jfinal.plugin.ehcache.CacheKit;
+import com.jfinal.upload.UploadFile;
+import com.mybank.pc.core.CoreController;
+import com.mybank.pc.core.CoreException;
+import com.mybank.pc.kits.DateKit;
+import com.mybank.pc.kits.QiNiuKit;
+import com.mybank.pc.kits._StrKit;
+import com.qiniu.common.QiniuException;
+import com.xiaoleilu.hutool.util.StrUtil;
 
 /**
  * 简介       通用的公共的controller

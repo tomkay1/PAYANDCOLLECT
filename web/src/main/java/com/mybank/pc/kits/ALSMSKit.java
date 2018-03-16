@@ -1,4 +1,4 @@
-package com.yhh.csap.kits;
+package com.mybank.pc.kits;
 
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
@@ -9,7 +9,7 @@ import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.jfinal.plugin.ehcache.CacheKit;
-import com.yhh.csap.Consts;
+import com.mybank.pc.Consts;
 
 /**
  * Created by yuhaihui8913 on 2018/1/10.

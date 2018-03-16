@@ -1,24 +1,28 @@
-package com.yhh.csap.admin.art;
+package com.mybank.pc.admin.art;
 
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Clear;
 import com.jfinal.kit.LogKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
+import com.mybank.pc.Consts;
+import com.mybank.pc.admin.model.Content;
+import com.mybank.pc.admin.model.Mapping;
+import com.mybank.pc.admin.model.Taxonomy;
+import com.mybank.pc.core.CoreController;
+import com.mybank.pc.interceptors.AdminAAuthInterceptor;
+import com.mybank.pc.kits.DateKit;
+import com.mybank.pc.kits.QiNiuKit;
+import com.mybank.pc.kits._StrKit;
 import com.xiaoleilu.hutool.util.StrUtil;
-import com.yhh.csap.Consts;
-import com.yhh.csap.admin.model.Content;
-import com.yhh.csap.admin.model.Mapping;
-import com.yhh.csap.admin.model.Taxonomy;
-import com.yhh.csap.core.CoreController;
-import com.yhh.csap.interceptors.AdminAAuthInterceptor;
-import com.yhh.csap.kits.DateKit;
-import com.yhh.csap.kits.QiNiuKit;
-import com.yhh.csap.kits._StrKit;
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * 简介

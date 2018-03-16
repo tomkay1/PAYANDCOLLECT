@@ -1,11 +1,11 @@
-package com.yhh.csap.admin.taxonomy;
-
-import com.jfinal.core.Controller;
-import com.yhh.csap.Consts;
-import com.yhh.csap.admin.model.Taxonomy;
-import com.yhh.csap.core.CoreValidator;
+package com.mybank.pc.admin.taxonomy;
 
 import java.util.List;
+
+import com.jfinal.core.Controller;
+import com.mybank.pc.Consts;
+import com.mybank.pc.admin.model.Taxonomy;
+import com.mybank.pc.core.CoreValidator;
 
 /**
  * 简介

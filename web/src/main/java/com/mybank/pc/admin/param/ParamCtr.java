@@ -1,15 +1,15 @@
-package com.yhh.csap.admin.param;
-
-import com.jfinal.aop.Before;
-import com.jfinal.plugin.activerecord.tx.Tx;
-import com.yhh.csap.admin.model.Param;
-import com.yhh.csap.core.CoreController;
-import com.yhh.csap.core.CoreData;
+package com.mybank.pc.admin.param;
 
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.jfinal.aop.Before;
+import com.jfinal.plugin.activerecord.tx.Tx;
+import com.mybank.pc.admin.model.Param;
+import com.mybank.pc.core.CoreController;
+import com.mybank.pc.core.CoreData;
 
 /**
  * Created by yuhaihui8913 on 2017/12/1.

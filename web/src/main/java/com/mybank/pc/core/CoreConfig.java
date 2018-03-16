@@ -1,8 +1,13 @@
-package com.yhh.csap.core;
+package com.mybank.pc.core;
 
 import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.wall.WallFilter;
-import com.jfinal.config.*;
+import com.jfinal.config.Constants;
+import com.jfinal.config.Handlers;
+import com.jfinal.config.Interceptors;
+import com.jfinal.config.JFinalConfig;
+import com.jfinal.config.Plugins;
+import com.jfinal.config.Routes;
 import com.jfinal.core.JFinal;
 import com.jfinal.json.FastJsonFactory;
 import com.jfinal.kit.PathKit;
@@ -11,22 +16,20 @@ import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.plugin.ehcache.EhCachePlugin;
 import com.jfinal.template.Engine;
+import com.mybank.pc.CMNCtr;
+import com.mybank.pc.admin.LoginCtr;
+import com.mybank.pc.admin.art.ArtCtr;
+import com.mybank.pc.admin.param.ParamCtr;
+import com.mybank.pc.admin.res.ResCtr;
+import com.mybank.pc.admin.role.RoleCtr;
+import com.mybank.pc.admin.taxonomy.TaxCtr;
+import com.mybank.pc.admin.user.UserCtr;
+import com.mybank.pc.interceptors.AdminIAuthInterceptor;
+import com.mybank.pc.interceptors.ExceptionInterceptor;
+import com.mybank.pc.kits.DateKit;
+import com.mybank.pc.kits.ResKit;
 import com.xiaoleilu.hutool.util.CollectionUtil;
 import com.xiaoleilu.hutool.util.StrUtil;
-import com.yhh.csap.CMNCtr;
-import com.yhh.csap.admin.LoginCtr;
-import com.yhh.csap.admin.res.ResCtr;
-import com.yhh.csap.admin.art.ArtCtr;
-import com.yhh.csap.admin.param.ParamCtr;
-import com.yhh.csap.admin.role.RoleCtr;
-import com.yhh.csap.admin.taxonomy.TaxCtr;
-import com.yhh.csap.admin.user.UserCtr;
-import com.yhh.csap.interceptors.AdminIAuthInterceptor;
-import com.yhh.csap.interceptors.ExceptionInterceptor;
-import com.yhh.csap.interceptors.WwwInterceptor;
-import com.yhh.csap.kits.DateKit;
-import com.yhh.csap.kits.ResKit;
-import com.yhh.csap.www.IndexCtr;
 
 /**
  * Created by yuhaihui8913 on 2017/11/14.
@@ -70,24 +73,6 @@ public class CoreConfig extends JFinalConfig{
             @Override
             public void config() {
                 add("/cmn", CMNCtr.class);
-            }
-        });
-
-
-        routes.add(new Routes() {
-            @Override
-            public void config() {
-
-            }
-        });
-
-        routes.add(new Routes() {
-            @Override
-            public void config() {
-                setBaseViewPath("/WEB-INF/template/www/");
-                addInterceptor(new WwwInterceptor());
-                add("/", IndexCtr.class);
-
             }
         });
 

@@ -1,4 +1,8 @@
-package com.yhh.csap.admin.user;
+package com.mybank.pc.admin.user;
+
+import java.math.BigInteger;
+import java.util.Date;
+import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jfinal.aop.Before;
@@ -6,20 +10,16 @@ import com.jfinal.aop.Clear;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.plugin.ehcache.CacheKit;
+import com.mybank.pc.Consts;
+import com.mybank.pc.admin.model.Role;
+import com.mybank.pc.admin.model.User;
+import com.mybank.pc.admin.model.UserRole;
+import com.mybank.pc.core.CoreController;
+import com.mybank.pc.interceptors.AdminAAuthInterceptor;
+import com.mybank.pc.kits.ext.BCrypt;
 import com.xiaoleilu.hutool.collection.CollUtil;
 import com.xiaoleilu.hutool.util.RandomUtil;
 import com.xiaoleilu.hutool.util.StrUtil;
-import com.yhh.csap.Consts;
-import com.yhh.csap.admin.model.Role;
-import com.yhh.csap.admin.model.User;
-import com.yhh.csap.admin.model.UserRole;
-import com.yhh.csap.core.CoreController;
-import com.yhh.csap.interceptors.AdminAAuthInterceptor;
-import com.yhh.csap.kits.ext.BCrypt;
-
-import java.math.BigInteger;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by 于海慧（125227112@qq.com） on 2016/12/2.

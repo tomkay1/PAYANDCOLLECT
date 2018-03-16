@@ -12,7 +12,7 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-package com.yhh.csap.kits.ext;
+package com.mybank.pc.kits.ext;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
