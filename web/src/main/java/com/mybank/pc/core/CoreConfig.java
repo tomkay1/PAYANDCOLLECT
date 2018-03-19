@@ -1,5 +1,7 @@
 package com.mybank.pc.core;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.wall.WallFilter;
 import com.jfinal.config.Constants;
@@ -9,6 +11,7 @@ import com.jfinal.config.JFinalConfig;
 import com.jfinal.config.Plugins;
 import com.jfinal.config.Routes;
 import com.jfinal.core.JFinal;
+import com.jfinal.handler.Handler;
 import com.jfinal.json.FastJsonFactory;
 import com.jfinal.kit.PathKit;
 import com.jfinal.log.Log4jLogFactory;
@@ -28,8 +31,10 @@ import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.interceptors.ExceptionInterceptor;
 import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.ResKit;
-import com.xiaoleilu.hutool.util.CollectionUtil;
-import com.xiaoleilu.hutool.util.StrUtil;
+
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by yuhaihui8913 on 2017/11/14.
@@ -132,7 +137,18 @@ public class CoreConfig extends JFinalConfig{
 
     @Override
     public void configHandler(Handlers handlers) {
-
+        if(JFinal.me().getConstants().getDevMode()){
+            handlers.add(new Handler() {
+                @Override
+                public void handle(String s, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, boolean[] booleans) {
+                    if(s.equals("/static/swagger/index.html")||s.equals("/Api")){
+                        return ;
+                    }else{
+                        next.handle(s,httpServletRequest,httpServletResponse,booleans);
+                    }
+                }
+            });
+        }
     }
 
     @Override

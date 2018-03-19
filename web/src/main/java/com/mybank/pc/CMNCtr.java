@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
+import cn.hutool.core.util.StrUtil;
 import com.jfinal.kit.LogKit;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.upload.UploadFile;
@@ -13,7 +14,6 @@ import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.QiNiuKit;
 import com.mybank.pc.kits._StrKit;
 import com.qiniu.common.QiniuException;
-import com.xiaoleilu.hutool.util.StrUtil;
 
 /**
  * 简介       通用的公共的controller

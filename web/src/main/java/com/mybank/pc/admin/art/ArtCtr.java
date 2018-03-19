@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.hutool.core.util.StrUtil;
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Clear;
 import com.jfinal.kit.LogKit;
@@ -22,7 +23,6 @@ import com.mybank.pc.interceptors.AdminAAuthInterceptor;
 import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.QiNiuKit;
 import com.mybank.pc.kits._StrKit;
-import com.xiaoleilu.hutool.util.StrUtil;
 
 /**
  * 简介

@@ -3,17 +3,27 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-  <display-name>WHBX</display-name>
+  <display-name>mb-pc</display-name>
   <filter>
     <filter-name>jfinal</filter-name>
     <filter-class>com.jfinal.core.JFinalFilter</filter-class>
     <init-param>
       <param-name>configClass</param-name>
-      <param-value>com.yhh.csap.core.CoreConfig</param-value>
+      <param-value>com.mybank.pc.core.CoreConfig</param-value>
     </init-param>
   </filter>
   <filter-mapping>
     <filter-name>jfinal</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+
+
+  <servlet>
+    <servlet-name>swagger</servlet-name>
+    <servlet-class>com.mybank.pc.api.SwaggerServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>swagger</servlet-name>
+    <url-pattern>/Api</url-pattern>
+  </servlet-mapping>
 </web-app>

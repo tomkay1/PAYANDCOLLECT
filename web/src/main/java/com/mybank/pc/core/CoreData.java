@@ -2,11 +2,11 @@ package com.mybank.pc.core;
 
 import java.util.List;
 
+import cn.hutool.log.StaticLog;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.Param;
 import com.mybank.pc.admin.model.Taxonomy;
-import com.xiaoleilu.hutool.log.StaticLog;
 
 /**
  * Created by yuhaihui8913 on 2017/11/16.

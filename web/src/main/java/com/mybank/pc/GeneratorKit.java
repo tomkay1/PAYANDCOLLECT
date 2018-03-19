@@ -23,12 +23,12 @@ public class GeneratorKit {
 	
 	public static void main(String[] args) {
 		// base model 所使用的包名
-		String baseModelPackageName = "com.yhh.csap.sale.model.base";
+		String baseModelPackageName = "com.mybank.pc.merchant.model.base";
 		// base model 文件保存路径
 		String baseModelOutputDir = PathKit.getWebRootPath() + "/../src/com/yhh/csap/model/base";
 		
 		// model 所使用的包名 (MappingKit 默认使用的包名)
-		String modelPackageName = "com.yhh.csap.sale.model";
+		String modelPackageName = "com.mybank.pc.merchant.model";
 		// model 文件保存路径 (MappingKit 与 DataDictionary 文件默认保存路径)
 		String modelOutputDir = baseModelOutputDir + "/..";
 		
@@ -44,7 +44,7 @@ public class GeneratorKit {
 		// 设置是否生成字典文件
 		gernerator.setGenerateDataDictionary(true);
 		// 设置需要被移除的表名前缀用于生成modelName。例如表名 "osc_user"，移除前缀 "osc_"后生成的model名为 "User"而非 OscUser
-		gernerator.setRemovedTableNamePrefixes("s_","www_","mt_");
+		gernerator.setRemovedTableNamePrefixes("s_");
 		// 生成
 		gernerator.generate();
 	}

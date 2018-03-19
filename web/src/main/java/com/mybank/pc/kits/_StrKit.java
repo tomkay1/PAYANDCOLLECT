@@ -1,7 +1,10 @@
 package com.mybank.pc.kits;
 
-import com.xiaoleilu.hutool.crypto.SecureUtil;
-import com.xiaoleilu.hutool.lang.Base64;
+
+
+
+import cn.hutool.core.codec.Base64;
+import cn.hutool.crypto.SecureUtil;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

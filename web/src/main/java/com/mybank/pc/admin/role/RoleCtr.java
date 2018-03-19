@@ -3,6 +3,8 @@ package com.mybank.pc.admin.role;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.log.StaticLog;
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Clear;
 import com.jfinal.kit.StrKit;
@@ -16,15 +18,24 @@ import com.mybank.pc.admin.model.RoleRes;
 import com.mybank.pc.admin.model.UserRole;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.interceptors.AdminAAuthInterceptor;
-import com.xiaoleilu.hutool.log.StaticLog;
-import com.xiaoleilu.hutool.util.StrUtil;
+import com.mybank.swagger.fz.annotation.Api;
+import com.mybank.swagger.fz.annotation.ApiOperation;
+import com.mybank.swagger.fz.annotation.Param;
+import com.mybank.swagger.fz.annotation.Params;
+
 
 /**
  * Created by yuhaihui8913 on 2016/12/5.
  */
 // @Before(AdminIAuthInterceptor.class)
+	@Api(tag="role",description = "角色管理")
 public class RoleCtr extends CoreController {
-
+	@ApiOperation(url = "/ad02/list",tag = "role",httpMethod = "post",description = "角色查询")
+	@Params(
+			{
+					@Param(name = "search",description = "查询条件",required = false,dataType = "string" )
+			}
+	)
 	public void list() {
 		String search = getPara("search");
 		StringBuffer where = new StringBuffer("from s_role sr where 1=1 ");

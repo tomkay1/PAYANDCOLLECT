@@ -11,7 +11,7 @@
             </p>
             <div>
                 <Form ref="editPasswordForm" :model="editPasswordForm" :label-width="100" label-position="right" :rules="passwordValidate">
-                    <FormItem label="原密码" prop="oldPass" :error="oldPassError">
+                    <FormItem label="原密码" prop="oldPass" >
                         <Input v-model="editPasswordForm.oldPass" type="password" placeholder="请输入现在使用的密码" ></Input>
                     </FormItem>
                     <FormItem label="新密码" prop="newPass">
@@ -22,7 +22,7 @@
                     </FormItem>
                 </Form>
                 <div slot="footer">
-                    <Button type="text" @click="cancelEditPass">取消</Button>
+                    <!--<Button type="text" @click="cancelEditPass">取消</Button>-->
                     <Button type="primary" :loading="savePassLoading" @click="saveEditPass">保存</Button>
                 </div>
             </div>
@@ -49,6 +49,7 @@ export default {
                 newPass: '',
                 rePass: ''
             },
+            savePassLoading:false,
             passwordValidate: {
                 oldPass: [
                     { required: true, message: '请输入原密码', trigger: 'blur' }
@@ -71,6 +72,7 @@ export default {
                 if (valid) {
                     this.savePassLoading = true;
                     this.$store.dispatch('update_pwd',{loginname:this.loginname,oldPwd:this.editPasswordForm.oldPass,newPwd:this.editPasswordForm.newPass}).then((res)=>{
+                        this.savePassLoading=false;
                     })
                 }
             });

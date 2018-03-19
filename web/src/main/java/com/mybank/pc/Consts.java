@@ -10,9 +10,9 @@ public class Consts {
 
     public static final Whitelist basicWithImages=Whitelist.basicWithImages();
 
-    public static final String ENCRYPT_KEY="yuhaihui3435-never-late";
+    public static final String ENCRYPT_KEY="mbpc-never-late";
 
-    public static final String USER_ACCESS_TOKEN="userId-csap";
+    public static final String USER_ACCESS_TOKEN="userId-mbpc";
 
     public static final int COOKIE_TIMEOUT=24*60*60*10;
 

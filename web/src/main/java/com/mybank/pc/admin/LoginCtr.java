@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.jfinal.aop.Clear;
 import com.jfinal.kit.StrKit;
@@ -16,7 +17,6 @@ import com.mybank.pc.interceptors.AdminAAuthInterceptor;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.kits.CookieKit;
 import com.mybank.pc.kits.ext.BCrypt;
-import com.xiaoleilu.hutool.util.StrUtil;
 
 /**
  * Created by yuhaihui8913 on 2018/1/26. 登录请求 处理

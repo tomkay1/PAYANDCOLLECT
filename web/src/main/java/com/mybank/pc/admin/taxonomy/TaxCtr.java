@@ -3,6 +3,7 @@ package com.mybank.pc.admin.taxonomy;
 import java.util.Date;
 import java.util.List;
 
+import cn.hutool.core.util.StrUtil;
 import com.jfinal.aop.Before;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.plugin.ehcache.CacheKit;
@@ -10,7 +11,6 @@ import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.Taxonomy;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.core.CoreData;
-import com.xiaoleilu.hutool.util.StrUtil;
 
 /**
  * Created by yuhaihui8913 on 2017/12/6.
