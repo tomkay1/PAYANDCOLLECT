@@ -1,4 +1,4 @@
-package com.mybank.pc.merchant.model.base;
+package com.mybank.pc.collection.model.base;
 
 import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.activerecord.IBean;
