@@ -73,14 +73,6 @@ public abstract class BaseCollectionCleartotle<M extends BaseCollectionCleartotl
 		return get("amountOff");
 	}
 
-	public void setChargeOff(java.lang.String chargeOff) {
-		set("chargeOff", chargeOff);
-	}
-	
-	public java.lang.String getChargeOff() {
-		return getStr("chargeOff");
-	}
-
 	public void setCat(java.util.Date cat) {
 		set("cat", cat);
 	}
@@ -111,6 +103,14 @@ public abstract class BaseCollectionCleartotle<M extends BaseCollectionCleartotl
 	
 	public java.lang.String getOperID() {
 		return getStr("operID");
+	}
+
+	public void setBankFee(java.math.BigDecimal bankFee) {
+		set("bankFee", bankFee);
+	}
+
+	public java.math.BigDecimal getBankFee() {
+		return get("bankFee");
 	}
 
 }

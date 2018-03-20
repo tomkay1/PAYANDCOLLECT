@@ -145,4 +145,12 @@ public abstract class BaseCollectionClear<M extends BaseCollectionClear<M>> exte
 		return getStr("operID");
 	}
 
+	public void setBankFee(java.math.BigDecimal bankFee) {
+		set("bankFee", bankFee);
+	}
+
+	public java.math.BigDecimal getBankFee() {
+		return get("bankFee");
+	}
+
 }

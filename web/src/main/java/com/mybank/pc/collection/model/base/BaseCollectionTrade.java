@@ -209,4 +209,13 @@ public abstract class BaseCollectionTrade<M extends BaseCollectionTrade<M>> exte
 		return get("clearDate");
 	}
 
+	public void setClearID(java.lang.Integer clearID) {
+		set("clearID", clearID);
+	}
+
+	public java.lang.Integer getClearID() {
+		return getInt("clearID");
+	}
+
+
 }
