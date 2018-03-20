@@ -193,4 +193,20 @@ public abstract class BaseCollectionTrade<M extends BaseCollectionTrade<M>> exte
 		return getStr("operID");
 	}
 
+	public void setMerchantID(java.lang.Integer merchantID) {
+		set("merchantID", merchantID);
+	}
+
+	public java.lang.Integer getMerchantID() {
+		return getInt("merchantID");
+	}
+
+	public void setClearDate(java.util.Date clearDate) {
+		set("clearDate", clearDate);
+	}
+
+	public java.util.Date getClearDate() {
+		return get("clearDate");
+	}
+
 }
