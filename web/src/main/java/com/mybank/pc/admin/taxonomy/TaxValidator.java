@@ -11,7 +11,7 @@ import com.mybank.pc.core.CoreValidator;
  * 简介
  * <p>
  * 项目名称:   [whbx]
- * 包:        [com.yhh.csap.admin.taxonomy]
+ * 包:        [com.mb.pc.admin.taxonomy]
  * 类名称:    [TaxValidator]
  * 类描述:    []
  * 创建人:    [于海慧]

@@ -16,6 +16,7 @@ import com.jfinal.json.FastJsonFactory;
 import com.jfinal.kit.PathKit;
 import com.jfinal.log.Log4jLogFactory;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
+import com.jfinal.plugin.cron4j.Cron4jPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.plugin.ehcache.EhCachePlugin;
 import com.jfinal.template.Engine;
@@ -27,6 +28,7 @@ import com.mybank.pc.admin.res.ResCtr;
 import com.mybank.pc.admin.role.RoleCtr;
 import com.mybank.pc.admin.taxonomy.TaxCtr;
 import com.mybank.pc.admin.user.UserCtr;
+import com.mybank.pc.interceptors.AdminAAuthInterceptor;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.interceptors.ExceptionInterceptor;
 import com.mybank.pc.kits.DateKit;
@@ -60,7 +62,7 @@ public class CoreConfig extends JFinalConfig{
         routes.add(new Routes() {
             @Override
             public void config() {
-//                addInterceptor(new AdminAAuthInterceptor());
+                addInterceptor(new AdminAAuthInterceptor());
                 add("/ad00", ParamCtr.class);
                 add("/ad01", UserCtr.class);
                 add("/ad02", RoleCtr.class);
@@ -121,6 +123,10 @@ public class CoreConfig extends JFinalConfig{
         plugins.add(arp);
         //开启eheache缓存
         plugins.add(new EhCachePlugin());
+        //计划任务插件
+        Cron4jPlugin cron4jPlugin=new Cron4jPlugin("task.properties","cron4j");
+        plugins.add(cron4jPlugin);
+
     }
 
     private DruidPlugin createDruidPlugin() {

@@ -34,6 +34,7 @@
         <commons-codec.version>1.6</commons-codec.version>
         <commons-io.version>2.2</commons-io.version>
         <commons-lang.version>2.5</commons-lang.version>
+        <cron4j.version>2.2.5</cron4j.version>
 
     </properties>
 
@@ -149,6 +150,12 @@
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>${commons-lang.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/it.sauronsoftware.cron4j/cron4j -->
+            <dependency>
+                <groupId>it.sauronsoftware.cron4j</groupId>
+                <artifactId>cron4j</artifactId>
+                <version>${cron4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

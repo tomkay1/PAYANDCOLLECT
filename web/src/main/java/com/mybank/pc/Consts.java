@@ -2,6 +2,8 @@ package com.mybank.pc;
 
 import org.jsoup.safety.Whitelist;
 
+import java.math.BigDecimal;
+
 /**
  * Created by yuhaihui8913 on 2017/11/14.
  * 常量类
@@ -27,6 +29,8 @@ public class Consts {
     public static final String T_CATALOG_CK="catalog";
 
     public static final String T_TAG_CK="tag";
+
+    public static final BigDecimal ZERO=new BigDecimal(0);
 
     public enum YORN {
         yes(true), no(false);
