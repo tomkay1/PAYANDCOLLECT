@@ -21,12 +21,12 @@ public class CoreData {
 	public static void loadParam() {
 		List<Param> list = Param.dao.find("select * from " + Param.TABLE);
 
-		for (Param p : list) {
+        for (Param p : list) {
 
-			// RenderManager.me().getEngine().getEngineConfig().addSharedObject(p.getK(),p.getVal());
-			CacheKit.put(Consts.CACHE_NAMES.paramCache.name(), p.getK(), p.getVal());
-		}
-		StaticLog.info("系统参数加载成功");
+            // RenderManager.me().getEngine().getEngineConfig().addSharedObject(p.getK(),p.getVal());
+            CacheKit.put(Consts.CACHE_NAMES.paramCache.name(), p.getK(), p.getVal());
+        }
+        StaticLog.info("系统参数加载成功");
 	}
 
 	public static void loadTax() {

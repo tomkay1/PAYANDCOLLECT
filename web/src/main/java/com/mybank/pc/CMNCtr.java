@@ -19,7 +19,7 @@ import com.qiniu.common.QiniuException;
  * 简介       通用的公共的controller
  * <p>
  * 项目名称:   [whbx]
- * 包:        [com.yhh.csap]
+ * 包:        [com.mb.pc]
  * 类名称:    [CMNCtr]
  * 类描述:    []
  * 创建人:    [于海慧]
