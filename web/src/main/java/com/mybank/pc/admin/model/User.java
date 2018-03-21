@@ -175,8 +175,8 @@ public class User extends BaseUser<User>  {
 		UserRole userRole=UserRole.dao.findFirst("select * from s_user_role where uid=? and rid=?",new BigInteger(uId),role.getId());
 		if(userRole==null) {
 			userRole = new UserRole();
-			userRole.setUid(new Long(uId));
-			userRole.setRid(role.getId().intValue());
+			userRole.setUId(new Long(uId));
+			userRole.setRId(role.getId().intValue());
 			userRole.save();
 		}
 		return user;

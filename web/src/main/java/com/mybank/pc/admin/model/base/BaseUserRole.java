@@ -17,20 +17,19 @@ public abstract class BaseUserRole<M extends BaseUserRole<M>> extends CoreModel<
 		return getLong("id");
 	}
 
-	public void setUid(java.lang.Long uid) {
-		set("uid", uid);
+	public void setUId(java.lang.Long uId) {
+		set("uId", uId);
 	}
 
-	public java.lang.Long getUid() {
-		return getLong("uid");
+	public java.lang.Long getUId() {
+		return getLong("uId");
 	}
 
-	public void setRid(java.lang.Integer rid) {
-		set("rid", rid);
+	public void setRId(java.lang.Integer rId) {
+		set("rId", rId);
 	}
 
-	public java.lang.Integer getRid() {
-		return getInt("rid");
+	public java.lang.Integer getRId() {
+		return getInt("rId");
 	}
-
 }

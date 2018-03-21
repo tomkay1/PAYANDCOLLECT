@@ -19,8 +19,8 @@ public class RoleRes extends BaseRoleRes<RoleRes> {
 			rr.delete();
 			List<UserRole> userRoles = UserRole.dao.find("select * from s_user_role where rid=?", rr.getRoleId());
 			for (UserRole userRole : userRoles) {
-				CacheKit.remove(Consts.CACHE_NAMES.userRoles.name(), userRole.getUid());
-				CacheKit.remove(Consts.CACHE_NAMES.userReses.name(), userRole.getUid());
+				CacheKit.remove(Consts.CACHE_NAMES.userRoles.name(), userRole.getUId());
+				CacheKit.remove(Consts.CACHE_NAMES.userReses.name(), userRole.getUId());
 			}
 		}
 	}

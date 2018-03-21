@@ -14,6 +14,8 @@ import com.mybank.pc.core.CoreException;
 import com.mybank.pc.kits.CookieKit;
 import com.mybank.pc.kits.ReqKit;
 import com.mybank.pc.kits.ResKit;
+import com.mybank.pc.merchant.model.MerchantInfo;
+import com.mybank.pc.merchant.model.MerchantUser;
 
 /**
  *
@@ -42,6 +44,10 @@ public class AdminIAuthInterceptor implements Interceptor {
 			}
 
 			controller.setAttr(Consts.CURR_USER, user);
+
+			//调用商户接口提供的服务
+			controller.setAttr(Consts.CURR_USER_MER,null);
+
 			controller.setAttr(Consts.CURR_USER_ROLES, Role.dao.findRolesByUserId(user.getId()));
 			controller.setAttr(Consts.CURR_USER_RESES, Res.dao.findResesByUserId(user.getId()));
 		}
