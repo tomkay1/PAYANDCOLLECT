@@ -22,6 +22,8 @@ public class Consts {
 
     public static final String CURR_USER="currUser";
 
+    public static final String CURR_USER_MER="currUserMer";
+
     public static final String CURR_USER_ROLES="currUserRoles";
 
     public static final String CURR_USER_RESES="currUserReses";
