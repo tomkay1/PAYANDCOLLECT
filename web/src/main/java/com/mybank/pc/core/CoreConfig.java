@@ -34,7 +34,7 @@ import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.interceptors.ExceptionInterceptor;
 import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.ResKit;
-
+import com.mybank.pc.merchant.info.MerchantInfoCtr;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -81,6 +81,13 @@ public class CoreConfig extends JFinalConfig{
             @Override
             public void config() {
                 add("/cmn", CMNCtr.class);
+            }
+        });
+
+        routes.add(new Routes() {
+            @Override
+            public void config() {
+                add("/mer00", MerchantInfoCtr.class);
             }
         });
 

@@ -1,0 +1,116 @@
+package com.mybank.pc.merchant.info;
+
+import com.jfinal.aop.Before;
+import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.tx.Tx;
+import com.jfinal.plugin.ehcache.CacheKit;
+import com.mybank.pc.Consts;
+import com.mybank.pc.admin.model.Taxonomy;
+import com.mybank.pc.core.CoreController;
+import com.mybank.pc.merchant.model.MerchantInfo;
+
+import java.math.BigInteger;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * 商户信息管理
+ */
+
+public class MerchantInfoCtr extends CoreController {
+    private MerchantInfoSrv merchantInfoSrv =enhance(MerchantInfoSrv.class);
+
+    public void list() {
+        Page<MerchantInfo> page;
+        String serach = getPara("search");
+        StringBuffer where = new StringBuffer("from merchant_info mi  where 1=1 and mi.dat is null  ");
+//        if (!isParaBlank("search")) {
+//            where.append(" and (instr(userinfo.email,?)>0 or instr(userinfo.phone,?)>0 or instr(userinfo.nickname,?)>0 or instr(userinfo.loginname,?)>0)");
+//            where.append(" ORDER BY userinfo.c_at");
+//            page = User.dao.paginate(getPN(), getPS(), "select * ", where.toString(), serach, serach, serach, serach);
+//        } else {
+            where.append(" ORDER BY mi.cat");
+            page = MerchantInfo.dao.paginate(getPN(), getPS(), "select * ", where.toString());
+//        }
+        List<Taxonomy> tlist =CacheKit.get(Consts.CACHE_NAMES.taxonomy.name(),"merTypeList");
+        Map map = new HashMap();
+        map.put("tList" ,tlist);
+        map.put("page",page);
+        renderJson(map);
+
+    }
+
+    @Before({MerchantInfoValidator.class, Tx.class})
+    public void save() {
+
+        MerchantInfo merInfo = getModel(MerchantInfo.class,"",true);
+
+        String merNo = merchantInfoSrv.getMerchantNo(merInfo.getMerchantType());
+        merInfo.setMerchantNo(merNo);
+        merInfo.setCat(new Date());
+
+        merInfo.setMat(new Date());
+        merInfo.setStatus(Consts.STATUS.enable.getVal());
+        merInfo.save();
+        renderSuccessJSON("新增商户信息成功。", "");
+    }
+
+    @Before({MerchantInfoValidator.class, Tx.class})
+    public void update() {
+        MerchantInfo merInfo = getModel(MerchantInfo.class,"",true);
+
+        merInfo.setMat(new Date());
+
+        merInfo.update();
+        renderSuccessJSON("更新商户信息成功。", "");
+    }
+
+    @Before({Tx.class})
+    public void del(){
+        int id=getParaToInt("id");
+        MerchantInfo merInfo=MerchantInfo.dao.findById(BigInteger.valueOf(id));
+        merInfo.setDat(new Date());
+        merInfo.update();
+        renderSuccessJSON("删除商户信息成功。");
+    }
+
+
+    /**
+     * 用户禁用操作处理
+     **/
+    @Before(Tx.class)
+    public void forbidden() {
+        String merInfoId = getPara("id");
+        int id = Integer.parseInt(merInfoId);
+        MerchantInfo merInfo = new MerchantInfo();
+        merInfo.setId(id);
+        merInfo.setStatus(Consts.STATUS.forbidden.getVal());
+        merInfo.update();
+
+
+        renderSuccessJSON("禁用操作执行成功。", "");
+    }
+
+    /**
+     * 恢复操作处理
+     **/
+    @Before(Tx.class)
+    public void enable() {
+        String merInfoId = getPara("id");
+        int id = Integer.parseInt(merInfoId);
+        MerchantInfo merInfo = new MerchantInfo();
+        merInfo.setId(id);
+        merInfo.setStatus(Consts.STATUS.enable.getVal());
+        merInfo.update();
+
+        renderSuccessJSON("恢复操作执行成功。", "");
+    }
+
+
+
+
+
+}

@@ -91,6 +91,19 @@ export const appRouter = [
         ]
     },
 
+    {
+        path: '/mer',
+        icon: 'monitor',
+        isCheck:'yes',
+        name: 'mer',
+        title: '商户管理',
+        component: Main,
+        children: [
+            { path: 'merinfo', title: '商户信息管理',isCheck:'yes', name: 'merinfo', component: resolve => { require(['@/views/mer/merinfo/main.vue'], resolve); } },
+            { path: 'custquery', title: '商户客户查询',isCheck:'yes', name: 'custquery', component: resolve => { require(['@/views/mer/custquery/main.vue'], resolve); } },
+            { path: 'fee', title: '商户手续费管理',isCheck:'yes', name: 'fee', component: resolve => { require(['@/views/mer/fee/main.vue'], resolve); } },
+        ]
+    },
 ];
 
 // 所有上面定义的路由都要写在下面的routers里
