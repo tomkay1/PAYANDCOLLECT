@@ -5,70 +5,38 @@ import com.jfinal.kit.LogKit;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.User;
 import com.mybank.pc.core.CoreValidator;
+import com.mybank.pc.merchant.model.MerchantInfo;
 
-import java.math.BigInteger;
 import java.util.List;
 
 /**
- * Created by yuhaihui8913 on 2017/12/1.
+ * 表单字段验证
  */
 public class MerchantInfoValidator extends CoreValidator {
-	public static final String LOGINNAME_EXIST = "登录名已被占用";
-	public static final String NICKNAME_EXIST = "昵称已被占用";
-	public static final String EMAIL_EXIST = "邮箱地址已被占用";
-	public static final String PHONE_EXIST = "手机号已被占用";
+	public static final String MERCHANT_EXIST = "商户名称已被占用";
+
+
 
 	@Override
 	protected void validate(Controller controller) {
-		User user = controller.getModel(User.class, "", true);
+		MerchantInfo merInfo = controller.getModel(MerchantInfo.class, "", true);
 		String ak = getActionKey();
 		LogKit.debug("ActionKey =" + ak);
-		if (ak.equals("/ad01/save")) {
+		if (ak.equals("/mer00/save")) {
 
-			List _list = User.dao.find("select id from s_user where loginname=?", user.getLoginname());
+			List _list = MerchantInfo.dao.find("select id from merchant_info where merchantName=?", merInfo.getMerchantName());
 			if (!_list.isEmpty()) {
-				addError(Consts.REQ_JSON_CODE.fail.name(), LOGINNAME_EXIST);
-				return;
-			}
-			// _list=User.dao.find("select id from s_user where
-			// nickname=?",user.getNickname());
-			// if(!_list.isEmpty()){
-			// addError(Consts.REQ_JSON_CODE.fail.name(),NICKNAME_EXIST);
-			// return ;
-			// }
-			_list = User.dao.find("select id from s_user where email=?", user.getEmail());
-			if (!_list.isEmpty()) {
-				addError(Consts.REQ_JSON_CODE.fail.name(), EMAIL_EXIST);
-				return;
-			}
-			_list = User.dao.find("select id from s_user where phone=?", user.getPhone());
-			if (!_list.isEmpty()) {
-				addError(Consts.REQ_JSON_CODE.fail.name(), PHONE_EXIST);
+				addError(Consts.REQ_JSON_CODE.fail.name(), MERCHANT_EXIST);
 				return;
 			}
 
-		} else if (ak.equals("/ad01/update")) {
-			BigInteger id = user.getId();
-			User _user = User.dao.findFirst("select id from s_user where loginname=? and id<>?", user.getLoginname(),
-					user.getId());
+
+		} else if (ak.equals("/mer00/update")) {
+
+			User _user = User.dao.findFirst("select id from merchant_info where merchantName=? and id<>?", merInfo.getMerchantName(),
+					merInfo.getId());
 			if (_user != null) {
-				addError(Consts.REQ_JSON_CODE.fail.name(), LOGINNAME_EXIST);
-				return;
-			}
-			// _user=User.dao.findFirst("select id from s_user where nickname=?
-			// and id<>?",user.getNickname(),user.getId());
-			// if(_user!=null){
-			// addError(Consts.REQ_JSON_CODE.fail.name(),NICKNAME_EXIST);
-			// return ;
-			// }
-			_user = User.dao.findFirst("select id from s_user where email=? and id<>?", user.getEmail(), user.getId());
-			if (_user != null) {
-				addError(Consts.REQ_JSON_CODE.fail.name(), EMAIL_EXIST);
-				return;
-			}
-			_user = User.dao.findFirst("select id from s_user where phone=? and id<>?", user.getPhone(), user.getId());
-			if (_user != null) {
-				addError(Consts.REQ_JSON_CODE.fail.name(), PHONE_EXIST);
+				addError(Consts.REQ_JSON_CODE.fail.name(), MERCHANT_EXIST);
 				return;
 			}
 		}

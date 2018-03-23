@@ -7,15 +7,17 @@ const merInfo = {
         totalPage:0,
         pageNumber:1,
         totalRow:0,
-        merInfo:{}
+        merInfo:{},
+        merchantType:[]
     },
     mutations: {
 
         set_merInfo_list(state,page){
-            state.merInfoList=page.list
-            state.totalPage=page.totalPage
-            state.pageNumber=page.pageNumber
-            state.totalRow=page.totalRow
+            state.merInfoList=page.page.list
+            state.totalPage=page.page.totalPage
+            state.pageNumber=page.page.pageNumber
+            state.totalRow=page.page.totalRow
+            state.merchantType =page.tList
         },
 
     },
@@ -29,77 +31,43 @@ const merInfo = {
             });
         },
 
-        user_save:function ({ commit,state },action) {
+        merInfo_save:function ({ commit,state },action) {
             let vm=this._vm;
-            let p=kit.clone(state.user)
-            let rIds=p.roleIds;
-            let rIds_str=rIds.join(",");
-            p.roleIds=rIds_str;
+            let p=kit.clone(state.merInfo)
             return new Promise(function (resolve, reject) {
-                vm.$axios.post('/ad01/'+action, p).then((res) => {
-                    if(res.resCode&&res.resCode=='success'){
-                        commit('user_reset');
-                    }
+                vm.$axios.post('/mer00/'+action, p).then((res) => {
+                    // if(res.resCode&&res.resCode=='success'){
+                    //     commit('user_reset');
+                    // }
                     resolve(res.resCode);
                 });
             });
         },
-        user_del:function({commit,state},param){
+        merInfo_del:function({commit,state},param){
             let vm=this._vm;
             return new Promise(function (resolve, reject) {
-                vm.$axios.post('/ad01/del', param).then((res) => {
+                vm.$axios.post('/mer00/del', param).then((res) => {
                     resolve(res.resCode)
                 })
             });
         },
-        user_stop:function({commit,state},param){
+        merInfo_stop:function({commit,state},param){
             let vm=this._vm;
             return new Promise(function (resolve, reject) {
-                vm.$axios.post('/ad01/forbidden', param).then((res) => {
+                vm.$axios.post('/mer00/forbidden', param).then((res) => {
                     resolve(res.resCode)
                 })
             });
         },
-        user_active:function({commit,state},param){
+        merInfo_active:function({commit,state},param){
             let vm=this._vm;
             return new Promise(function (resolve, reject) {
-                vm.$axios.post('/ad01/resumed', param).then((res) => {
+                vm.$axios.post('/mer00/enable', param).then((res) => {
                     resolve(res.resCode)
                 })
             });
         },
-        user_reset_pwd:function ({ commit,state },param) {
-            let vm=this._vm;
-            return new Promise(function (resolve, reject) {
-                vm.$axios.post('/ad01/resetPwd', param).then((res) => {
-                    resolve(res);
-                });
-            });
-        },
-        user_login:function ({ commit,state },param) {
-            let vm=this._vm;
-            return new Promise(function (resolve, reject) {
-                vm.$axios.post('/ad06/login', param).then((res) => {
-                    resolve(res);
-                });
-            });
-        },
-        user_logout:function ({ commit,state },param) {
-            let vm=this._vm;
-            return new Promise(function (resolve, reject) {
-                vm.$axios.post('/ad06/logout', param).then((res) => {
-                    resolve(res);
-                });
-            });
-        },
-        update_pwd:function ({commit,state},param) {
-            let vm=this._vm;
-            return new Promise(function (resolve, reject) {
-                vm.$axios.post('/ad01/modifyPassword', param).then((res) => {
-                    resolve(res);
-                });
-            });
-        }
+
 
     }
 };

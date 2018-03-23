@@ -29,56 +29,94 @@
             </Card>
             </Col>
         </Row>
-        <Modal v-model="userModal" @on-visible-change="vChange" :mask-closable="false" >
+        <Modal v-model="merInfoModal" @on-visible-change="vChange" :mask-closable="false" >
             <p slot="header">
                 <Icon type="information-circled"></Icon>
                 <span>{{modalTitle}}</span>
             </p>
-            <Form ref="formValidate" :label-width="80" :model="merInfo" :rules="ruleValidate">
+            <Form ref="formValidate" :label-width="150" :model="merInfo" :rules="ruleValidate">
                 <FormItem label="商户名称" prop="merchantName">
-                    <Input v-model="merInfo.merchantName" :disabled="!isAdd" placeholder="请输入..." style="width: 300px"></Input>
+                    <Input v-model="merInfo.merchantName" :disabled="!isAdd" placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
                 <FormItem label="商户类型" prop="merchantType">
-                    <Input v-model="merInfo.merchantType" placeholder="请输入..." style="width: 300px"></Input>
+                    <Select v-model="merInfo.merchantType" style="width:300px">
+                        <Option  v-for="item in merchantTypeList" :value="item.text" :key="item.text">{{ item.title }}</Option>
+                    </Select>
                 </FormItem>
                 <FormItem label="负责人名称" prop="perName">
-                    <Input v-model="merInfo.perName" placeholder="请输入..." style="width: 300px"></Input>
+                    <Input v-model="merInfo.perName" placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
                 <FormItem label="身份证号码" prop="cardID">
-                    <Input v-model="merInfo.cardID" placeholder="请输入..." style="width: 300px"></Input>
+                    <Input v-model="merInfo.cardID" placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
-                <FormItem label="负责人联系方式" prop="mobile">
-                    <Input v-model="merInfo.mobile" placeholder="请输入..." style="width: 300px"></Input>
+                <FormItem label="负责人手机号" prop="mobile">
+                    <Input v-model="merInfo.mobile" placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
                  <FormItem label="负责人Email" prop="email">
-                      <Input v-model="merInfo.email" placeholder="请输入..." style="width: 300px"></Input>
+                     <Input v-model="merInfo.email" placeholder="请输入..." style="width: 300px"/>
                  </FormItem>
                  <FormItem label="负责人联系地址" prop="address">
-                      <Input v-model="merInfo.address" placeholder="请输入..." style="width: 300px"></Input>
+                     <Input v-model="merInfo.address" placeholder="请输入..." style="width: 300px"/>
                  </FormItem>
-                 <FormItem label="负责人联系地址（备用1）" prop="mobile1">
-                       <Input v-model="merInfo.mobile1" placeholder="请输入..." style="width: 300px"></Input>
+                 <FormItem label="备用联系地址1" prop="mobile1">
+                     <Input v-model="merInfo.mobile1" placeholder="请输入..." style="width: 300px"/>
                  </FormItem>
-                 <FormItem label="负责人联系地址（备用2）" prop="mobile2">
-                       <Input v-model="merInfo.mobile2" placeholder="请输入..." style="width: 300px"></Input>
+                 <FormItem label="备用联系地址2" prop="mobile2">
+                     <Input v-model="merInfo.mobile2" placeholder="请输入..." style="width: 300px"/>
                  </FormItem>
                  <FormItem label="预存手续费余额" prop="feeAmount">
-                      <Input v-model="merInfo.feeAmount" placeholder="请输入..." style="width: 300px"></Input>
+                     <Input v-model="merInfo.feeAmount" placeholder="请输入..." style="width: 300px"/>
                  </FormItem>
                  <FormItem label="手持身份证照片" prop="cardImg">
-                 <Input v-model="merInfo.cardImg" placeholder="请输入..." style="width: 300px"></Input>
+                     <Input v-model="merInfo.cardImg" placeholder="请输入..." style="width: 300px"/>
+
+                     <Upload
+                             ref="upload"
+                             :show-upload-list="false"
+                             :default-file-list="defaultList"
+                             :on-success="handleSuccess"
+                             :format="['jpg','jpeg','png']"
+                             :max-size="2048"
+                             :on-format-error="handleFormatError"
+                             :on-exceeded-size="handleMaxSize"
+                             :before-upload="handleBeforeUpload"
+                             multiple
+                             type="drag"
+                             action="//jsonplaceholder.typicode.com/posts/"
+                             style="display: inline-block;width:300px; ">
+                         <div style="width: 300px;height:30px;">
+                             <Icon type="camera" size="20" ></Icon>点击上传图片
+                         </div>
+                     </Upload>
+                     <div style="width: 300px;height:200px;line-height: 200px;">
+                         <div class="demo-upload-list" v-for="item in uploadList">
+                             <template v-if="item.status === 'finished'">
+                                 <img :src="item.url">
+                                 <div class="demo-upload-list-cover">
+                                     <Icon type="ios-eye-outline" @click.native="handleView(item.name)"></Icon>
+                                     <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
+                                 </div>
+                             </template>
+                             <template v-else>
+                                 <Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
+                             </template>
+                         </div>
+                     </div>
                  </FormItem>
+
+
+
                  <FormItem label="身份证正面" prop="cardZ">
-                 <Input v-model="merInfo.cardZ" placeholder="请输入..." style="width: 300px"></Input>
+                     <Input v-model="merInfo.cardZ" placeholder="请输入..." style="width: 300px"/>
                  </FormItem>
                  <FormItem label="身份证背面" prop="cardF">
-                 <Input v-model="merInfo.cardF" placeholder="请输入..." style="width: 300px"></Input>
+                     <Input v-model="merInfo.cardF" placeholder="请输入..." style="width: 300px"/>
                  </FormItem>
             </Form>
             <div slot="footer">
                 <Button type="success" :loading="modalLoading" @click="save">保存</Button>
                 <Button @click="reset" v-show="isAdd">重置</Button>
-                <Button type="error" @click="userModal=false">关闭</Button>
+                <Button type="error" @click="merInfoModal=false">关闭</Button>
             </div>
         </Modal>
     </div>
@@ -91,7 +129,7 @@ const delBtn=(vm,h,param)=>{
         return h('Poptip', {
             props: {
                 confirm: '',
-                title: '您确定要删除这个用户信息吗？'
+                title: '您确定要删除吗？'
             },
             style: {
                 marginRight: '5px'
@@ -129,7 +167,7 @@ const stopBtn=(vm,h,param)=>{
         return h('Poptip', {
             props: {
                 confirm: '',
-                title: '您确定要禁用这个用户吗？'
+                title: '您确定要禁用吗？'
             },
             style: {
                 marginRight: '5px'
@@ -150,7 +188,7 @@ const stopBtn=(vm,h,param)=>{
         return h('Poptip', {
             props: {
                 confirm: '',
-                title: '您确定要激活这个用户吗？'
+                title: '您确定要激活吗？'
             },
             style: {
                 marginRight: '5px'
@@ -175,6 +213,7 @@ const stopBtn=(vm,h,param)=>{
                 'pageNumber': state => state.merInfo.pageNumber,
                 'total': state => state.merInfo.totalRow,
                 'merInfo': state => state.merInfo.merInfo,
+                'merchantTypeList' :state => state.merInfo.merchantType,
             })
         },
         methods: {
@@ -182,31 +221,61 @@ const stopBtn=(vm,h,param)=>{
                 this.isAdd=true
                 this.modalTitle="新增商户"
                 let vm = this;
-                    vm.userModal = true;
-                    vm.$store.commit('user_reset');
-
+                    vm.merInfoModal = true;
+            },
+            del(i){
+                let vm=this;
+                this.$store.dispatch('merInfo_del',{id:i}).then((res)=>{
+                    setTimeout(vm.search,1000)
+                    //vm.search()
+                })
+            },
+            edit(user){
+                this.modalTitle="修改商户"
+                this.isAdd=false;
+                let vm=this
+                this.$store.dispatch('role_list').then((res) => {
+                    vm.$store.commit('user_reset',user);
+                    vm.merInfoModal = true;
+                });
+            },
+            stop(i){
+                let vm=this;
+                this.$store.dispatch('merInfo_stop',{id:i}).then((res)=>{
+                    setTimeout(vm.search,1000)
+                        //vm.search()
+                    //this.$store.dispatch('merInfo_list',{search:this.searchKey,pn:pn})
+                })
+            },
+            active(i){
+                let vm=this;
+                this.$store.dispatch('merInfo_active',{id:i}).then((res)=>{
+                    setTimeout(vm.search,1000)
+                    //vm.search()
+                    //this.$store.dispatch('merInfo_list',{search:this.searchKey,pn:pn})
+                })
             },
             save(){
-                            let vm = this;
-                            this.modalLoading = true;
-                            this.$refs['formValidate'].validate((valid) => {
-                                if (valid) {
-                                    let action='save';
-                                    if(!vm.isAdd)
-                                        action='update';
-                                    this.$store.dispatch('user_save',action).then((res) => {
-                                        if (res && res == 'success') {
-                                            vm.userModal = false;
-                                            this.$store.dispatch('user_list')
-                                        } else {
-                                            this.modalLoading = false;
-                                        }
-                                    })
-                                } else {
-                                    this.modalLoading = false;
-                                }
-                            })
-                        },
+                let vm = this;
+                this.modalLoading = true;
+                this.$refs['formValidate'].validate((valid) => {
+                    if (valid) {
+                        let action='save';
+                        if(!vm.isAdd)
+                            action='update';
+                        this.$store.dispatch('merInfo_save',action).then((res) => {
+                            if (res && res == 'success') {
+                                vm.merInfoModal = false;
+                                this.$store.dispatch('merInfo_list')
+                            } else {
+                                this.modalLoading = false;
+                            }
+                        })
+                    } else {
+                        this.modalLoading = false;
+                    }
+                })
+            },
             reset(){
                             this.$refs['formValidate'].resetFields()
                         },
@@ -228,26 +297,30 @@ const stopBtn=(vm,h,param)=>{
         mounted () {
             //页面加载时或数据方法
            this.$store.dispatch('merInfo_list')
+
         },
         data () {
             return {
                 self: this,
                 searchKey: '',
-                userModal: false,
+                merInfoModal: false,
                 isAdd:true,
                 modalTitle: '新增用户',
                 modalLoading: false,
                 ruleValidate: {
-                    loginname: [
-                        {type: 'string', required: true, message: '用户名不能为空', trigger: 'blur'},
-                        {type: 'string', max: 50, message: '用户名长度不能超过50', trigger: 'blur'}
+                    merchantName: [
+                        {type: 'string', required: true, message: '商户名称不能为空', trigger: 'blur'},
+                        {type: 'string', max: 100, message: '用户名长度不能超过100', trigger: 'blur'}
                     ],
-                    nickname: [
-                        {required: true, message: '姓名不能为空', max: 50, trigger: 'blur'},
-                        {type: 'string', message: '姓名长度不能超过50', max: 50, trigger: 'blur'}
+                    merchantType: [
+                        {type: 'string', required: true, message: '请选择商户类型', trigger: 'blur'}
                     ],
-                    phone: [
-                        {required: true, message: '手机号不能为空', max: 20, trigger: 'blur'},
+                    perName: [
+                        {required: true, message: '负责人名称不能为空', max: 50, trigger: 'blur'},
+                        {type: 'string', message: '负责人名称长度不能超过50', max: 50, trigger: 'blur'}
+                    ],
+                    mobile: [
+                        {required: true, message: '负责人手机号不能为空', max: 20, trigger: 'blur'},
                         {type: 'string', message: '请输入11位手机号', len: 11, trigger: 'blur'},
                         {
                             type: 'string',
@@ -259,17 +332,24 @@ const stopBtn=(vm,h,param)=>{
                     email: [
                         {type: 'email', message: 'email格式不正确', max: 255, trigger: 'blur'},
                         {type: 'string', message: 'email长度不能超过255', max: 255, trigger: 'blur'}
-                    ], idcard: [
-                        {type: 'string', max: 50, message: '证件号长度不能超过50', trigger: 'blur'}
-                    ], roleIds: [
-                        {required: true, type: 'array', min: 1, message: '至少选择一个角色', trigger: 'change'},
+                    ],
+                    cardID: [
+                        {required: true, message: '身份证号不能为空',  trigger: 'blur'},
+                        {type: 'string', max: 50, message: '身份证号长度不能超过50', trigger: 'blur'}
                     ],
                 },
+
+
+
                 tableColums: [
 
                     {
                         title: '商户名称',
                         key: 'merchantName',
+                    },
+                    {
+                        title: '商户编号',
+                        key: 'merchantNo',
                     },
                     {
                         title: '负责人姓名',
