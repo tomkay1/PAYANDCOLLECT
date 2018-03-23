@@ -77,6 +77,20 @@ export const appRouter = [
             // { path: 'artList', title: '文章列表', name: 'admin_artList', component: resolve => { require(['@/views/admin/art/list.vue'], resolve); } },
         ]
     },
+    {
+        path: '/cclear',
+        icon: 'calculator',
+        isCheck:'no',
+        name: 'collectionClear',
+        title: '清分管理',
+        component: Main,
+        children: [
+            { path: 'cla', title: '清分查询',isCheck:'no', name: 'collectionClear_cla', component: resolve => { require(['@/views/collection-clear/clearList_admin.vue'], resolve); } },
+            { path: 'clm', title: '商户清分查询', isCheck:'no',name: 'collectionClear_clm', component: resolve => { require(['@/views/collection-clear/clearList_mer.vue'], resolve); } },
+            { path: 'debit', title: '出账处理', isCheck:'no',name: 'collectionClear_debit', component: resolve => { require(['@/views/collection-clear/debit.vue'], resolve); } },
+        ]
+    },
+
 ];
 
 // 所有上面定义的路由都要写在下面的routers里

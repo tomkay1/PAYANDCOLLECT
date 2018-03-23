@@ -1,11 +1,24 @@
 package com.mybank.pc.kits;
 
-/**
- * 简介
- * <p>
- * 项目名称: [whbx] 包: [com.mb.pc.kits] 类名称: [AppKit] 类描述: [] 创建人: [于海慧] 创建时间:
- * [2018/1/27] 修改人: [] 修改时间: [] 修改备注: [] 版本: [v1.0]
- */
+
+import cn.hutool.core.util.StrUtil;
+import com.jfinal.plugin.ehcache.CacheKit;
+import com.mybank.pc.Consts;
+
 public class AppKit {
+
+    /**
+     * 通用的Excel保存的根位置，使用的时候还需要根据自己的业务定义之下的具体的文件夹例如:
+     *
+     * getExcelPath()+'/aa/20160203/'
+     * @return
+     */
+    public static String getExcelPath(){
+        String ret= (String)CacheKit.get(Consts.CACHE_NAMES.paramCache.name(),"ePath");
+        if(StrUtil.isBlank(ret))
+            ret="/WEB-INF/excelLocation/";
+
+        return ret;
+    }
 
 }

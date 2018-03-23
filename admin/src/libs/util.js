@@ -7,7 +7,7 @@ let util = {
 
 };
 util.title = function (title) {
-    title = title || 'CSAP管理控制台';
+    title = title || 'MYBANK代收付系统控制台';
     window.document.title = title;
 };
 

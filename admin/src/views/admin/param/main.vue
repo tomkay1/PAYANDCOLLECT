@@ -84,21 +84,19 @@
                             <FormItem label="密码">
                                 <Input v-model="param.emailPassword" placeholder="请输入..." style="width: 300px"></Input>
                             </FormItem>
-                            <FormItem label="模板">
-                                <Input v-model="param.emailTemplate" placeholder="请输入..." style="width: 300px"
-                                       type="textarea" :autosize="{minRows: 5,maxRows: 5}"></Input>
-                            </FormItem>
-
                         </Tab-pane>
-                        <Tab-pane label="其它设置" icon="settings">
-                            <FormItem label="微信公众账号二维码图片">
-                                <Input v-model="param.wx_pic" placeholder="请输入..." style="width: 300px"></Input>
+                        <Tab-pane label="时间设置" icon="clock">
+                            <FormItem label="每日清分时间">
+                                <Input v-model="param.clearTime" placeholder="请输入..." style="width: 300px"></Input>
                             </FormItem>
+                        </Tab-pane>
+                        <Tab-pane label="其他设置" icon="settings">
+
                             <FormItem label="图片上传最大值">
                                 <Input v-model="param.pic_maxSize" placeholder="请输入..." style="width: 300px"></Input>
                             </FormItem>
-                            <FormItem label="单笔卡申请最大制卡数量">
-                                <Input v-model="param.createCardMaxCount" placeholder="请输入..." style="width: 300px"></Input>
+                            <FormItem label="导出excel位置">
+                                <Input v-model="param.ePath" placeholder="请输入..." style="width: 300px"></Input>
                             </FormItem>
 
                         </Tab-pane>

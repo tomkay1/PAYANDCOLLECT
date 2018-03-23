@@ -28,6 +28,7 @@ import com.mybank.pc.admin.res.ResCtr;
 import com.mybank.pc.admin.role.RoleCtr;
 import com.mybank.pc.admin.taxonomy.TaxCtr;
 import com.mybank.pc.admin.user.UserCtr;
+import com.mybank.pc.collection.clear.CClearCtr;
 import com.mybank.pc.interceptors.AdminAAuthInterceptor;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.interceptors.ExceptionInterceptor;
@@ -82,6 +83,16 @@ public class CoreConfig extends JFinalConfig{
                 add("/cmn", CMNCtr.class);
             }
         });
+
+
+        //清分模块路由
+        routes.add(new Routes() {
+            @Override
+            public void config() {
+                add("/cc", CClearCtr.class);
+            }
+        });
+
 
     }
 

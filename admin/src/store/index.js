@@ -9,6 +9,7 @@ import art from './modules/art';
 import res from './modules/res';
 import tax from './modules/tax';
 import home from './modules/home';
+import cc from './modules/collection_clear';
 
 Vue.use(Vuex);
 
@@ -42,6 +43,7 @@ const store = new Vuex.Store({
         res,
         tax,
         home,
+        cc,
        
     }
 });

@@ -19,3 +19,58 @@ select *
 from collection_trade ct WHERE ct.finalCode='0' and ct.tradeTime<? AND ct.merchantID=?
                                AND ct.clearStatus!='0' AND ct.dat is NULL
 #end
+
+#sql("findPage")
+SELECT *,(cc.amountFeeSum-cc.bankFee) as profit  FROM collection_clear cc WHERE 1=1
+    #for(x : cond)
+       AND #(x.key) #para(x.value)
+    #end
+  ORDER BY cc.cat DESC
+
+#end
+
+
+#sql("findTotalPage")
+SELECT *,(cc.amountFeeSum-cc.bankFee) as profit FROM collection_cleartotle cc WHERE 1=1
+#for(x : cond)
+  AND #(x.key) #para(x.value)
+#end
+ORDER BY cc.cat DESC
+
+#end
+
+
+#sql("sum")
+SELECT
+  sum(cc.tradeCount) as tradeCount,
+  sum(cc.amountSum) as amountSum,
+  sum(cc.amountFeeSum) as amountFeeSum,
+  sum(cc.accountFee) as accountFee,
+  sum(cc.tradeFee) as tradeFee,
+  sum(cc.amountOff) as amountOff,
+  sum(cc.bankFee) as bankFee,
+  sum(cc.amountFeeSum-cc.bankFee) as profit,
+  cc.merNO,(select merchantName from merchant_info where id=cc.merID) as merName
+FROM collection_clear cc WHERE 1=1
+#for(x : cond)
+ AND  #(x.key) #para(x.value)
+#end
+GROUP BY merID
+
+#end
+
+#sql("sumTotal")
+SELECT sum(cc.tradeCount) as tradeCount,
+  sum(cc.amountSum) as amountSum,
+  sum(cc.amountFeeSum) as amountFeeSum,
+  sum(cc.accountFee) as accountFee,
+  sum(cc.tradeFee) as tradeFee,
+  sum(cc.amountOff) as amountOff,
+  sum(cc.bankFee) as bankFee,
+  sum(cc.amountFeeSum-cc.bankFee) as profit
+FROM collection_cleartotle cc WHERE 1=1
+#for(x : cond)
+ AND  #(x.key) #para(x.value)
+#end
+
+#end
