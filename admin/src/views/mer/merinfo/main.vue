@@ -68,28 +68,28 @@
                      <Input v-model="merInfo.feeAmount" placeholder="请输入..." style="width: 300px"/>
                  </FormItem>
                  <FormItem label="手持身份证照片" prop="cardImg">
-                     <Input v-model="merInfo.cardImg" placeholder="请输入..." style="width: 300px"/>
+                     <!--<Input v-model="merInfo.cardImg" placeholder="请输入..." style="width: 300px"/>-->
 
                      <Upload
                              ref="upload"
                              :show-upload-list="false"
-                             :default-file-list="defaultList"
                              :on-success="handleSuccess"
                              :format="['jpg','jpeg','png']"
                              :max-size="2048"
                              :on-format-error="handleFormatError"
                              :on-exceeded-size="handleMaxSize"
-                             :before-upload="handleBeforeUpload"
-                             multiple
                              type="drag"
-                             action="//jsonplaceholder.typicode.com/posts/"
-                             style="display: inline-block;width:300px; ">
-                         <div style="width: 300px;height:30px;">
-                             <Icon type="camera" size="20" ></Icon>点击上传图片
-                         </div>
+                             action="/api/cmn/act03"
+                             style="display: inline-block;width:300px;">
+
+                             <Icon type="camera" size="20" ></Icon>点击上传手持身份证照片
+                         <img :src="url" v-show="showImg" width="300" height="200">
                      </Upload>
-                     <div style="width: 300px;height:200px;line-height: 200px;">
-                         <div class="demo-upload-list" v-for="item in uploadList">
+
+
+
+                     <!--<div style="width: 300px;height:200px;line-height: 200px;">
+                        <div class="demo-upload-list" v-for="item in uploadList">
                              <template v-if="item.status === 'finished'">
                                  <img :src="item.url">
                                  <div class="demo-upload-list-cover">
@@ -101,7 +101,7 @@
                                  <Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
                              </template>
                          </div>
-                     </div>
+                     </div>-->
                  </FormItem>
 
 
@@ -283,6 +283,8 @@ const stopBtn=(vm,h,param)=>{
                 if (!b) {
                     this.$refs['formValidate'].resetFields()
                     this.modalLoading = false;
+                    this.showImg =false;
+                    this.url='';
                 }
             },
             search(pn){
@@ -291,6 +293,25 @@ const stopBtn=(vm,h,param)=>{
 
             refresh(){
                 this.$store.dispatch('merInfo_list',{search:this.searchKey})
+            },
+            handleSuccess (res, file) {
+            console.info(file)
+                this.merInfo.cardImg =res.resData;
+                this.url = "http://localhost:8082/cmn/act04?picid="+this.merInfo.cardImg
+                this.showImg=true;
+
+            },
+            handleFormatError (file) {
+                this.$Notice.warning({
+                    title: '文件格式不正确',
+                    desc: '文件 ' + file.name + ' 格式不正确，请上传 jpg 或 png 格式的图片。'
+                });
+            },
+            handleMaxSize (file) {
+                this.$Notice.warning({
+                    title: '超出文件大小限制',
+                    desc: '文件 ' + file.name + ' 太大，不能超过 2M。'
+                });
             },
 
         },
@@ -301,6 +322,8 @@ const stopBtn=(vm,h,param)=>{
         },
         data () {
             return {
+                showImg: false,
+                url:'',
                 self: this,
                 searchKey: '',
                 merInfoModal: false,
