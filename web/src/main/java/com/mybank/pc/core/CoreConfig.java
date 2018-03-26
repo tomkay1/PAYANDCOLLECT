@@ -28,6 +28,7 @@ import com.mybank.pc.admin.res.ResCtr;
 import com.mybank.pc.admin.role.RoleCtr;
 import com.mybank.pc.admin.taxonomy.TaxCtr;
 import com.mybank.pc.admin.user.UserCtr;
+import com.mybank.pc.collection.trade.CTradeCtr;
 import com.mybank.pc.interceptors.AdminAAuthInterceptor;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.interceptors.ExceptionInterceptor;
@@ -70,11 +71,15 @@ public class CoreConfig extends JFinalConfig{
                 add("/ad04", ArtCtr.class);
                 add("/ad05", TaxCtr.class);
                 add("/ad06", LoginCtr.class);
-
             }
         });
 
-
+        routes.add(new Routes() {
+            @Override
+            public void config() {
+            	 add("/coll", CTradeCtr.class);
+            }
+        });
 
         routes.add(new Routes() {
             @Override

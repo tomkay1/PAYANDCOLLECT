@@ -77,6 +77,44 @@ export const appRouter = [
             // { path: 'artList', title: '文章列表', name: 'admin_artList', component: resolve => { require(['@/views/admin/art/list.vue'], resolve); } },
         ]
     },
+        {
+        path: '/cclear',
+        icon: 'calculator',
+        isCheck:'no',
+        name: 'collectionClear',
+        title: '清分管理',
+        component: Main,
+        children: [
+            { path: 'cla', title: '清分查询',isCheck:'no', name: 'collectionClear_cla', component: resolve => { require(['@/views/collection-clear/clearList_admin.vue'], resolve); } },
+            { path: 'clm', title: '商户清分查询', isCheck:'no',name: 'collectionClear_clm', component: resolve => { require(['@/views/collection-clear/clearList_mer.vue'], resolve); } },
+            { path: 'debit', title: '出账处理', isCheck:'no',name: 'collectionClear_debit', component: resolve => { require(['@/views/collection-clear/debit.vue'], resolve); } },
+        ]
+    },
+
+    {
+        path: '/mer',
+        icon: 'monitor',
+        isCheck:'yes',
+        name: 'mer',
+        title: '商户管理',
+        component: Main,
+        children: [
+            { path: 'merinfo', title: '商户信息管理',isCheck:'yes', name: 'merinfo', component: resolve => { require(['@/views/mer/merinfo/main.vue'], resolve); } },
+            { path: 'custquery', title: '商户客户查询',isCheck:'yes', name: 'custquery', component: resolve => { require(['@/views/mer/custquery/main.vue'], resolve); } },
+            { path: 'fee', title: '商户手续费管理',isCheck:'yes', name: 'fee', component: resolve => { require(['@/views/mer/fee/main.vue'], resolve); } },
+        ]
+    },
+    {
+        path: '/coll',
+        icon: 'monitor',
+        isCheck: 'no',
+        name: 'coll',
+        title: '代收交易管理',
+        component: Main,
+        children: [
+            { path: 'trade', title: '交易流水查询', isCheck: 'yes', name: 'coll_trade', component: resolve => { require(['@/views/coll/trade/main.vue'], resolve); } }
+        ]
+    }
 ];
 
 // 所有上面定义的路由都要写在下面的routers里

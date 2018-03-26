@@ -9,26 +9,25 @@ import art from './modules/art';
 import res from './modules/res';
 import tax from './modules/tax';
 import home from './modules/home';
+import collTrade from './modules/collTrade';
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        spinShow:false,
-        uploadPicMaxSize:5242880,
-        ignoreSpinshow:false,
+        spinShow: false,
+        uploadPicMaxSize: 5242880,
+        ignoreSpinshow: false,
 
     },
     mutations: {
-        upadteSpinshow(state,p){
-            if(!this.state.ignoreSpinshow)
-                state.spinShow=p;
+        upadteSpinshow(state, p) {
+            if (!this.state.ignoreSpinshow)
+                state.spinShow = p;
         },
-        updateIgnoreSpinshow(state,p){
-            state.ignoreSpinshow=p
-        },
-
-
+        updateIgnoreSpinshow(state, p) {
+            state.ignoreSpinshow = p
+        }
     },
     actions: {
 
@@ -42,10 +41,8 @@ const store = new Vuex.Store({
         res,
         tax,
         home,
-       
+        collTrade
     }
 });
-
-
 
 export default store;

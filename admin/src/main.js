@@ -8,20 +8,20 @@ import App from './app.vue';
 import 'iview/dist/styles/iview.css';
 // import VueI18n from 'vue-i18n';
 import util from '@/libs/util';
-import axios from 'axios'
-import qs from 'qs'
+import axios from 'axios';
+import qs from 'qs';
 // import message from 'iview/src/components/message'
 import env from '../build/env';
 
 Vue.use(iView);
-require('es6-promise').polyfill()
+require('es6-promise').polyfill();
 
 let axiosIns = axios.create({});
-if (env == 'development') {
+if (env === 'development') {
     axiosIns.defaults.baseURL = '/api';
-} else if (env == 'debug') {
+} else if (env === 'debug') {
     axiosIns.defaults.baseURL = '/api';
-} else if (env == 'production') {
+} else if (env === 'production') {
     axiosIns.defaults.baseURL = '';
 }
 
