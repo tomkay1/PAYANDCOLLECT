@@ -11,26 +11,31 @@ import tax from './modules/tax';
 import home from './modules/home';
 import merInfo from './modules/merInfo';
 import cc from './modules/collection_clear';
+import collTrade from './modules/collection_trade';
+import collEntrust from './modules/collection_entrust';
+import collRealtime from './modules/collection_realtime';
+import collBatch from './modules/collection_batch';
+import collQuery from './modules/collection_query';
+import collUndo from './modules/collection_undo';
+import collReconciliation from './modules/collection_reconciliation';
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        spinShow:false,
-        uploadPicMaxSize:5242880,
-        ignoreSpinshow:false,
+        spinShow: false,
+        uploadPicMaxSize: 5242880,
+        ignoreSpinshow: false,
 
     },
     mutations: {
-        upadteSpinshow(state,p){
-            if(!this.state.ignoreSpinshow)
-                state.spinShow=p;
+        upadteSpinshow(state, p) {
+            if (!this.state.ignoreSpinshow)
+                state.spinShow = p;
         },
-        updateIgnoreSpinshow(state,p){
-            state.ignoreSpinshow=p
-        },
-
-
+        updateIgnoreSpinshow(state, p) {
+            state.ignoreSpinshow = p
+        }
     },
     actions: {
 
@@ -45,11 +50,15 @@ const store = new Vuex.Store({
         tax,
         home,
         cc,
-
         merInfo,
+        collTrade,
+        collEntrust,
+        collRealtime,
+        collBatch,
+        collQuery,
+        collUndo,
+        collReconciliation
     }
 });
-
-
 
 export default store;
