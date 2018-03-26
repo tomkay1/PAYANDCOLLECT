@@ -77,7 +77,7 @@ export const appRouter = [
             // { path: 'artList', title: '文章列表', name: 'admin_artList', component: resolve => { require(['@/views/admin/art/list.vue'], resolve); } },
         ]
     },
-        {
+    {
         path: '/cclear',
         icon: 'calculator',
         isCheck:'no',
@@ -112,7 +112,13 @@ export const appRouter = [
         title: '代收交易管理',
         component: Main,
         children: [
-            { path: 'trade', title: '交易流水查询', isCheck: 'yes', name: 'coll_trade', component: resolve => { require(['@/views/coll/trade/main.vue'], resolve); } }
+            { path: 'trade', title: '交易流水查询', isCheck: 'yes', name: 'coll_trade', component: resolve => { require(['@/views/coll/trade/main.vue'], resolve); } },
+            { path: 'trade', title: '委托管理', isCheck: 'yes', name: 'coll_entrust', component: resolve => { require(['@/views/coll/entrust/main.vue'], resolve); } },
+            { path: 'trade', title: '实时代收管理', isCheck: 'yes', name: 'coll_realtime', component: resolve => { require(['@/views/coll/realtime/main.vue'], resolve); } },
+            { path: 'trade', title: '批量代收管理', isCheck: 'yes', name: 'coll_batch', component: resolve => { require(['@/views/coll/batch/main.vue'], resolve); } },
+            { path: 'trade', title: '交易状态管理', isCheck: 'yes', name: 'coll_query', component: resolve => { require(['@/views/coll/query/main.vue'], resolve); } },
+            { path: 'trade', title: '撤销管理', isCheck: 'yes', name: 'coll_undo', component: resolve => { require(['@/views/coll/undo/main.vue'], resolve); } },
+            { path: 'trade', title: '对账管理', isCheck: 'yes', name: 'coll_reconciliation', component: resolve => { require(['@/views/coll/reconciliation/main.vue'], resolve); } }
         ]
     }
 ];

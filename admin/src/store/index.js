@@ -11,7 +11,13 @@ import tax from './modules/tax';
 import home from './modules/home';
 import merInfo from './modules/merInfo';
 import cc from './modules/collection_clear';
-import collTrade from './modules/collTrade';
+import collTrade from './modules/collection_trade';
+import collEntrust from './modules/collection_entrust';
+import collRealtime from './modules/collection_realtime';
+import collBatch from './modules/collection_batch';
+import collQuery from './modules/collection_query';
+import collUndo from './modules/collection_undo';
+import collReconciliation from './modules/collection_reconciliation';
 
 Vue.use(Vuex);
 
@@ -46,6 +52,12 @@ const store = new Vuex.Store({
         cc,
         merInfo,
         collTrade,
+        collEntrust,
+        collRealtime,
+        collBatch,
+        collQuery,
+        collUndo,
+        collReconciliation
     }
 });
 
