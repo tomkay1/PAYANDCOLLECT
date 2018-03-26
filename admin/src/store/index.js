@@ -9,6 +9,8 @@ import art from './modules/art';
 import res from './modules/res';
 import tax from './modules/tax';
 import home from './modules/home';
+import merInfo from './modules/merInfo';
+import cc from './modules/collection_clear';
 import collTrade from './modules/collTrade';
 
 Vue.use(Vuex);
@@ -41,7 +43,9 @@ const store = new Vuex.Store({
         res,
         tax,
         home,
-        collTrade
+        cc,
+        merInfo,
+        collTrade,
     }
 });
 

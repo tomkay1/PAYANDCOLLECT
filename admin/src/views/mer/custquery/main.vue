@@ -300,7 +300,6 @@
             }
         },
         mounted () {
-
             this.$store.dispatch('user_list')
         },
         data () {

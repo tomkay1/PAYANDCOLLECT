@@ -16,7 +16,7 @@ public class Consts {
 
     public static final String USER_ACCESS_TOKEN="userId-mbpc";
 
-    public static final int COOKIE_TIMEOUT=24*60*60*10;
+    public static final int COOKIE_TIMEOUT=4*60*60;
 
     public static final int COOKIE_FOREVER=24*60*60*6*365*50;
 

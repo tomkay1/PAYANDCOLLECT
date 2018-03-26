@@ -1,5 +1,6 @@
 package com.mybank.pc.merchant.model;
 
+import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.merchant.model.base.BaseMerchantInfo;
 
 /**
@@ -8,4 +9,22 @@ import com.mybank.pc.merchant.model.base.BaseMerchantInfo;
 @SuppressWarnings("serial")
 public class MerchantInfo extends BaseMerchantInfo<MerchantInfo> {
 	public static final MerchantInfo dao = new MerchantInfo().dao();
+
+	public String getStatusTxt(){
+		String sts = getStatus();
+		if(sts==null)return "";
+		if("0".equals(sts)){
+			return "正常";
+		}
+		else if("1".equals(sts)){
+			return "禁用";
+		}else {
+			return "";
+		}
+
+
+	}
+	public String getCatTxt(){
+		return DateKit.dateToStr(getCat(),DateKit.yyyy_MM_dd);
+	}
 }

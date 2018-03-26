@@ -4,21 +4,23 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jfinal.kit.LogKit;
+import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.upload.UploadFile;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.core.CoreException;
-import com.mybank.pc.kits.DateKit;
-import com.mybank.pc.kits.QiNiuKit;
-import com.mybank.pc.kits._StrKit;
+import com.mybank.pc.kits.*;
 import com.qiniu.common.QiniuException;
+import sun.net.www.protocol.file.FileURLConnection;
 
 /**
  * 简介       通用的公共的controller
  * <p>
- * 项目名称:   [whbx]
+ * 项目名称:   [mb-pc]
  * 包:        [com.mb.pc]
  * 类名称:    [CMNCtr]
  * 类描述:    []
@@ -98,6 +100,16 @@ public class CMNCtr extends CoreController {
 
     }
 
+    /**
+     *
+     * 下载根据excel 路径 下载excel
+     *
+     */
+    public void act02(){
+        String ePath=getPara("ePath");
+        File file=FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() +ePath );
+        renderFile(file, DateUtil.current(true)+"");
+    }
 
 
 
