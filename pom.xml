@@ -35,6 +35,8 @@
         <commons-io.version>2.2</commons-io.version>
         <commons-lang.version>2.5</commons-lang.version>
         <cron4j.version>2.2.5</cron4j.version>
+        <mongodbPlugin>1.0.8.2</mongodbPlugin>
+        <mongodbDriver>3.4.0</mongodbDriver>
 
     </properties>
 
@@ -156,6 +158,16 @@
                 <groupId>it.sauronsoftware.cron4j</groupId>
                 <artifactId>cron4j</artifactId>
                 <version>${cron4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cybermkd</groupId>
+                <artifactId>MongodbPlugin</artifactId>
+                <version>${mongodbPlugin}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>${mongodbDriver}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
