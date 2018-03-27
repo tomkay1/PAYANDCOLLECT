@@ -2,7 +2,6 @@ package com.mybank.pc;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jfinal.kit.LogKit;
 import com.jfinal.kit.PathKit;
@@ -17,7 +16,10 @@ import com.mybank.pc.kits.QiNiuKit;
 import com.mybank.pc.kits._StrKit;
 import com.qiniu.common.QiniuException;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 
 /**
@@ -115,33 +117,25 @@ public class CMNCtr extends CoreController {
     public void act03() {
         UploadFile uf = getFile("file");
         File file = uf.getFile();
-        String savePath  = "/Users/xufei/Desktop/";
-        savePath = savePath+DateKit.dateToStr(new Date(), DateKit.yyyyMMdd)+"/";
-        String picName =  _StrKit.getUUID() + "."+FileUtil.getType(file);
-        try {
-            if(!FileUtil.exist(savePath)) {
-               FileUtil.mkdir(savePath);
-            }
-            IoUtil.copy(IoUtil.toStream(file),new FileOutputStream(savePath+picName));
-
-
-        } catch (IOException e) {
-            LogKit.error("上传图片失败>>" + e.getMessage());
+        String fileID =CMNSrv.saveFile(file,FileUtil.getType(file));
+        if (fileID == null) {
             renderFailJSON("图片上传失败");
+        }else{
+            renderSuccessJSON("图片上传成功",   fileID);
         }
-        renderSuccessJSON("图片上传成功",   picName);
+
 
     }
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
     public void act04(){
         String picid = getPara("picid");
         //读取本地图片输入流
-        FileInputStream fis = null;
+        InputStream fis = null;
         OutputStream out = null;
         try {
-            String savePath  = "/Users/xufei/Desktop/";
-            savePath = savePath+DateKit.dateToStr(new Date(), DateKit.yyyyMMdd)+"/";
-            fis = new FileInputStream(savePath+picid);
+            CMNSrv.MongoFileVO mvo=CMNSrv.loadFile(picid);
+
+            fis = mvo.getInputStream();
             getResponse().setContentType("image/jpeg");
             out = getResponse().getOutputStream();
             int len = -1;
@@ -150,6 +144,7 @@ public class CMNCtr extends CoreController {
                 out.write(b, 0, len);
             }
             out.flush();
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -167,6 +162,7 @@ public class CMNCtr extends CoreController {
                     e.printStackTrace();
                 }
             }
+            renderNull();
         }
 
 

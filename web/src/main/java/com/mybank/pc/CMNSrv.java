@@ -1,60 +1,110 @@
 package com.mybank.pc;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import com.cybermkd.mongo.kit.MongoKit;
 import com.jfinal.kit.LogKit;
-import com.mybank.pc.admin.model.Ufile;
-import com.mybank.pc.kits._StrKit;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.gridfs.GridFSDownloadStream;
+import com.mongodb.client.gridfs.model.GridFSFile;
+import com.mongodb.client.gridfs.model.GridFSUploadOptions;
+import com.mybank.pc.kits.ResKit;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Date;
+import java.io.InputStream;
 
 public class CMNSrv {
-    private static String  sysPath = "/Users/xufei/Desktop/";
+    private static final String mongoDb =ResKit.getConfig("mongodb.db");
+    private static final String mongoCon =ResKit.getConfig("mongodb.con");
     /**
      * 保存文件服务
      * @param file 需要保存的文件对象
-     * @param path 文件路保存的相对路径(结尾需加"/")，格式为：模块名/YYYYMM/
      * @param fileType 文件扩展名
      * @return 文件保存后的唯一标识
      */
-    public static String saveFile(File file ,String path, String fileType ){
-
-        String savePath = sysPath + path;
-        String fileID = _StrKit.getUUID();
-        String picName =  fileID + "."+ FileUtil.getType(file);
+    public static String saveFile(File file , String fileType ){
+        String mongoID =null;
         try {
-            //检查路径
-            if(!FileUtil.exist(savePath)) {
-                FileUtil.mkdir(savePath);
-            }
-            //保存文件到本地
-            IoUtil.copy(IoUtil.toStream(file),new FileOutputStream(savePath+picName));
-            //保存文件信息
-            Ufile ufile= new Ufile();
-            ufile.setId(fileID);
-            ufile.setPath(path);
-            ufile.setType(fileType);
-            ufile.setCat(new Date());
-            ufile.dao.save();
-        } catch (IOException e) {
+        MongoClient mongoClient=MongoKit.INSTANCE.getClient();
+        MongoDatabase myDatabase = mongoClient.getDatabase(mongoDb);
+        GridFSBucket gridFSBucket = GridFSBuckets.create(myDatabase,mongoCon);
+        GridFSUploadOptions options = new GridFSUploadOptions()
+                .metadata(new Document("fileType", fileType));
+         mongoID= gridFSBucket.uploadFromStream(file.getName(),IoUtil.toStream(file),options).toString();
+
+        LogKit.debug("保存文件mongoID:" + mongoID);
+
+        } catch (Exception e) {
             LogKit.error("文件保存失败：" + e.getMessage());
         }
-      return fileID;
+
+
+      return mongoID;
     }
 
     /**
-     * 上传文件读取
+     * 读取上传的文件
      * @param ufileID 文件保存时的唯一标识
-     * @return 文件对象
+     * @return mongo文件对象
      */
-    public static File loadFile(String ufileID){
+    public static MongoFileVO loadFile(String ufileID){
 
-       Ufile ufile = Ufile.dao.findById(ufileID);
+        MongoClient mongoClient=MongoKit.INSTANCE.getClient();
+        MongoDatabase myDatabase = mongoClient.getDatabase(mongoDb);
+        GridFSBucket gridFSBucket = GridFSBuckets.create(myDatabase,mongoCon);
+        MongoFileVO mongoFileVO=new MongoFileVO();
 
-       return  new File(sysPath+ufile.getPath()+"."+ufile.getType());
+        GridFSDownloadStream downloadStream = gridFSBucket.openDownloadStream(new ObjectId(ufileID));
+        GridFSFile gridFSFile = downloadStream.getGridFSFile();
+        mongoFileVO.setInputStream(downloadStream);
+        mongoFileVO.setFileType(gridFSFile.getMetadata().get("fileType").toString());
+        mongoFileVO.setFileName(gridFSFile.getFilename());
+        mongoFileVO.setLength(gridFSFile.getLength());
+        return mongoFileVO;
     }
+
+     public static class MongoFileVO{
+        private InputStream inputStream;
+        private String fileType;
+        private String fileName;
+        private long length;
+
+        public InputStream getInputStream() {
+            return inputStream;
+        }
+
+        public void setInputStream(InputStream inputStream) {
+            this.inputStream = inputStream;
+        }
+
+        public String getFileType() {
+            return fileType;
+        }
+
+        public void setFileType(String fileType) {
+            this.fileType = fileType;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
+        }
+
+        public long getLength() {
+            return length;
+        }
+
+        public void setLength(long length) {
+            this.length = length;
+        }
+    }
+
 
 }

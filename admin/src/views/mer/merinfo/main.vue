@@ -73,49 +73,59 @@
                      <Upload
                              ref="upload"
                              :show-upload-list="false"
-                             :on-success="handleSuccess"
+                             :on-success="handleSuccessCard"
                              :format="['jpg','jpeg','png']"
-                             :max-size="2048"
+                             :max-size="4096"
                              :on-format-error="handleFormatError"
                              :on-exceeded-size="handleMaxSize"
                              type="drag"
-                             action="/api/cmn/act03"
+                             :action="uploadAction"
                              style="display: inline-block;width:300px;">
+                         点击上传手持身份证照片
 
-                             <Icon type="camera" size="20" ></Icon>点击上传手持身份证照片
-                         <img :src="url" v-show="showImg" width="300" height="200">
+                         <img :src="urlCard" v-show="showImgCard" width="300" >
                      </Upload>
-
-
-
-                     <!--<div style="width: 300px;height:200px;line-height: 200px;">
-                        <div class="demo-upload-list" v-for="item in uploadList">
-                             <template v-if="item.status === 'finished'">
-                                 <img :src="item.url">
-                                 <div class="demo-upload-list-cover">
-                                     <Icon type="ios-eye-outline" @click.native="handleView(item.name)"></Icon>
-                                     <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
-                                 </div>
-                             </template>
-                             <template v-else>
-                                 <Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
-                             </template>
-                         </div>
-                     </div>-->
                  </FormItem>
 
 
 
                  <FormItem label="身份证正面" prop="cardZ">
-                     <Input v-model="merInfo.cardZ" placeholder="请输入..." style="width: 300px"/>
+                     <Upload
+                             ref="upload"
+                             :show-upload-list="false"
+                             :on-success="handleSuccessCardZ"
+                             :format="['jpg','jpeg','png']"
+                             :max-size="4096"
+                             :on-format-error="handleFormatError"
+                             :on-exceeded-size="handleMaxSize"
+                             type="drag"
+                             :action="uploadAction"
+                             style="display: inline-block;width:300px;">
+
+                         点击上传身份证正面
+                         <img :src="urlCardZ" v-show="showImgCardZ" width="300"  >
+                     </Upload>
                  </FormItem>
                  <FormItem label="身份证背面" prop="cardF">
-                     <Input v-model="merInfo.cardF" placeholder="请输入..." style="width: 300px"/>
+                     <Upload
+                             ref="upload"
+                             :show-upload-list="false"
+                             :on-success="handleSuccessCardF"
+                             :format="['jpg','jpeg','png']"
+                             :max-size="4096"
+                             :on-format-error="handleFormatError"
+                             :on-exceeded-size="handleMaxSize"
+                             type="drag"
+                             :action="uploadAction"
+                             style="display: inline-block;width:300px;">
+
+                         点击上传身份证背面
+                         <img :src="urlCardF" v-show="showImgCardF" width="300" >
+                     </Upload>
                  </FormItem>
             </Form>
             <div slot="footer">
                 <Button type="success" :loading="modalLoading" @click="save">保存</Button>
-                <Button @click="reset" v-show="isAdd">重置</Button>
                 <Button type="error" @click="merInfoModal=false">关闭</Button>
             </div>
         </Modal>
@@ -125,6 +135,7 @@
 
 <script>
     import {mapState} from 'vuex'
+    import consts from '../../../libs/consts'
 const delBtn=(vm,h,param)=>{
         return h('Poptip', {
             props: {
@@ -276,15 +287,16 @@ const stopBtn=(vm,h,param)=>{
                     }
                 })
             },
-            reset(){
-                            this.$refs['formValidate'].resetFields()
-                        },
             vChange(b){
                 if (!b) {
                     this.$refs['formValidate'].resetFields()
                     this.modalLoading = false;
-                    this.showImg =false;
-                    this.url='';
+                    this.showImgCard =false;
+                    this.showImgCardF =false;
+                    this.showImgCardZ =false;
+                    this.urlCard='';
+                    this.urlCardF='';
+                    this.urlCardZ='';
                 }
             },
             search(pn){
@@ -294,11 +306,22 @@ const stopBtn=(vm,h,param)=>{
             refresh(){
                 this.$store.dispatch('merInfo_list',{search:this.searchKey})
             },
-            handleSuccess (res, file) {
-            console.info(file)
+            handleSuccessCard (res, file) {
                 this.merInfo.cardImg =res.resData;
-                this.url = "http://localhost:8082/cmn/act04?picid="+this.merInfo.cardImg
-                this.showImg=true;
+                this.urlCard = consts.devLocation+"/cmn/act04?picid="+this.merInfo.cardImg
+                this.showImgCard=true;
+
+            },
+            handleSuccessCardZ (res, file) {
+                this.merInfo.cardZ =res.resData;
+                this.urlCardZ = consts.devLocation+"/cmn/act04?picid="+this.merInfo.cardZ
+                this.showImgCardZ=true;
+
+            },
+            handleSuccessCardF (res, file) {
+                this.merInfo.cardF =res.resData;
+                this.urlCardF = consts.devLocation+"/cmn/act04?picid="+this.merInfo.cardF
+                this.showImgCardF=true;
 
             },
             handleFormatError (file) {
@@ -322,13 +345,18 @@ const stopBtn=(vm,h,param)=>{
         },
         data () {
             return {
-                showImg: false,
-                url:'',
+                showImgCard: false,
+                showImgCardZ: false,
+                showImgCardF: false,
+                urlCard:'',
+                urlCardZ:'',
+                urlCardF:'',
                 self: this,
                 searchKey: '',
                 merInfoModal: false,
                 isAdd:true,
                 modalTitle: '新增用户',
+                uploadAction:consts.env+'/cmn/act03',
                 modalLoading: false,
                 ruleValidate: {
                     merchantName: [
