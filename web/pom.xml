@@ -110,6 +110,14 @@
 			<groupId>it.sauronsoftware.cron4j</groupId>
 			<artifactId>cron4j</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.cybermkd</groupId>
+			<artifactId>MongodbPlugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>mybank-pc</finalName>

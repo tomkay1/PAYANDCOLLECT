@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.wall.WallFilter;
+import com.cybermkd.mongo.plugin.MongoJFinalPlugin;
 import com.jfinal.config.Constants;
 import com.jfinal.config.Handlers;
 import com.jfinal.config.Interceptors;
@@ -23,6 +24,7 @@ import com.jfinal.template.Engine;
 import com.mybank.pc.CMNCtr;
 import com.mybank.pc.admin.LoginCtr;
 import com.mybank.pc.admin.art.ArtCtr;
+import com.mybank.pc.admin.model.Res;
 import com.mybank.pc.admin.param.ParamCtr;
 import com.mybank.pc.admin.res.ResCtr;
 import com.mybank.pc.admin.role.RoleCtr;
@@ -147,6 +149,11 @@ public class CoreConfig extends JFinalConfig{
         //计划任务插件
         Cron4jPlugin cron4jPlugin=new Cron4jPlugin("task.properties","cron4j");
         plugins.add(cron4jPlugin);
+        MongoJFinalPlugin jFinalPlugin = new MongoJFinalPlugin();
+        jFinalPlugin.add(ResKit.getConfig("mongodb.ip"),ResKit.getConfigInt("mongodb.port")).auth(ResKit.getConfig("mongodb.user"),ResKit.getConfig("mongodb.pwd"));
+        jFinalPlugin.setDatabase(ResKit.getConfig("mongodb.db"));
+        plugins.add(jFinalPlugin);
+
 
     }
 
