@@ -8,7 +8,7 @@ const merInfo = {
         pageNumber:1,
         totalRow:0,
         merInfo:{},
-        merchantType:[]
+        merchantTypeList:[]
     },
     mutations: {
 
@@ -17,9 +17,15 @@ const merInfo = {
             state.totalPage=page.page.totalPage
             state.pageNumber=page.page.pageNumber
             state.totalRow=page.page.totalRow
-            state.merchantType =page.tList
+            state.merchantTypeList =page.tList
         },
+        merInfo_reset(state,param){
 
+            if(param) {
+                state.merInfo = kit.clone(param)
+            }
+
+        }
     },
     actions:{
         merInfo_list:function ({ commit,state },param) {

@@ -36,12 +36,14 @@
             </p>
             <Form ref="formValidate" :label-width="150" :model="merInfo" :rules="ruleValidate">
                 <FormItem label="商户名称" prop="merchantName">
-                    <Input v-model="merInfo.merchantName" :disabled="!isAdd" placeholder="请输入..." style="width: 300px"/>
+                    <Input v-model="merInfo.merchantName"  placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
                 <FormItem label="商户类型" prop="merchantType">
                     <Select v-model="merInfo.merchantType" style="width:300px">
-                        <Option  v-for="item in merchantTypeList" :value="item.text" :key="item.text">{{ item.title }}</Option>
+                        <Option  v-for="item in merchantTypeList" :value="item.text"  :key="item.text">{{ item.title }}</Option>
                     </Select>
+                    <span>merchantType: {{merInfo.merchantType }}</span>
+
                 </FormItem>
                 <FormItem label="负责人名称" prop="perName">
                     <Input v-model="merInfo.perName" placeholder="请输入..." style="width: 300px"/>
@@ -224,7 +226,7 @@ const stopBtn=(vm,h,param)=>{
                 'pageNumber': state => state.merInfo.pageNumber,
                 'total': state => state.merInfo.totalRow,
                 'merInfo': state => state.merInfo.merInfo,
-                'merchantTypeList' :state => state.merInfo.merchantType,
+                'merchantTypeList' :state => state.merInfo.merchantTypeList,
             })
         },
         methods: {
@@ -241,14 +243,14 @@ const stopBtn=(vm,h,param)=>{
                     //vm.search()
                 })
             },
-            edit(user){
+            edit(merInfo){
                 this.modalTitle="修改商户"
                 this.isAdd=false;
                 let vm=this
-                this.$store.dispatch('role_list').then((res) => {
-                    vm.$store.commit('user_reset',user);
-                    vm.merInfoModal = true;
-                });
+
+                vm.$store.commit('merInfo_reset',merInfo)
+                vm.merInfoModal = true
+
             },
             stop(i){
                 let vm=this;
@@ -345,6 +347,11 @@ const stopBtn=(vm,h,param)=>{
         },
         data () {
             return {
+                selected: 'C',   // 比如想要默认选中为 Three 那么就把他设置为C
+                options: [
+                    { text: 'One', value: 'A' },  //每个选项里面就不用在多一个selected 了
+                    { text: 'Two', value: 'B' },
+                    { text: 'Three', value: 'C' }],
                 showImgCard: false,
                 showImgCardZ: false,
                 showImgCardF: false,
