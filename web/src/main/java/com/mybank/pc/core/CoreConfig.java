@@ -150,8 +150,9 @@ public class CoreConfig extends JFinalConfig{
         Cron4jPlugin cron4jPlugin=new Cron4jPlugin("task.properties","cron4j");
         plugins.add(cron4jPlugin);
         MongoJFinalPlugin jFinalPlugin = new MongoJFinalPlugin();
-        jFinalPlugin.add(ResKit.getConfig("mongodb.ip"),ResKit.getConfigInt("mongodb.port")).auth(ResKit.getConfig("mongodb.user"),ResKit.getConfig("mongodb.pwd"));
+        jFinalPlugin.add(ResKit.getConfig("mongodb.ip"),ResKit.getConfigInt("mongodb.port"));
         jFinalPlugin.setDatabase(ResKit.getConfig("mongodb.db"));
+        jFinalPlugin.auth(ResKit.getConfig("mongodb.user"),ResKit.getConfig("mongodb.pwd"));
         plugins.add(jFinalPlugin);
 
 
