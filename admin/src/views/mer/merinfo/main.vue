@@ -10,10 +10,9 @@
                 <Row>
                     <Col span="8">
                     <Button type="primary" icon="person-add" @click="add">新增商户</Button>
-
                     </Col>
                     <Col span="8" offset="8" align="right">
-                    <Input v-model="searchKey" placeholder="请输入..." style="width: 200px"/>
+                    <Input v-model="searchKey" placeholder="输入商户编号/名称/负责人名称" style="width: 200px"/>
                     <span @click="search" style="margin: 0 10px;">
                         <Button type="primary" icon="search">搜索</Button></span>
                     </Col>
@@ -21,11 +20,11 @@
                 <Row class="margin-top-10">
                     <Table :context="self" border :data="merInfoList" :columns="tableColums" stripe></Table>
                 </Row>
-                <div style="margin: 10px;overflow: hidden">
-                    <div style="float: right;">
-                        <Page :total="total" :current="pageNumber" @on-change="search"  show-total show-elevator></Page>
-                    </div>
-                </div>
+                <Row class="margin-top-10">
+                    <Col span="24" align="right">
+                        <Page  :total="total" :current="pageNumber" @on-change="search"  show-total show-elevator></Page>
+                    </Col>
+                </Row>
             </Card>
             </Col>
         </Row>
@@ -42,7 +41,6 @@
                     <Select v-model="merInfo.merchantType" style="width:300px">
                         <Option  v-for="item in merchantTypeList" :value="item.text"  :key="item.text">{{ item.title }}</Option>
                     </Select>
-                    {{merInfo.merchantType}}
                 </FormItem>
                 <FormItem label="负责人名称" prop="perName">
                     <Input v-model="merInfo.perName" placeholder="请输入..." style="width: 300px"/>
@@ -79,12 +77,15 @@
                              :max-size="4096"
                              :on-format-error="handleFormatError"
                              :on-exceeded-size="handleMaxSize"
+                             :before-upload="handleBeforeUpload"
                              type="drag"
                              :action="uploadAction"
-                             style="display: inline-block;width:300px;">
-                         点击上传手持身份证照片
+                             style="width:300px; line-height: 0px;">
+
+                         <div style="line-height: 32px;">点击上传手持身份证照片</div>
 
                          <img :src="urlCard" v-show="showImgCard" width="300" >
+
                      </Upload>
                  </FormItem>
 
@@ -101,9 +102,8 @@
                              :on-exceeded-size="handleMaxSize"
                              type="drag"
                              :action="uploadAction"
-                             style="display: inline-block;width:300px;">
-
-                         点击上传身份证正面
+                             style="width:300px; line-height: 0px;">
+                         <div style="line-height: 32px;">点击上传身份证正面</div>
                          <img :src="urlCardZ" v-show="showImgCardZ" width="300"  >
                      </Upload>
                  </FormItem>
@@ -118,9 +118,9 @@
                              :on-exceeded-size="handleMaxSize"
                              type="drag"
                              :action="uploadAction"
-                             style="display: inline-block;width:300px;">
+                             style="width:300px; line-height: 0px;">
 
-                         点击上传身份证背面
+                         <div style="line-height: 32px;">点击上传身份证背面</div>
                          <img :src="urlCardF" v-show="showImgCardF" width="300" >
                      </Upload>
                  </FormItem>
@@ -234,7 +234,8 @@ const stopBtn=(vm,h,param)=>{
                 this.modalTitle="新增商户"
                 let vm = this;
                     vm.merInfoModal = true;
-                    this.$store.commit('merInfo_reset',{"merchantType+''":'',merchantType:''})
+                    //点击添加按钮是将对象设置成空
+                    this.$store.commit('merInfo_reset',{})
             },
             del(i){
                 let vm=this;
@@ -249,6 +250,12 @@ const stopBtn=(vm,h,param)=>{
                 let vm=this
 
                 vm.$store.commit('merInfo_reset',merInfo)
+                this.urlCard=consts.devLocation+"/cmn/act04?picid="+merInfo.cardImg;
+                this.urlCardF=consts.devLocation+"/cmn/act04?picid="+merInfo.cardF;
+                this.urlCardZ=consts.devLocation+"/cmn/act04?picid="+merInfo.cardZ;
+                this.showImgCard =true;
+                this.showImgCardF =true;
+                this.showImgCardZ =true;
                 vm.merInfoModal = true
 
             },
@@ -308,22 +315,28 @@ const stopBtn=(vm,h,param)=>{
             refresh(){
                 this.$store.dispatch('merInfo_list',{search:this.searchKey})
             },
+            handleBeforeUpload(res, file){
+                this.modalLoading =true;
+            },
             handleSuccessCard (res, file) {
                 this.merInfo.cardImg =res.resData;
                 this.urlCard = consts.devLocation+"/cmn/act04?picid="+this.merInfo.cardImg
                 this.showImgCard=true;
+                this.modalLoading =false;
 
             },
             handleSuccessCardZ (res, file) {
                 this.merInfo.cardZ =res.resData;
                 this.urlCardZ = consts.devLocation+"/cmn/act04?picid="+this.merInfo.cardZ
                 this.showImgCardZ=true;
+                this.modalLoading =false;
 
             },
             handleSuccessCardF (res, file) {
                 this.merInfo.cardF =res.resData;
                 this.urlCardF = consts.devLocation+"/cmn/act04?picid="+this.merInfo.cardF
                 this.showImgCardF=true;
+                this.modalLoading =false;
 
             },
             handleFormatError (file) {
@@ -347,11 +360,6 @@ const stopBtn=(vm,h,param)=>{
         },
         data () {
             return {
-                selected: 'C',   // 比如想要默认选中为 Three 那么就把他设置为C
-                options: [
-                    { text: 'One', value: 'A' },  //每个选项里面就不用在多一个selected 了
-                    { text: 'Two', value: 'B' },
-                    { text: 'Three', value: 'C' }],
                 showImgCard: false,
                 showImgCardZ: false,
                 showImgCardF: false,
@@ -388,13 +396,29 @@ const stopBtn=(vm,h,param)=>{
                         }
                     ],
                     email: [
-                        {type: 'email', message: 'email格式不正确', max: 255, trigger: 'blur'},
-                        {type: 'string', message: 'email长度不能超过255', max: 255, trigger: 'blur'}
+                        {type: 'string', required: true, message: 'Email不能为空', trigger: 'blur'},
+                        {type: 'email', message: 'Email格式不正确', max: 255, trigger: 'blur'},
+                        {type: 'string', message: 'Email长度不能超过255', max: 255, trigger: 'blur'}
                     ],
                     cardID: [
                         {required: true, message: '身份证号不能为空',  trigger: 'blur'},
                         {type: 'string', max: 50, message: '身份证号长度不能超过50', trigger: 'blur'}
                     ],
+                    address: [
+                        {required: true, message: '联系地址不能为空',  trigger: 'blur'},
+                        {type: 'string', max: 200, message: '联系地址长度不能超过20', trigger: 'blur'}
+                    ],
+                    cardImg: [
+                        {required: true, message: '手持身份证照片不能为空',  trigger: 'blur'}
+                    ],
+                    cardZ: [
+                        {required: true, message: '身份证正面照片不能为空',  trigger: 'blur'}
+                    ],
+                    cardF: [
+                        {required: true, message: '身份证反面照片不能为空',  trigger: 'blur'}
+                    ],
+
+
                 },
 
 
@@ -404,33 +428,44 @@ const stopBtn=(vm,h,param)=>{
                     {
                         title: '商户名称',
                         key: 'merchantName',
+                        align:'center',
                     },
                     {
                         title: '商户编号',
                         key: 'merchantNo',
+                        align:'center',
+                    },
+                    {
+                        title: '商户类型',
+                        key: 'merTypeTxt',
+                        align:'center',
                     },
                     {
                         title: '负责人姓名',
                         key: 'perName',
+                        align:'center',
                     },
-                    {
-                        title: '身份证号码',
-                        key: 'cardID',
-                    },
+                    // {
+                    //     title: '身份证号码',
+                    //     key: 'cardID',
+                    // },
                     {
                         title: '手机',
                         key: 'mobile',
+                        align:'center',
                     },
 
                     {
                         title: '创建时间',
                         key: 'catTxt',
+                        align:'center',
                     },
 
                     {
                         title: '状态',
                         key: 'statusTxt',
                         width:120,
+                        align:'center',
                         render:(h, param)=>{
                             if (param.row.status == '0') {
                                 return h('Tag', {

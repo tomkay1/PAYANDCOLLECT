@@ -27,14 +27,14 @@ public class MerchantInfoCtr extends CoreController {
         Page<MerchantInfo> page;
         String serach = getPara("search");
         StringBuffer where = new StringBuffer("from merchant_info mi  where 1=1 and mi.dat is null  ");
-//        if (!isParaBlank("search")) {
-//            where.append(" and (instr(userinfo.email,?)>0 or instr(userinfo.phone,?)>0 or instr(userinfo.nickname,?)>0 or instr(userinfo.loginname,?)>0)");
-//            where.append(" ORDER BY userinfo.c_at");
-//            page = User.dao.paginate(getPN(), getPS(), "select * ", where.toString(), serach, serach, serach, serach);
-//        } else {
+        if (!isParaBlank("search")) {
+            where.append(" and (instr(mi.merchantNo,?)>0 or instr(mi.merchantName,?)>0 or instr(mi.perName,?)>0) ");
+            where.append(" ORDER BY mi.cat");
+            page = MerchantInfo.dao.paginate(getPN(), getPS(), "select * ", where.toString(), serach, serach, serach);
+        } else {
             where.append(" ORDER BY mi.cat");
             page = MerchantInfo.dao.paginate(getPN(), getPS(), "select * ", where.toString());
-//        }
+        }
         List<Taxonomy> tlist =CacheKit.get(Consts.CACHE_NAMES.taxonomy.name(),"merTypeList");
         Map map = new HashMap();
         map.put("tList" ,tlist);
@@ -54,6 +54,7 @@ public class MerchantInfoCtr extends CoreController {
 
         merInfo.setMat(new Date());
         merInfo.setStatus(Consts.STATUS.enable.getVal());
+        merInfo.setOperID(String.valueOf(currUser().getId()));
         merInfo.save();
         renderSuccessJSON("新增商户信息成功。", "");
     }
@@ -63,7 +64,7 @@ public class MerchantInfoCtr extends CoreController {
         MerchantInfo merInfo = getModel(MerchantInfo.class,"",true);
 
         merInfo.setMat(new Date());
-
+        merInfo.setOperID(String.valueOf(currUser().getId()));
         merInfo.update();
         renderSuccessJSON("更新商户信息成功。", "");
     }
