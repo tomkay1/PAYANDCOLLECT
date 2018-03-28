@@ -2,8 +2,13 @@ package com.mybank.pc.core;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.nosql.mongo.MongoDS;
+import cn.hutool.db.nosql.mongo.MongoFactory;
 import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.wall.WallFilter;
+import com.cybermkd.mongo.kit.MongoBean;
+import com.cybermkd.mongo.kit.MongoKit;
+import com.cybermkd.mongo.kit.MongoQuery;
 import com.cybermkd.mongo.plugin.MongoJFinalPlugin;
 import com.jfinal.config.Constants;
 import com.jfinal.config.Handlers;
@@ -21,6 +26,7 @@ import com.jfinal.plugin.cron4j.Cron4jPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.plugin.ehcache.EhCachePlugin;
 import com.jfinal.template.Engine;
+import com.mongodb.gridfs.GridFS;
 import com.mybank.pc.CMNCtr;
 import com.mybank.pc.admin.LoginCtr;
 import com.mybank.pc.admin.art.ArtCtr;
@@ -38,6 +44,12 @@ import com.mybank.pc.interceptors.ExceptionInterceptor;
 import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.ResKit;
 import com.mybank.pc.merchant.info.MerchantInfoCtr;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.bson.BsonDocument;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.conversions.Bson;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,6 +58,13 @@ import javax.servlet.http.HttpServletResponse;
  * Created by yuhaihui8913 on 2017/11/14.
  */
 public class CoreConfig extends JFinalConfig{
+
+    static ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
+            .getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+
+    static {
+        root.setLevel(ch.qos.logback.classic.Level.INFO);
+    }
     @Override
     public void configConstant(Constants constants) {
         constants.setDevMode(ResKit.getConfigBoolean("devMode"));
@@ -154,6 +173,7 @@ public class CoreConfig extends JFinalConfig{
         jFinalPlugin.setDatabase(ResKit.getConfig("mongodb.db"));
         jFinalPlugin.auth(ResKit.getConfig("mongodb.user"),ResKit.getConfig("mongodb.pwd"));
         plugins.add(jFinalPlugin);
+
 
 
     }
