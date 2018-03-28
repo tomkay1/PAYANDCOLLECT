@@ -2,20 +2,10 @@ package com.mybank.pc.core;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.db.nosql.mongo.MongoDS;
-import cn.hutool.db.nosql.mongo.MongoFactory;
 import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.wall.WallFilter;
-import com.cybermkd.mongo.kit.MongoBean;
-import com.cybermkd.mongo.kit.MongoKit;
-import com.cybermkd.mongo.kit.MongoQuery;
 import com.cybermkd.mongo.plugin.MongoJFinalPlugin;
-import com.jfinal.config.Constants;
-import com.jfinal.config.Handlers;
-import com.jfinal.config.Interceptors;
-import com.jfinal.config.JFinalConfig;
-import com.jfinal.config.Plugins;
-import com.jfinal.config.Routes;
+import com.jfinal.config.*;
 import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
 import com.jfinal.json.FastJsonFactory;
@@ -26,11 +16,9 @@ import com.jfinal.plugin.cron4j.Cron4jPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.plugin.ehcache.EhCachePlugin;
 import com.jfinal.template.Engine;
-import com.mongodb.gridfs.GridFS;
 import com.mybank.pc.CMNCtr;
 import com.mybank.pc.admin.LoginCtr;
 import com.mybank.pc.admin.art.ArtCtr;
-import com.mybank.pc.admin.model.Res;
 import com.mybank.pc.admin.param.ParamCtr;
 import com.mybank.pc.admin.res.ResCtr;
 import com.mybank.pc.admin.role.RoleCtr;
@@ -43,12 +31,8 @@ import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.interceptors.ExceptionInterceptor;
 import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.ResKit;
+import com.mybank.pc.merchant.cust.MerchantCustCtr;
 import com.mybank.pc.merchant.info.MerchantInfoCtr;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.bson.BsonDocument;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.conversions.Bson;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
@@ -114,6 +98,12 @@ public class CoreConfig extends JFinalConfig{
             @Override
             public void config() {
                 add("/mer00", MerchantInfoCtr.class);
+            }
+        });
+        routes.add(new Routes() {
+            @Override
+            public void config() {
+                add("/mer01", MerchantCustCtr.class);
             }
         });
 

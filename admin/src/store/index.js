@@ -18,6 +18,7 @@ import collBatch from './modules/collection_batch';
 import collQuery from './modules/collection_query';
 import collUndo from './modules/collection_undo';
 import collReconciliation from './modules/collection_reconciliation';
+import merCust from "./modules/merCust";
 
 Vue.use(Vuex);
 
@@ -51,6 +52,7 @@ const store = new Vuex.Store({
         home,
         cc,
         merInfo,
+        merCust,
         collTrade,
         collEntrust,
         collRealtime,

@@ -22,7 +22,7 @@
                 </Row>
                 <Row class="margin-top-10">
                     <Col span="24" align="right">
-                        <Page  :total="total" :current="pageNumber" @on-change="search"  show-total show-elevator></Page>
+                        <Page  :total="total" :current="pageNumber" @on-change="search"  show-total show-sizer></Page>
                     </Col>
                 </Row>
             </Card>
@@ -38,7 +38,7 @@
                     <Input v-model="merInfo.merchantName"  placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
                 <FormItem label="商户类型" prop="merchantType">
-                    <Select v-model="merInfo.merchantType" style="width:300px">
+                    <Select v-model="merInfo.merchantType" style="width:300px" :disabled="isEditMerType">
                         <Option  v-for="item in merchantTypeList" :value="item.text"  :key="item.text">{{ item.title }}</Option>
                     </Select>
                 </FormItem>
@@ -231,6 +231,7 @@ const stopBtn=(vm,h,param)=>{
         methods: {
             add(){
                 this.isAdd=true
+                this.isEditMerType=false
                 this.modalTitle="新增商户"
                 let vm = this;
                     vm.merInfoModal = true;
@@ -246,7 +247,8 @@ const stopBtn=(vm,h,param)=>{
             },
             edit(merInfo){
                 this.modalTitle="修改商户"
-                this.isAdd=false;
+                this.isAdd=false
+                this.isEditMerType=true
                 let vm=this
 
                 vm.$store.commit('merInfo_reset',merInfo)
@@ -370,6 +372,7 @@ const stopBtn=(vm,h,param)=>{
                 searchKey: '',
                 merInfoModal: false,
                 isAdd:true,
+                isEditMerType:false,
                 modalTitle: '新增用户',
                 uploadAction:consts.env+'/cmn/act03',
                 modalLoading: false,
@@ -468,18 +471,27 @@ const stopBtn=(vm,h,param)=>{
                         align:'center',
                         render:(h, param)=>{
                             if (param.row.status == '0') {
-                                return h('Tag', {
+                                return h('span', {
                                     props: {
-                                        type: 'dot',
-                                        color: 'blue'
+
                                     },
+                                    style:{
+                                        'font-weight':'bold',
+                                        'color':'#2d8cf0'
+
+                                    }
                                 }, param.row.statusTxt)
                             } else if (param.row.status == '1') {
-                                return h('Tag', {
+                                return h('span', {
                                     props: {
-                                        type: 'dot',
-                                        color: 'red'
+                                        // type: 'dot',
+                                        // color: 'red'
                                     },
+                                    style:{
+                                        'font-weight':'bold',
+                                        'color':'#ed3f14'
+
+                                    }
                                 }, param.row.statusTxt)
                             }
                         }
