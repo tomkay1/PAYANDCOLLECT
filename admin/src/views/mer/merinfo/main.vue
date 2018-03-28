@@ -42,8 +42,7 @@
                     <Select v-model="merInfo.merchantType" style="width:300px">
                         <Option  v-for="item in merchantTypeList" :value="item.text"  :key="item.text">{{ item.title }}</Option>
                     </Select>
-                    <span>merchantType: {{merInfo.merchantType }}</span>
-
+                    {{merInfo.merchantType}}
                 </FormItem>
                 <FormItem label="负责人名称" prop="perName">
                     <Input v-model="merInfo.perName" placeholder="请输入..." style="width: 300px"/>
@@ -235,6 +234,7 @@ const stopBtn=(vm,h,param)=>{
                 this.modalTitle="新增商户"
                 let vm = this;
                     vm.merInfoModal = true;
+                    this.$store.commit('merInfo_reset',{"merchantType+''":'',merchantType:''})
             },
             del(i){
                 let vm=this;
@@ -335,7 +335,7 @@ const stopBtn=(vm,h,param)=>{
             handleMaxSize (file) {
                 this.$Notice.warning({
                     title: '超出文件大小限制',
-                    desc: '文件 ' + file.name + ' 太大，不能超过 2M。'
+                    desc: '文件 ' + file.name + ' 太大，不能超过 4M。'
                 });
             },
 
@@ -374,11 +374,11 @@ const stopBtn=(vm,h,param)=>{
                         {type: 'string', required: true, message: '请选择商户类型', trigger: 'blur'}
                     ],
                     perName: [
-                        {required: true, message: '负责人名称不能为空', max: 50, trigger: 'blur'},
+                        {required: true, message: '负责人名称不能为空', trigger: 'blur'},
                         {type: 'string', message: '负责人名称长度不能超过50', max: 50, trigger: 'blur'}
                     ],
                     mobile: [
-                        {required: true, message: '负责人手机号不能为空', max: 20, trigger: 'blur'},
+                        {required: true, message: '负责人手机号不能为空', trigger: 'blur'},
                         {type: 'string', message: '请输入11位手机号', len: 11, trigger: 'blur'},
                         {
                             type: 'string',

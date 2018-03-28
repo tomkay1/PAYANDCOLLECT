@@ -20,10 +20,12 @@ const merInfo = {
             state.merchantTypeList =page.tList
         },
         merInfo_reset(state,param){
+            //console.info(state.merchantTypeList)
 
             if(param) {
                 state.merInfo = kit.clone(param)
             }
+            console.info(state.merInfo)
 
         }
     },
