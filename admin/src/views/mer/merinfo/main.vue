@@ -36,12 +36,13 @@
             </p>
             <Form ref="formValidate" :label-width="150" :model="merInfo" :rules="ruleValidate">
                 <FormItem label="商户名称" prop="merchantName">
-                    <Input v-model="merInfo.merchantName" :disabled="!isAdd" placeholder="请输入..." style="width: 300px"/>
+                    <Input v-model="merInfo.merchantName"  placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
                 <FormItem label="商户类型" prop="merchantType">
                     <Select v-model="merInfo.merchantType" style="width:300px">
-                        <Option  v-for="item in merchantTypeList" :value="item.text" :key="item.text">{{ item.title }}</Option>
+                        <Option  v-for="item in merchantTypeList" :value="item.text"  :key="item.text">{{ item.title }}</Option>
                     </Select>
+                    {{merInfo.merchantType}}
                 </FormItem>
                 <FormItem label="负责人名称" prop="perName">
                     <Input v-model="merInfo.perName" placeholder="请输入..." style="width: 300px"/>
@@ -68,54 +69,64 @@
                      <Input v-model="merInfo.feeAmount" placeholder="请输入..." style="width: 300px"/>
                  </FormItem>
                  <FormItem label="手持身份证照片" prop="cardImg">
-                     <Input v-model="merInfo.cardImg" placeholder="请输入..." style="width: 300px"/>
+                     <!--<Input v-model="merInfo.cardImg" placeholder="请输入..." style="width: 300px"/>-->
 
                      <Upload
                              ref="upload"
                              :show-upload-list="false"
-                             :default-file-list="defaultList"
-                             :on-success="handleSuccess"
+                             :on-success="handleSuccessCard"
                              :format="['jpg','jpeg','png']"
-                             :max-size="2048"
+                             :max-size="4096"
                              :on-format-error="handleFormatError"
                              :on-exceeded-size="handleMaxSize"
-                             :before-upload="handleBeforeUpload"
-                             multiple
                              type="drag"
-                             action="//jsonplaceholder.typicode.com/posts/"
-                             style="display: inline-block;width:300px; ">
-                         <div style="width: 300px;height:30px;">
-                             <Icon type="camera" size="20" ></Icon>点击上传图片
-                         </div>
+                             :action="uploadAction"
+                             style="display: inline-block;width:300px;">
+                         点击上传手持身份证照片
+
+                         <img :src="urlCard" v-show="showImgCard" width="300" >
                      </Upload>
-                     <div style="width: 300px;height:200px;line-height: 200px;">
-                         <div class="demo-upload-list" v-for="item in uploadList">
-                             <template v-if="item.status === 'finished'">
-                                 <img :src="item.url">
-                                 <div class="demo-upload-list-cover">
-                                     <Icon type="ios-eye-outline" @click.native="handleView(item.name)"></Icon>
-                                     <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
-                                 </div>
-                             </template>
-                             <template v-else>
-                                 <Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
-                             </template>
-                         </div>
-                     </div>
                  </FormItem>
 
 
 
                  <FormItem label="身份证正面" prop="cardZ">
-                     <Input v-model="merInfo.cardZ" placeholder="请输入..." style="width: 300px"/>
+                     <Upload
+                             ref="upload"
+                             :show-upload-list="false"
+                             :on-success="handleSuccessCardZ"
+                             :format="['jpg','jpeg','png']"
+                             :max-size="4096"
+                             :on-format-error="handleFormatError"
+                             :on-exceeded-size="handleMaxSize"
+                             type="drag"
+                             :action="uploadAction"
+                             style="display: inline-block;width:300px;">
+
+                         点击上传身份证正面
+                         <img :src="urlCardZ" v-show="showImgCardZ" width="300"  >
+                     </Upload>
                  </FormItem>
                  <FormItem label="身份证背面" prop="cardF">
-                     <Input v-model="merInfo.cardF" placeholder="请输入..." style="width: 300px"/>
+                     <Upload
+                             ref="upload"
+                             :show-upload-list="false"
+                             :on-success="handleSuccessCardF"
+                             :format="['jpg','jpeg','png']"
+                             :max-size="4096"
+                             :on-format-error="handleFormatError"
+                             :on-exceeded-size="handleMaxSize"
+                             type="drag"
+                             :action="uploadAction"
+                             style="display: inline-block;width:300px;">
+
+                         点击上传身份证背面
+                         <img :src="urlCardF" v-show="showImgCardF" width="300" >
+                     </Upload>
                  </FormItem>
             </Form>
             <div slot="footer">
                 <Button type="success" :loading="modalLoading" @click="save">保存</Button>
-                <Button @click="reset" v-show="isAdd">重置</Button>
                 <Button type="error" @click="merInfoModal=false">关闭</Button>
             </div>
         </Modal>
@@ -125,6 +136,7 @@
 
 <script>
     import {mapState} from 'vuex'
+    import consts from '../../../libs/consts'
 const delBtn=(vm,h,param)=>{
         return h('Poptip', {
             props: {
@@ -213,7 +225,7 @@ const stopBtn=(vm,h,param)=>{
                 'pageNumber': state => state.merInfo.pageNumber,
                 'total': state => state.merInfo.totalRow,
                 'merInfo': state => state.merInfo.merInfo,
-                'merchantTypeList' :state => state.merInfo.merchantType,
+                'merchantTypeList' :state => state.merInfo.merchantTypeList,
             })
         },
         methods: {
@@ -222,6 +234,7 @@ const stopBtn=(vm,h,param)=>{
                 this.modalTitle="新增商户"
                 let vm = this;
                     vm.merInfoModal = true;
+                    this.$store.commit('merInfo_reset',{"merchantType+''":'',merchantType:''})
             },
             del(i){
                 let vm=this;
@@ -230,14 +243,14 @@ const stopBtn=(vm,h,param)=>{
                     //vm.search()
                 })
             },
-            edit(user){
+            edit(merInfo){
                 this.modalTitle="修改商户"
                 this.isAdd=false;
                 let vm=this
-                this.$store.dispatch('role_list').then((res) => {
-                    vm.$store.commit('user_reset',user);
-                    vm.merInfoModal = true;
-                });
+
+                vm.$store.commit('merInfo_reset',merInfo)
+                vm.merInfoModal = true
+
             },
             stop(i){
                 let vm=this;
@@ -276,13 +289,16 @@ const stopBtn=(vm,h,param)=>{
                     }
                 })
             },
-            reset(){
-                            this.$refs['formValidate'].resetFields()
-                        },
             vChange(b){
                 if (!b) {
                     this.$refs['formValidate'].resetFields()
                     this.modalLoading = false;
+                    this.showImgCard =false;
+                    this.showImgCardF =false;
+                    this.showImgCardZ =false;
+                    this.urlCard='';
+                    this.urlCardF='';
+                    this.urlCardZ='';
                 }
             },
             search(pn){
@@ -291,6 +307,36 @@ const stopBtn=(vm,h,param)=>{
 
             refresh(){
                 this.$store.dispatch('merInfo_list',{search:this.searchKey})
+            },
+            handleSuccessCard (res, file) {
+                this.merInfo.cardImg =res.resData;
+                this.urlCard = consts.devLocation+"/cmn/act04?picid="+this.merInfo.cardImg
+                this.showImgCard=true;
+
+            },
+            handleSuccessCardZ (res, file) {
+                this.merInfo.cardZ =res.resData;
+                this.urlCardZ = consts.devLocation+"/cmn/act04?picid="+this.merInfo.cardZ
+                this.showImgCardZ=true;
+
+            },
+            handleSuccessCardF (res, file) {
+                this.merInfo.cardF =res.resData;
+                this.urlCardF = consts.devLocation+"/cmn/act04?picid="+this.merInfo.cardF
+                this.showImgCardF=true;
+
+            },
+            handleFormatError (file) {
+                this.$Notice.warning({
+                    title: '文件格式不正确',
+                    desc: '文件 ' + file.name + ' 格式不正确，请上传 jpg 或 png 格式的图片。'
+                });
+            },
+            handleMaxSize (file) {
+                this.$Notice.warning({
+                    title: '超出文件大小限制',
+                    desc: '文件 ' + file.name + ' 太大，不能超过 4M。'
+                });
             },
 
         },
@@ -301,11 +347,23 @@ const stopBtn=(vm,h,param)=>{
         },
         data () {
             return {
+                selected: 'C',   // 比如想要默认选中为 Three 那么就把他设置为C
+                options: [
+                    { text: 'One', value: 'A' },  //每个选项里面就不用在多一个selected 了
+                    { text: 'Two', value: 'B' },
+                    { text: 'Three', value: 'C' }],
+                showImgCard: false,
+                showImgCardZ: false,
+                showImgCardF: false,
+                urlCard:'',
+                urlCardZ:'',
+                urlCardF:'',
                 self: this,
                 searchKey: '',
                 merInfoModal: false,
                 isAdd:true,
                 modalTitle: '新增用户',
+                uploadAction:consts.env+'/cmn/act03',
                 modalLoading: false,
                 ruleValidate: {
                     merchantName: [
@@ -316,11 +374,11 @@ const stopBtn=(vm,h,param)=>{
                         {type: 'string', required: true, message: '请选择商户类型', trigger: 'blur'}
                     ],
                     perName: [
-                        {required: true, message: '负责人名称不能为空', max: 50, trigger: 'blur'},
+                        {required: true, message: '负责人名称不能为空', trigger: 'blur'},
                         {type: 'string', message: '负责人名称长度不能超过50', max: 50, trigger: 'blur'}
                     ],
                     mobile: [
-                        {required: true, message: '负责人手机号不能为空', max: 20, trigger: 'blur'},
+                        {required: true, message: '负责人手机号不能为空', trigger: 'blur'},
                         {type: 'string', message: '请输入11位手机号', len: 11, trigger: 'blur'},
                         {
                             type: 'string',
