@@ -9,7 +9,11 @@
                 </p>
                 <Row>
                     <Col span="24" >
-                    <Input v-model="searchKey" placeholder="输入客户姓名/手机号" style="width: 200px"/>
+
+                    <!--<Tooltip content="支持模糊查找" placement="top-end">-->
+                        <Input v-model="searchKey" placeholder="输入客户姓名/手机号" style="width: 200px"/>
+                    <!--</Tooltip>-->
+
                     <Input v-model="searchKey1" placeholder="商户编号" style="width: 200px"/>
                     <span @click="search" style="margin: 0 10px;">
                         <Button type="primary" icon="search">搜索</Button></span>
