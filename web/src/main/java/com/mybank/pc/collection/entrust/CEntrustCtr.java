@@ -49,26 +49,7 @@ public class CEntrustCtr extends CoreController {
 		String bTime = getPara("bTime");
 		String eTime = getPara("eTime");
 
-		// StringBuffer where = new StringBuffer("from unionpay_entrust where
-		// 1=1 ");
-		// if (StringUtils.isNotBlank(serach)) {
-		// where.append(
-		// "AND (instr(customerNm,?)>0 OR instr(certifId,?)>0 OR
-		// instr(accNo,?)>0 OR instr(phoneNo,?)>0) ");
-		// where.append("ORDER BY mat DESC,cat DESC");
-		// page = UnionpayEntrust.dao.paginate(getPN(), getPS(), "select * ",
-		// where.toString(), serach, serach, serach,
-		// serach);
-		// } else {
-		// where.append("ORDER BY mat DESC,cat DESC");
-		// page = UnionpayEntrust.dao.paginate(getPN(), getPS(), "select * ",
-		// where.toString());
-		// }
-
 		Kv kv = Kv.create();
-		if (StringUtils.isNotBlank(serach)) {
-
-		}
 		kv.set("serach", serach).set("bTime", bTime).set("eTime", eTime);
 		SqlPara sqlPara = Db.getSqlPara("collection_entrust.findUnionpayEntrustPage", kv);
 		page = UnionpayEntrust.dao.paginate(getPN(), getPS(), sqlPara);
@@ -87,7 +68,7 @@ public class CEntrustCtr extends CoreController {
 		String phoneNo = getPara("phoneNo");
 		String cvn2 = getPara("cvn2");
 		String expired = getPara("expired");
-		
+
 		try {
 			Kv kv = Kv.create();
 			kv.set("accNo", accNo).set("certifTp", certifTp).set("certifId", certifId).set("customerNm", customerNm)
