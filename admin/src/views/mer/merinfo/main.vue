@@ -130,6 +130,18 @@
                 <Button type="error" @click="merInfoModal=false">关闭</Button>
             </div>
         </Modal>
+
+        <Modal v-model="merFeeModal"  :mask-closable="false" >
+            <p slot="header">
+                <Icon type="information-circled"></Icon>
+                <span>{{merFeeTitle}}</span>
+            </p>
+            <div slot="footer">
+                <Button type="success" :loading="feeModalLoading" @click="save">保存</Button>
+                <Button type="error" @click="merFeeModal=false">关闭</Button>
+            </div>
+        </Modal>
+
     </div>
 
 </template>
@@ -137,10 +149,13 @@
 <script>
     import {mapState} from 'vuex'
     import consts from '../../../libs/consts'
-const delBtn=(vm,h,param)=>{
+
+    const delBtn=(vm,h,param)=>{
         return h('Poptip', {
             props: {
                 confirm: '',
+                placement:'top-end',
+                width:150,
                 title: '您确定要删除吗？'
             },
             style: {
@@ -158,8 +173,7 @@ const delBtn=(vm,h,param)=>{
             }
         }, '删除')]);
     }
-
-const editBtn=(vm,h,param)=>{
+    const editBtn=(vm,h,param)=>{
         return h('Button', {
             props: {
                 type: 'primary',
@@ -175,10 +189,12 @@ const editBtn=(vm,h,param)=>{
             }
         }, '编辑')
     }
-const stopBtn=(vm,h,param)=>{
+    const stopBtn=(vm,h,param)=>{
         return h('Poptip', {
             props: {
                 confirm: '',
+                placement:'top-end',
+                width:150,
                 title: '您确定要禁用吗？'
             },
             style: {
@@ -200,6 +216,8 @@ const stopBtn=(vm,h,param)=>{
         return h('Poptip', {
             props: {
                 confirm: '',
+                placement:'top-end',
+                width:150,
                 title: '您确定要激活吗？'
             },
             style: {
@@ -217,8 +235,26 @@ const stopBtn=(vm,h,param)=>{
             }
         }, '激活')]);
     }
+    const feeBtn=(vm,h,param)=>{
+        return h('Button', {
+            props: {
+                type: 'primary',
+                size: 'small'
+            },
+            style: {
+                marginRight: '5px'
+            },
+            on: {
+                click: () => {
+                    vm.fee(param.row.id)
+                }
+            }
+        }, '手续费管理')
+    }
+
     export default {
-        computed: {
+
+            computed: {
             ...mapState({
                 'merInfoList': state => state.merInfo.merInfoList,
                 'totalPage': state => state.merInfo.totalPage,
@@ -313,7 +349,6 @@ const stopBtn=(vm,h,param)=>{
             search(pn){
                 this.$store.dispatch('merInfo_list',{search:this.searchKey,pn:pn})
             },
-
             refresh(){
                 this.$store.dispatch('merInfo_list',{search:this.searchKey})
             },
@@ -353,7 +388,9 @@ const stopBtn=(vm,h,param)=>{
                     desc: '文件 ' + file.name + ' 太大，不能超过 4M。'
                 });
             },
-
+            fee(i){
+                this.merFeeModal=true
+            },
         },
         mounted () {
             //页面加载时或数据方法
@@ -362,6 +399,9 @@ const stopBtn=(vm,h,param)=>{
         },
         data () {
             return {
+                merFeeTitle:'手续费管理',
+                merFeeModal:false,
+                feeModalLoading:false,
                 showImgCard: false,
                 showImgCardZ: false,
                 showImgCardF: false,
@@ -376,6 +416,7 @@ const stopBtn=(vm,h,param)=>{
                 modalTitle: '新增用户',
                 uploadAction:consts.env+'/cmn/act03',
                 modalLoading: false,
+
                 ruleValidate: {
                     merchantName: [
                         {type: 'string', required: true, message: '商户名称不能为空', trigger: 'blur'},
@@ -424,8 +465,6 @@ const stopBtn=(vm,h,param)=>{
 
                 },
 
-
-
                 tableColums: [
 
                     {
@@ -437,11 +476,13 @@ const stopBtn=(vm,h,param)=>{
                         title: '商户编号',
                         key: 'merchantNo',
                         align:'center',
+                        width:90,
                     },
                     {
                         title: '商户类型',
                         key: 'merTypeTxt',
                         align:'center',
+                        width:90,
                     },
                     {
                         title: '负责人姓名',
@@ -462,6 +503,7 @@ const stopBtn=(vm,h,param)=>{
                         title: '创建时间',
                         key: 'catTxt',
                         align:'center',
+                        width:100,
                     },
 
                     {
@@ -490,7 +532,7 @@ const stopBtn=(vm,h,param)=>{
                     {
                         title: '操作',
                         key: 'action',
-                        width: 180,
+                        width: 260,
                         align: 'center',
                         render: (h, param) =>{
                             if (!param.row.dAt) {
@@ -498,15 +540,17 @@ const stopBtn=(vm,h,param)=>{
 
 
                                         return h('div', [
+                                            feeBtn(this,h,param),
                                             editBtn(this,h,param),
                                             delBtn(this,h,param),
-                                      stopBtn(this,h,param),
+                                            stopBtn(this,h,param),
                                         ]);
 
                                 } else {
 
 
                                         return h('div', [
+                                            feeBtn(this,h,param),
                                             editBtn(this,h,param),
                                             delBtn(this,h,param),
                                             actBtn(this,h,param),
