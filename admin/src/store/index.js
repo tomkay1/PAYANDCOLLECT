@@ -54,6 +54,7 @@ const store = new Vuex.Store({
         home,
         cc,
         merInfo,
+        merCust,
         collTrade,
         collEntrust,
         collRealtime,
