@@ -2,6 +2,7 @@ package com.mybank.pc;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jfinal.kit.LogKit;
 import com.jfinal.kit.PathKit;
@@ -132,17 +133,16 @@ public class CMNCtr extends CoreController {
         //读取本地图片输入流
         InputStream fis = null;
         OutputStream out = null;
+
         try {
+
             CMNSrv.MongoFileVO mvo=CMNSrv.loadFile(picid);
+
 
             fis = mvo.getInputStream();
             getResponse().setContentType("image/jpeg");
             out = getResponse().getOutputStream();
-            int len = -1;
-            byte[] b = new byte[1024];
-            while ((len = fis.read(b)) != -1) {
-                out.write(b, 0, len);
-            }
+            IoUtil.copy(fis,out);
             out.flush();
 
         } catch (Exception e) {
@@ -162,6 +162,7 @@ public class CMNCtr extends CoreController {
                     e.printStackTrace();
                 }
             }
+
             renderNull();
         }
 
