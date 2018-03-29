@@ -4,3 +4,6 @@
 #namespace("collection_entrust")
   #include("collection_entrust.sql")
 #end
+#namespace("merchant")
+  #include("merchant.sql")
+#end

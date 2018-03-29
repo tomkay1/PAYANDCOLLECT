@@ -471,27 +471,18 @@ const stopBtn=(vm,h,param)=>{
                         align:'center',
                         render:(h, param)=>{
                             if (param.row.status == '0') {
-                                return h('span', {
+                                return h('Tag', {
                                     props: {
-
+                                        type: 'dot',
+                                        color: 'blue'
                                     },
-                                    style:{
-                                        'font-weight':'bold',
-                                        'color':'#2d8cf0'
-
-                                    }
                                 }, param.row.statusTxt)
                             } else if (param.row.status == '1') {
-                                return h('span', {
+                                return h('Tag', {
                                     props: {
-                                        // type: 'dot',
-                                        // color: 'red'
+                                        type: 'dot',
+                                        color: 'red'
                                     },
-                                    style:{
-                                        'font-weight':'bold',
-                                        'color':'#ed3f14'
-
-                                    }
                                 }, param.row.statusTxt)
                             }
                         }

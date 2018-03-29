@@ -29,10 +29,10 @@ public class MerchantInfoCtr extends CoreController {
         StringBuffer where = new StringBuffer("from merchant_info mi  where 1=1 and mi.dat is null  ");
         if (!isParaBlank("search")) {
             where.append(" and (instr(mi.merchantNo,?)>0 or instr(mi.merchantName,?)>0 or instr(mi.perName,?)>0) ");
-            where.append(" ORDER BY mi.cat");
+            where.append(" ORDER BY mi.cat desc");
             page = MerchantInfo.dao.paginate(getPN(), getPS(), "select * ", where.toString(), serach, serach, serach);
         } else {
-            where.append(" ORDER BY mi.cat");
+            where.append(" ORDER BY mi.cat desc");
             page = MerchantInfo.dao.paginate(getPN(), getPS(), "select * ", where.toString());
         }
         List<Taxonomy> tlist =CacheKit.get(Consts.CACHE_NAMES.taxonomy.name(),"merTypeList");

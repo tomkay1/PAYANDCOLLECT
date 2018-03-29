@@ -1,3 +1,4 @@
+import kit from '../../libs/kit';
 const merCust = {
     state: {
         merCustList:[],
@@ -15,6 +16,9 @@ const merCust = {
             state.pageNumber=page.pageNumber
             state.totalRow=page.totalRow
 
+        },
+        merCust_info:function(state,param){
+            state.merCust = kit.clone(param)
         },
 
     },
@@ -37,6 +41,7 @@ const merCust = {
                 })
             });
         },
+
 
 
     }
