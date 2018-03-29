@@ -9,6 +9,8 @@ import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson.JSON;
+import com.cybermkd.mongo.kit.MongoBean;
+import com.cybermkd.mongo.kit.MongoKit;
 import com.jfinal.aop.Duang;
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.LogKit;
@@ -19,6 +21,9 @@ import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.upload.UploadFile;
+import com.mongodb.Mongo;
+import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.gridfs.GridFSFile;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.User;
 import com.mybank.pc.collection.model.CollectionClear;
@@ -32,6 +37,7 @@ import com.mybank.pc.merchant.model.MerchantInfo;
 import sun.rmi.runtime.Log;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -56,6 +62,7 @@ public class CClearCtr extends CoreController {
         String eTime=getPara("eTime");
         String chargeOff=getPara("chargeOff");
 
+
         bTime=DateKit.getTimeStampBegin(DateKit.strToDate(bTime,DateKit.yyyy_MM_dd));
         eTime=DateKit.getTimeStampEnd(DateKit.strToDate(eTime,DateKit.yyyy_MM_dd));
 
@@ -76,8 +83,8 @@ public class CClearCtr extends CoreController {
         }
         kv.put("clearTime>=",bTime);
         kv.put("clearTime<=",eTime);
-
-        SqlPara sqlPara = Db.getSqlPara("collection_clear.findPage", Kv.by("cond", kv));
+        String sqlKey=merchantInfo==null?"collection_clear.findPage":"collection_clear.findPage4Mer";
+        SqlPara sqlPara = Db.getSqlPara(sqlKey, Kv.by("cond", kv));
         page =CollectionClear.dao.paginate(getPN(), getPS(), sqlPara);
         renderJson(JSON.toJSONString(page,new BigDecimalValueFilter()));
     }
@@ -110,8 +117,8 @@ public class CClearCtr extends CoreController {
         }
         kv.put("clearTime>=",bTime);
         kv.put("clearTime<=",eTime);
-
-        SqlPara sqlPara = Db.getSqlPara("collection_clear.sum", Kv.by("cond", kv));
+        String sqlKey=merchantInfo==null?"collection_clear.sum":"collection_clear.sum4Mer";
+        SqlPara sqlPara = Db.getSqlPara(sqlKey, Kv.by("cond", kv));
         CollectionClear collectionClear =CollectionClear.dao.findFirst( sqlPara);
         renderJson(collectionClear);
     }
@@ -193,26 +200,33 @@ public class CClearCtr extends CoreController {
      * forceUpdate是否强制更新数据
      */
     public void  debit(){
-        Integer clearId=getParaToInt("clearId");
-        String  chargeOffTradeNo=getPara("chargeOffTradeNo");
-        String forceUpdate=getPara("forceUpdate");//是否强制更新
-        forceUpdate=StrUtil.isBlank(forceUpdate)?Consts.YORN_STR.no.getVal():Consts.YORN_STR.yes.getVal();
-        if(StrUtil.isBlank(chargeOffTradeNo)){
-            renderFailJSON("银行转账凭据号不能为空");
-            return;
-        }
-        CollectionClear collectionClear=CollectionClear.dao.findById(clearId);
+//        Integer clearId=getParaToInt("id");
+//        String  chargeOffTradeNo=getPara("chargeOffTradeNo");
+//        String amoutOff=getPara("amountOff");
+//        String chargeAt=getPara("chargeAt");
 
-        if ((collectionClear.getChargeOff().equals(Consts.YORN_STR.yes.getVal())|| StrUtil.isNotBlank(collectionClear.getChargeOffTradeNo()))&&forceUpdate.equals(Consts.YORN_STR.no.getVal())){
-            renderFailJSON("该清分数据已经出账");
-            return;
-        }
-        collectionClear.setChargeOffTradeNo(chargeOffTradeNo);
+//        String forceUpdate=getPara("forceUpdate");//是否强制更新
+//        forceUpdate=StrUtil.isBlank(forceUpdate)?Consts.YORN_STR.no.getVal():Consts.YORN_STR.yes.getVal();
+//        if(StrUtil.isBlank(chargeOffTradeNo)){
+//            renderFailJSON("银行转账凭据号不能为空");
+//            return;
+//        }
+        CollectionClear collectionClear=getModel(CollectionClear.class,"",true);
+
+//        if ((collectionClear.getChargeOff().equals(Consts.YORN_STR.yes.getVal())|| StrUtil.isNotBlank(collectionClear.getChargeOffTradeNo()))){
+//                &&forceUpdate.equals(Consts.YORN_STR.no.getVal())){
+//            renderFailJSON("该清分数据已经出账");
+//            return;
+//        }
+//        collectionClear.setChargeOffTradeNo(chargeOffTradeNo);
         collectionClear.setChargeOff(Consts.YORN_STR.yes.getVal());
         collectionClear.setMat(new Date());
-        collectionClear.setClearTime(new Date());
+//        collectionClear.setAmountOff(new BigDecimal(amoutOff));
+//        collectionClear.setClearTime(new Date());
+//        collectionClear.setChargeAt();
         collectionClear.setOperID(currUser()!=null?currUser().getId().toString():null);
         collectionClear.update();
+        renderSuccessJSON("出账处理成功");
     }
 
 
@@ -232,6 +246,7 @@ public class CClearCtr extends CoreController {
         Object obj=null;
         String chargeOffTradeNo=null;
         String clearNo=null;
+        Date chargetAt=null;
         int sCount=0,fCount=0,eCount=0;
         CollectionClear collectionClear=null;
 
@@ -239,16 +254,36 @@ public class CClearCtr extends CoreController {
         for (int i=2;i<readAll.size()-4;i++){
             map=readAll.get(i);
             obj = map.get("汇款凭证单号");
+            if (obj==null){
+                LogKit.error("导入的数据模板中缺少汇款凭证单号列");
+                renderFailJSON("导入的数据文件模板不正确，缺少汇款凭证单号列");
+                return;
+            }
             chargeOffTradeNo = obj == null ? "" : obj.toString();
             obj=map.get("清分流水号");
+            if (obj==null){
+                LogKit.error("导入的数据模板中缺少清分流水号列");
+                renderFailJSON("导入的数据文件模板不正确，缺少清分流水号列");
+                return;
+            }
             clearNo=obj == null ? "" : obj.toString();
+            obj=map.get("出账汇款时间");
+            if (obj==null){
+                LogKit.error("导入的数据模板中缺少出账汇款时间列");
+                renderFailJSON("导入的数据文件模板不正确,缺少出账汇款时间列");
+                return;
+            }
+            chargetAt=DateKit.strToDate((String) obj,DateKit.STR_DATEFORMATE);
+
+
             collectionClear=CollectionClear.dao.findFristByPropEQ("clearNo",clearNo);
             if(collectionClear!=null){
                 if(collectionClear.getChargeOff().equals(Consts.YORN_STR.no.getVal())) {
                     sCount++;
                     collectionClear.setChargeOffTradeNo(chargeOffTradeNo);
                     collectionClear.setChargeOff(Consts.YORN_STR.yes.getVal());
-                    collectionClear.setChargeAt(new Date());
+                    collectionClear.setChargeAt(chargetAt);
+                    collectionClear.setMat(new Date());
                     collectionClear.setOperID(currUser()!=null?currUser().getId().toString():"");
                     collectionClear.update();
                 }else{
@@ -278,8 +313,8 @@ public class CClearCtr extends CoreController {
         String excelTitle=bTime+"-"+eTime+"清分数据汇总";
         User user=currUser();
         Kv kv = Kv.create();
-        kv.put("clearTime>=",bTime);
-        kv.put("clearTime<=",eTime);
+        kv.put("cleartotleTime>=",bTime);
+        kv.put("cleartotleTime<=",eTime);
 
         SqlPara sqlPara = Db.getSqlPara("collection_clear.findTotalPage", Kv.by("cond", kv));
         List<CollectionCleartotle> list =CollectionCleartotle.dao.find(sqlPara);
@@ -524,6 +559,8 @@ public class CClearCtr extends CoreController {
 
             ret.add(map);
         }
+
+
     }
 
     /**

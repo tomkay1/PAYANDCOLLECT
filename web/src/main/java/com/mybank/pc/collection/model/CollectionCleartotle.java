@@ -16,4 +16,6 @@ public class CollectionCleartotle extends BaseCollectionCleartotle<CollectionCle
 	public String getCleartotleTimeTxt(){
 		return DateKit.dateToStr(getCleartotleTime(),DateKit.yyyy_MM_dd);
 	}
+
+
 }

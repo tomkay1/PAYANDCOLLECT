@@ -74,3 +74,39 @@ FROM collection_cleartotle cc WHERE 1=1
 #end
 
 #end
+
+
+#sql("findPage4Mer")
+SELECT
+  cc.merNO,(select merchantName from merchant_info where id=cc.merID) as merName,
+  cc.tradeCount as tradeCount,
+  cc.amountSum as amountSum,
+  cc.amountFeeSum as amountFeeSum,
+  cc.accountFee as accountFee,
+  cc.tradeFee as tradeFee,
+  cc.amountOff as amountOff,cc.clearNo as clearNo,cc.clearTime as clearTime,cc.chargeAt as chargeAt,cc.chargeOff as chargeOff,
+  cc.chargeOffTradeNo as chargeOffTradeNo
+FROM collection_clear cc WHERE 1=1
+#for(x : cond)
+ AND #(x.key) #para(x.value)
+#end
+ORDER BY cc.cat DESC
+
+#end
+
+#sql("sum4Mer")
+SELECT
+           sum(cc.tradeCount) as tradeCount,
+           sum(cc.amountSum) as amountSum,
+           sum(cc.amountFeeSum) as amountFeeSum,
+           sum(cc.accountFee) as accountFee,
+           sum(cc.tradeFee) as tradeFee,
+           sum(cc.amountOff) as amountOff,
+  cc.merNO,(select merchantName from merchant_info where id=cc.merID) as merName
+FROM collection_clear cc WHERE 1=1
+                               #for(x : cond)
+                               AND  #(x.key) #para(x.value)
+#end
+GROUP BY merID
+
+#end

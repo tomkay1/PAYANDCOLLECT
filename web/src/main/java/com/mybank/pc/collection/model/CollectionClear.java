@@ -1,5 +1,7 @@
 package com.mybank.pc.collection.model;
 
+import cn.hutool.core.util.StrUtil;
+import com.mybank.pc.Consts;
 import com.mybank.pc.collection.model.base.BaseCollectionClear;
 import com.mybank.pc.kits.DateKit;
 
@@ -19,12 +21,16 @@ public class CollectionClear extends BaseCollectionClear<CollectionClear> {
 		return getBigDecimal("profit")==null?"0":getBigDecimal("profit").toString();
 	}
 
-	public String getClearDateTimeTxt(){
+	public String getClearTimeTxt(){
 		return DateKit.dateToStr(getClearTime(),DateKit.yyyy_MM_dd);
 	}
 
 	@Override
 	public String getTableName() {
 		return "collection_clear";
+	}
+
+	public String getChargeAtTxt(){
+		return getChargeAt()==null?Consts.BLANK:DateKit.dateToStr(getChargeAt(),DateKit.format4Login);
 	}
 }

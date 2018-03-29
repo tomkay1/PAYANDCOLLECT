@@ -32,6 +32,8 @@ public class Consts {
 
     public static final String T_TAG_CK="tag";
 
+    public static final String BLANK="";
+
     public static final BigDecimal ZERO=new BigDecimal(0);
 
     public enum YORN {
