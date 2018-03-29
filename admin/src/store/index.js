@@ -18,6 +18,9 @@ import collBatch from './modules/collection_batch';
 import collQuery from './modules/collection_query';
 import collUndo from './modules/collection_undo';
 import collReconciliation from './modules/collection_reconciliation';
+import merCust from "./modules/merCust";
+import unionpayEntrust from './modules/unionpay_entrust';
+import collReconciliation from './modules/collection_reconciliation';
 
 Vue.use(Vuex);
 
@@ -57,7 +60,8 @@ const store = new Vuex.Store({
         collBatch,
         collQuery,
         collUndo,
-        collReconciliation
+        collReconciliation,
+        unionpayEntrust
     }
 });
 
