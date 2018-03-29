@@ -1,6 +1,5 @@
 package com.mybank.pc;
 
-import com.jfinal.kit.PathKit;
 import com.jfinal.kit.Prop;
 import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.dialect.MysqlDialect;
@@ -23,12 +22,12 @@ public class GeneratorKit {
 	
 	public static void main(String[] args) {
 		// base model 所使用的包名
-		String baseModelPackageName = "com.mybank.pc.merchant.model.base";
+		String baseModelPackageName = "com.mybank.pc.collection.model.base";
 		// base model 文件保存路径
-		String baseModelOutputDir = PathKit.getWebRootPath() + "/../src/com/yhh/csap/model/base";
+		String baseModelOutputDir = "C:/work/tmp/GeneratorClass/model/base";
 		
 		// model 所使用的包名 (MappingKit 默认使用的包名)
-		String modelPackageName = "com.mybank.pc.merchant.model";
+		String modelPackageName = "com.mybank.pc.collection.model";
 		// model 文件保存路径 (MappingKit 与 DataDictionary 文件默认保存路径)
 		String modelOutputDir = baseModelOutputDir + "/..";
 		

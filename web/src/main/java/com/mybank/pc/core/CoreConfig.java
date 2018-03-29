@@ -25,6 +25,7 @@ import com.mybank.pc.admin.role.RoleCtr;
 import com.mybank.pc.admin.taxonomy.TaxCtr;
 import com.mybank.pc.admin.user.UserCtr;
 import com.mybank.pc.collection.clear.CClearCtr;
+import com.mybank.pc.collection.entrust.CEntrustCtr;
 import com.mybank.pc.collection.trade.CTradeCtr;
 import com.mybank.pc.interceptors.AdminAAuthInterceptor;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
@@ -164,6 +165,7 @@ public class CoreConfig extends JFinalConfig{
         jFinalPlugin.setDatabase(ResKit.getConfig("mongodb.db"));
         jFinalPlugin.auth(ResKit.getConfig("mongodb.user"),ResKit.getConfig("mongodb.pwd"));
         plugins.add(jFinalPlugin);
+
 
 
 

@@ -33,12 +33,12 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 		return getStr("merchantName");
 	}
 
-	public void setMerchantType(java.lang.Integer merchantType) {
+	public void setMerchantType(java.lang.String merchantType) {
 		set("merchantType", merchantType);
 	}
 	
-	public java.lang.Integer getMerchantType() {
-		return getInt("merchantType");
+	public java.lang.String getMerchantType() {
+		return getStr("merchantType");
 	}
 
 	public void setPerName(java.lang.String perName) {
