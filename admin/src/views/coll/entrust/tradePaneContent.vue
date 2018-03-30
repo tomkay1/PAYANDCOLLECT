@@ -22,7 +22,7 @@
                 </Row>
                 <div style="margin: 10px;overflow: hidden">
                     <div style="float: right;">
-                        <Page page-size="10" :total="total" :current="pageNumber" @on-change="search" show-total show-elevator></Page>
+                        <Page :page-size="pageSize" :total="total" :current="pageNumber" @on-change="search" show-total show-elevator></Page>
                     </div>
                 </div>
             </Card>
@@ -52,19 +52,26 @@
                     'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
                     search: this.searchKey,
                     pn: pn,
-                    ps: '10'
+                    ps: this.pageSize
                 }
                 this.$store.dispatch('get_entrust_trade_list', param)
             }
         },
         mounted() {
-            this.$store.dispatch('get_entrust_trade_list')
+            let param = {
+                'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
+                'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
+                search: this.searchKey,
+                ps: this.pageSize
+            }
+            this.$store.dispatch('get_entrust_trade_list', param)
         },
         data() {
             return {
                 bTime: new Date(),
                 eTime: new Date(),
                 searchKey: '',
+                pageSize: 10,
                 tableColums: [
                     {
                         title: '姓名',

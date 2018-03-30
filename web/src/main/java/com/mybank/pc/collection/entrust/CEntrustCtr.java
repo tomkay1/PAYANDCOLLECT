@@ -50,7 +50,7 @@ public class CEntrustCtr extends CoreController {
 		String eTime = getPara("eTime");
 
 		Kv kv = Kv.create();
-		kv.set("serach", serach).set("bTime", bTime).set("eTime", eTime);
+		kv.set("search", serach).set("bTime", bTime).set("eTime", eTime);
 		SqlPara sqlPara = Db.getSqlPara("collection_entrust.findUnionpayEntrustPage", kv);
 		page = UnionpayEntrust.dao.paginate(getPN(), getPS(), sqlPara);
 
@@ -77,15 +77,39 @@ public class CEntrustCtr extends CoreController {
 
 			String userId = CookieKit.get(this, Consts.USER_ACCESS_TOKEN);
 
+			boolean isSuccess = false;
 			if (merCode.equals("all")) {
-				cEntrustSrv.establish(kv.set("merCode", "0"), userId);
-				cEntrustSrv.establish(kv.set("merCode", "1"), userId);
+				try {
+					isSuccess = cEntrustSrv.establish(kv.set("merCode", "0"), userId);
+				} catch (Exception e) {
+					isSuccess = false;
+				}
+				try {
+					isSuccess = cEntrustSrv.establish(kv.set("merCode", "1"), userId) && isSuccess;
+				} catch (Exception e) {
+					isSuccess = false;
+				}
 			} else {
-				cEntrustSrv.establish(kv.set("merCode", merCode), userId);
+				try {
+					isSuccess = cEntrustSrv.establish(kv.set("merCode", merCode), userId);
+				} catch (Exception e) {
+					isSuccess = false;
+				}
 			}
-			renderSuccessJSON("交易成功");
+
+			if (isSuccess) {
+				renderSuccessJSON("交易成功");
+			} else {
+				renderFailJSON("交易失败");
+			}
+
 		} catch (Exception e) {
 			throw new CoreException("交易失败");
 		}
+	}
+
+	@ActionKey("/coll/entrust/terminate")
+	public void terminate() {
+
 	}
 }

@@ -7,7 +7,7 @@
             </p>
             <Form ref="formValidate" :label-width="120" :model="entrust" :rules="ruleValidate">
                 <FormItem label="商户类型" prop="merCode">
-                    <Select v-model="entrust.merCode" >
+                    <Select v-model="entrust.merCode">
                         <Option v-for="item in merCodeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                     </Select>
                 </FormItem>
@@ -51,6 +51,9 @@
 
     export default {
         name: 'addEntrustModal',
+        props: [
+            'pageSize'
+        ],
         computed: {
             ...mapState({
                 'entrust': state => state.collEntrust.collEntrust,
@@ -59,6 +62,11 @@
         methods: {
             open() {
                 this.addEntrustModal = true;
+                this.$store.commit('collEntrust_set', {});
+                this.modalLoading = false;
+            },
+            close(){
+                this.addEntrustModal = false;
                 this.$store.commit('collEntrust_set', {});
                 this.modalLoading = false;
             },
@@ -73,11 +81,8 @@
                 this.$refs['formValidate'].validate((valid) => {
                     if (valid) {
                         this.$store.dispatch('entrust_save').then((res) => {
-                            this.modalLoading = false;
-                            if (res && res == 'success') {
-                                vm.roleModal = false;
-                                this.$store.dispatch('get_entrust_list')
-                            }
+                            this.$store.dispatch('get_entrust_list', { ps: this.pageSize })
+                            this.close()
                         })
                     } else {
                         this.modalLoading = false;
@@ -110,8 +115,8 @@
                     },
                 ],
                 ruleValidate: {
-                    merCode:[
-                       { type: 'string', required: true, message: '商户类型不能为空', trigger: 'blur' },
+                    merCode: [
+                        { type: 'string', required: true, message: '商户类型不能为空', trigger: 'blur' },
                     ],
                     customerNm: [
                         { type: 'string', required: true, message: '姓名不能为空', trigger: 'blur' },
