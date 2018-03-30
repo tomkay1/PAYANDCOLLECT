@@ -1,5 +1,7 @@
 package com.mybank.pc.collection.model;
 
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseCollectionEntrust;
 
 /**
@@ -12,9 +14,8 @@ public class CollectionEntrust extends BaseCollectionEntrust<CollectionEntrust> 
 	public CollectionEntrust findOne() {
 		CollectionEntrust result = null;
 		try {
-			result = dao.findFirst(
-					"SELECT * FROM collection_entrust WHERE customerNm = ? AND certifId = ? AND accNo = ? AND merId = ?",
-					getCustomerNm(), getCertifId(), getAccNo(), getMerId());
+			SqlPara sqlPara = Db.getSqlPara("collection_entrust.findOne", _getAttrs());
+			result = dao.findFirst(sqlPara);
 		} catch (Exception e) {
 			e.printStackTrace();
 			result = null;

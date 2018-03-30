@@ -9,14 +9,14 @@
                 </p>
                 <Row>
                     <Col span="8">
-                        <Button type="primary" icon="person-add" @click="add">建立委托</Button>
-                        <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
+                    <Button type="primary" icon="person-add" @click="add">建立委托</Button>
+                    <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
                     </Col>
                     <Col span="8" offset="8" align="right">
-                        <Input v-model="searchKey" placeholder="请输入..." style="width: 200px" />
-                        <span @click="search" style="margin: 0 10px;">
-                            <Button type="primary" icon="search">搜索</Button>
-                        </span>
+                    <Input v-model="searchKey" placeholder="请输入..." style="width: 200px" />
+                    <span @click="search" style="margin: 0 10px;">
+                        <Button type="primary" icon="search">搜索</Button>
+                    </span>
                     </Col>
                 </Row>
                 <Row class="margin-top-10">
@@ -24,13 +24,13 @@
                 </Row>
                 <div style="margin: 10px;overflow: hidden">
                     <div style="float: right;">
-                        <Page page-size="10" :total="total" :current="pageNumber" @on-change="search" show-total show-elevator></Page>
+                        <Page :page-size="pageSize" :total="total" :current="pageNumber" @on-change="search" show-total show-elevator></Page>
                     </div>
                 </div>
             </Card>
             </Col>
         </Row>
-        <addForm ref="aem"></addForm>
+        <addForm ref="aem" :pageSize="pageSize"></addForm>
     </div>
 </template>
 
@@ -50,10 +50,10 @@
         },
         methods: {
             search(pn) {
-                this.$store.dispatch('get_entrust_list', { search: this.searchKey, pn: pn })
+                this.$store.dispatch('get_entrust_list', { search: this.searchKey, pn: pn, ps: this.pageSize })
             },
             refresh() {
-                this.$store.dispatch('get_entrust_list', { search: this.searchKey })
+                this.$store.dispatch('get_entrust_list', { search: this.searchKey, ps: this.pageSize })
             },
             add() {
                 this.$refs.aem.open();
@@ -63,11 +63,12 @@
             addForm: addEntrustModal
         },
         mounted() {
-            this.$store.dispatch('get_entrust_list')
+            this.$store.dispatch('get_entrust_list', { ps: this.pageSize })
         },
         data() {
             return {
                 searchKey: '',
+                pageSize: 10,
                 tableColums: [
                     {
                         title: '姓名',

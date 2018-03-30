@@ -1,5 +1,6 @@
 package com.mybank.pc.collection.entrust;
 
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 import com.mybank.pc.collection.model.CollectionEntrust;
 import com.mybank.pc.collection.model.UnionpayEntrust;
 import com.mybank.pc.exception.EntrustRuntimeException;
+import com.mybank.pc.exception.TxnKey;
 import com.mybank.pc.interceptors.EntrustExceptionInterceptor;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
@@ -22,7 +24,8 @@ import com.mybank.pc.kits.unionpay.acp.SDKConfig;
 public class CEntrustSrv {
 
 	@Before({ EntrustExceptionInterceptor.class, Tx.class })
-	public void establish(Kv kv, String userId) {
+	@TxnKey("establish")
+	public boolean establish(Kv kv, String userId) {
 		UnionpayEntrust unionpayEntrust = new UnionpayEntrust();
 		try {
 			String merCode = kv.getStr("merCode");
@@ -37,10 +40,10 @@ public class CEntrustSrv {
 
 			Date now = new Date();
 			String orderId = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(now) + accNo;
-			if(orderId.length()>40){
-				orderId=orderId.substring(0, 40);
+			if (orderId.length() > 40) {
+				orderId = orderId.substring(0, 40);
 			}
-			
+
 			String txnTime = new SimpleDateFormat("yyyyMMddHHmmss").format(now);
 
 			unionpayEntrust.setCustomerNm(customerNm);
@@ -52,17 +55,14 @@ public class CEntrustSrv {
 			unionpayEntrust.setExpired(expired);
 			unionpayEntrust.setTradeNo(new SimpleDateFormat("yyyyMMddHHmmssSSS").format(now) + certifId);
 			unionpayEntrust.setOrderId(orderId);
+			unionpayEntrust.setTxnType("72");
+			unionpayEntrust.setTxnSubType("11");
 			unionpayEntrust.setTxnTime(txnTime);
 			unionpayEntrust.setCat(now);
 			unionpayEntrust.setMat(now);
 			unionpayEntrust.setOperID(userId);
 
-			SDK sdk = null;
-			if (merCode.equals("0")) {
-				sdk = SDK.REALTIME_SDK;
-			} else if (merCode.equals("1")) {
-				sdk = SDK.BATCH_SDK;
-			}
+			SDK sdk = getSDK(merCode);
 			SDKConfig sdkConfig = sdk.getSdkConfig();
 			AcpService acpService = sdk.getAcpService();
 			String encoding = "UTF-8";
@@ -123,7 +123,7 @@ public class CEntrustSrv {
 																	// acpsdk.backTransUrl
 			Map<String, String> rspData = acpService.post(reqData, requestBackUrl, encoding); // 发送请求报文并接受同步应答（默认连接超时时间30秒，读取返回结果超时时间30秒）;这里调用signData之后，调用submitUrl之前不能对submitFromData中的键值对做任何修改，如果修改会导致验签不通过
 			unionpayEntrust.setResp(JsonKit.toJson(rspData));
-			handlingEstablishResult(rspData, acpService, encoding, unionpayEntrust);
+			return handlingEstablishResult(rspData, acpService, encoding, unionpayEntrust);
 		} catch (EntrustRuntimeException e) {
 			throw e;
 		} catch (Exception e) {
@@ -140,8 +140,9 @@ public class CEntrustSrv {
 	 * @param acpService
 	 * @param encoding
 	 */
-	private void handlingEstablishResult(Map<String, String> rspData, AcpService acpService, String encoding,
+	private boolean handlingEstablishResult(Map<String, String> rspData, AcpService acpService, String encoding,
 			UnionpayEntrust unionpayEntrust) {
+		boolean result = false;
 		try {
 			CollectionEntrust query = new CollectionEntrust();
 			query.setCustomerNm(unionpayEntrust.getCustomerNm());
@@ -188,6 +189,7 @@ public class CEntrustSrv {
 			if (("00").equals(respCode)) {// 成功
 				collectionEntrust.setStatus("0");
 				unionpayEntrust.setFinalCode("0");
+				result = true;
 			} else {
 				collectionEntrust.setStatus("1");
 				unionpayEntrust.setFinalCode("2");
@@ -199,6 +201,7 @@ public class CEntrustSrv {
 				collectionEntrust.update();
 			}
 			unionpayEntrust.save();
+			return result;
 		} catch (Exception e) {
 			EntrustRuntimeException xe = new EntrustRuntimeException(e);
 			xe.setContext(unionpayEntrust);
@@ -206,49 +209,90 @@ public class CEntrustSrv {
 		}
 	}
 
-	public void handlingException(Invocation invocation, EntrustRuntimeException e) {
-		String actionKey = invocation.getActionKey();
-		if (actionKey.equals("/coll/entrust/establish")) {
-			UnionpayEntrust unionpayEntrust = (UnionpayEntrust) e.getContext();
-			unionpayEntrust.setExpired(JsonKit.toJson(e.getExceptionInfo()));
-			unionpayEntrust.setFinalCode("2");
-			unionpayEntrust.save();
+	@Before({ EntrustExceptionInterceptor.class, Tx.class })
+	public void terminate(Kv kv, String userId) {
+		String merCode = kv.getStr("merCode");
+		String accNo = kv.getStr("accNo");
 
-			CollectionEntrust query = new CollectionEntrust();
-			String customerNm = unionpayEntrust.getCustomerNm();
-			query.setCustomerNm(customerNm == null ? "" : customerNm);
-			String certifId = unionpayEntrust.getCertifId();
-			query.setCertifId(certifId == null ? "" : certifId);
-			String accNo = unionpayEntrust.getAccNo();
-			query.setAccNo(accNo == null ? "" : accNo);
-			String merId = unionpayEntrust.getMerId();
-			query.setMerId(merId == null ? "" : merId);
+		SDK sdk = getSDK(merCode);
+		SDKConfig sdkConfig = sdk.getSdkConfig();
+		AcpService acpService = sdk.getAcpService();
+		String encoding = "UTF-8";
+		String merId = sdk.getMerId();
 
-			CollectionEntrust collectionEntrust = query.findOne();
-			boolean needSave = collectionEntrust == null;
-			if (needSave) {
-				collectionEntrust = new CollectionEntrust();
-				collectionEntrust.setCustomerNm(unionpayEntrust.getCustomerNm());
-				collectionEntrust.setCertifTp(unionpayEntrust.getCertifTp());
-				collectionEntrust.setCertifId(unionpayEntrust.getCertifId());
-				collectionEntrust.setAccNo(unionpayEntrust.getAccNo());
-				collectionEntrust.setPhoneNo(unionpayEntrust.getPhoneNo());
-				collectionEntrust.setCvn2(unionpayEntrust.getCvn2());
-				collectionEntrust.setExpired(unionpayEntrust.getExpired());
-				collectionEntrust.setMerId(unionpayEntrust.getMerId());
-				collectionEntrust.setCat(unionpayEntrust.getCat());
-			}
-			collectionEntrust.setMat(unionpayEntrust.getCat());
-			collectionEntrust.setStatus("1");
-			collectionEntrust.setOperID(unionpayEntrust.getOperID());
+		CollectionEntrust query = new CollectionEntrust();
+		query.setAccNo(accNo);
+		query.setMerId(merId);
+		CollectionEntrust collectionEntrust = query.findOne();
 
-			if (needSave) {
-				collectionEntrust.save();
-			} else {
-				collectionEntrust.update();
-			}
+		Date now = new Date();
+		String orderId = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(now) + accNo;
+		if (orderId.length() > 40) {
+			orderId = orderId.substring(0, 40);
 		}
+		String txnTime = new SimpleDateFormat("yyyyMMddHHmmss").format(now);
 
+		Map<String, String> contentData = new HashMap<String, String>();
+
+	}
+
+	public void handlingException(Invocation invocation, EntrustRuntimeException e) {
+		Method method = invocation.getMethod();
+		if (method.isAnnotationPresent(TxnKey.class)) {
+			TxnKey txnKey = method.getAnnotation(TxnKey.class);
+
+			if (txnKey.value().equals("establish")) {
+				UnionpayEntrust unionpayEntrust = (UnionpayEntrust) e.getContext();
+				unionpayEntrust.setExceInfo(JsonKit.toJson(e.getExceptionInfo()));
+				unionpayEntrust.setFinalCode("2");
+				unionpayEntrust.save();
+
+				CollectionEntrust query = new CollectionEntrust();
+				String customerNm = unionpayEntrust.getCustomerNm();
+				query.setCustomerNm(customerNm == null ? "" : customerNm);
+				String certifId = unionpayEntrust.getCertifId();
+				query.setCertifId(certifId == null ? "" : certifId);
+				String accNo = unionpayEntrust.getAccNo();
+				query.setAccNo(accNo == null ? "" : accNo);
+				String merId = unionpayEntrust.getMerId();
+				query.setMerId(merId == null ? "" : merId);
+
+				CollectionEntrust collectionEntrust = query.findOne();
+				boolean needSave = collectionEntrust == null;
+				if (needSave) {
+					collectionEntrust = new CollectionEntrust();
+					collectionEntrust.setCustomerNm(unionpayEntrust.getCustomerNm());
+					collectionEntrust.setCertifTp(unionpayEntrust.getCertifTp());
+					collectionEntrust.setCertifId(unionpayEntrust.getCertifId());
+					collectionEntrust.setAccNo(unionpayEntrust.getAccNo());
+					collectionEntrust.setPhoneNo(unionpayEntrust.getPhoneNo());
+					collectionEntrust.setCvn2(unionpayEntrust.getCvn2());
+					collectionEntrust.setExpired(unionpayEntrust.getExpired());
+					collectionEntrust.setMerId(unionpayEntrust.getMerId());
+					collectionEntrust.setCat(unionpayEntrust.getCat());
+				}
+				collectionEntrust.setMat(unionpayEntrust.getCat());
+				collectionEntrust.setStatus("1");
+				collectionEntrust.setOperID(unionpayEntrust.getOperID());
+
+				if (needSave) {
+					collectionEntrust.save();
+				} else {
+					collectionEntrust.update();
+				}
+			}
+
+		}
+	}
+
+	private SDK getSDK(String merCode) {
+		SDK sdk = null;
+		if (merCode.equals("0")) {
+			sdk = SDK.REALTIME_SDK;
+		} else if (merCode.equals("1")) {
+			sdk = SDK.BATCH_SDK;
+		}
+		return sdk;
 	}
 
 }
