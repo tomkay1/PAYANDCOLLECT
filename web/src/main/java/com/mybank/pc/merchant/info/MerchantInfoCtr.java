@@ -7,6 +7,7 @@ import com.jfinal.plugin.ehcache.CacheKit;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.Taxonomy;
 import com.mybank.pc.core.CoreController;
+import com.mybank.pc.merchant.model.MerchantFee;
 import com.mybank.pc.merchant.model.MerchantInfo;
 
 import java.math.BigInteger;
@@ -110,7 +111,25 @@ public class MerchantInfoCtr extends CoreController {
         renderSuccessJSON("恢复操作执行成功。", "");
     }
 
+    public void listFee() {
 
+        String merID = getPara("id");
+        StringBuffer tradeType1 = new StringBuffer("select * from merchant_fee mf  where 1=1 and mf.dat is null  ");
+        tradeType1.append(" and mf.merID=? and mf.tradeType='1'");
+
+
+        StringBuffer tradeType2 = new StringBuffer("select * from merchant_fee mf  where 1=1 and mf.dat is null  ");
+        tradeType2.append(" and mf.merID=? and mf.tradeType='2'");
+        List<MerchantFee> feeListJ = MerchantFee.dao.find(tradeType1.toString(),merID);
+        List<MerchantFee> feeListB = MerchantFee.dao.find(tradeType2.toString(),merID);
+
+        Map map = new HashMap();
+        map.put("feeListJ",feeListJ);
+        map.put("feeListB",feeListB);
+
+        renderJson(map);
+
+    }
 
 
 

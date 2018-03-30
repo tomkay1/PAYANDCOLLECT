@@ -8,7 +8,9 @@ const merInfo = {
         pageNumber:1,
         totalRow:0,
         merInfo:{},
-        merchantTypeList:[]
+        merchantTypeList:[],
+        merFeeListJ:[],
+        merFeeListB:[],
     },
     mutations: {
 
@@ -23,7 +25,11 @@ const merInfo = {
             if(param) {
                 state.merInfo = kit.clone(param)
             }
-        }
+        },
+        set_merFee_list(state,map){
+            state.merFeeListJ=map.feeListJ
+            state.merFeeListB=map.feeListB
+        },
     },
     actions:{
         merInfo_list:function ({ commit,state },param) {
@@ -68,6 +74,15 @@ const merInfo = {
             return new Promise(function (resolve, reject) {
                 vm.$axios.post('/mer00/enable', param).then((res) => {
                     resolve(res.resCode)
+                })
+            });
+        },
+
+        merFee_list:function({commit,state},param){
+            let vm=this._vm;
+            return new Promise(function (resolve, reject) {
+                vm.$axios.post('/mer00/listFee', param).then((res) => {
+                  commit("set_merFee_list",res)
                 })
             });
         },
