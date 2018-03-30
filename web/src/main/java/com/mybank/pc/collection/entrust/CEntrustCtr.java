@@ -48,9 +48,12 @@ public class CEntrustCtr extends CoreController {
 		String serach = getPara("search");
 		String bTime = getPara("bTime");
 		String eTime = getPara("eTime");
+		String txnType = getPara("txnType");
+		String txnSubType = getPara("txnSubType");
 
 		Kv kv = Kv.create();
-		kv.set("search", serach).set("bTime", bTime).set("eTime", eTime);
+		kv.set("search", serach).set("bTime", bTime).set("eTime", eTime).set("txnType", txnType).set("txnSubType",
+				txnSubType);
 		SqlPara sqlPara = Db.getSqlPara("collection_entrust.findUnionpayEntrustPage", kv);
 		page = UnionpayEntrust.dao.paginate(getPN(), getPS(), sqlPara);
 
@@ -110,6 +113,43 @@ public class CEntrustCtr extends CoreController {
 
 	@ActionKey("/coll/entrust/terminate")
 	public void terminate() {
+		String merCode = getPara("merCode");
+		String accNo = getPara("accNo");
 
+		try {
+			Kv kv = Kv.create();
+			kv.set("accNo", accNo);
+
+			String userId = CookieKit.get(this, Consts.USER_ACCESS_TOKEN);
+
+			boolean isSuccess = false;
+			if (merCode.equals("all")) {
+				try {
+					isSuccess = cEntrustSrv.terminate(kv.set("merCode", "0"), userId);
+				} catch (Exception e) {
+					isSuccess = false;
+				}
+				try {
+					isSuccess = cEntrustSrv.terminate(kv.set("merCode", "1"), userId) && isSuccess;
+				} catch (Exception e) {
+					isSuccess = false;
+				}
+			} else {
+				try {
+					isSuccess = cEntrustSrv.terminate(kv.set("merCode", merCode), userId);
+				} catch (Exception e) {
+					isSuccess = false;
+				}
+			}
+
+			if (isSuccess) {
+				renderSuccessJSON("交易成功");
+			} else {
+				renderFailJSON("交易失败");
+			}
+
+		} catch (Exception e) {
+			throw new CoreException("交易失败");
+		}
 	}
 }

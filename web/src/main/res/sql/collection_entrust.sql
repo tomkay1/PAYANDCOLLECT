@@ -9,6 +9,12 @@
 	    #if(eTime)
 	    	AND DATE(cat) <= #para(eTime)
 	    #end
+	    #if(txnType)
+	    	AND txnType = #para(txnType)
+	    #end
+	    #if(txnSubType)
+	    	AND txnSubType = #para(txnSubType)
+	    #end
 	  ORDER BY mat DESC,cat DESC
 #end
 #sql("findOne")

@@ -37,7 +37,15 @@ const collEntrust = {
             return new Promise(function (resolve, reject) {
                 vm.$axios.post('/coll/entrust/establish', state.collEntrust).then((res) => {
                     resolve(res.resCode);
-                })
+                });
+            });
+        },
+        entrust_terminate: function ({ commit, state }) {
+            let vm = this._vm;
+            return new Promise(function (resolve, reject) {
+                vm.$axios.post('/coll/entrust/terminate', state.collEntrust).then((res) => {
+                    resolve(res.resCode);
+                });
             });
         }
     }

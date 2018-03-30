@@ -10,6 +10,7 @@
                 <Row>
                     <Col span="8">
                     <Button type="primary" icon="person-add" @click="add">建立委托</Button>
+                    <Button type="primary" icon="person-add" @click="terminate">解除委托</Button>
                     <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
                     </Col>
                     <Col span="8" offset="8" align="right">
@@ -31,12 +32,15 @@
             </Col>
         </Row>
         <addForm ref="aem" :pageSize="pageSize"></addForm>
+        <terminateEntrustModal ref="tem" :pageSize="pageSize"></terminateEntrustModal>
     </div>
 </template>
 
 <script>
     import { mapState } from 'vuex'
     import addEntrustModal from './addForm.vue'
+    import terminateEntrustModal from './terminateForm.vue'
+
     export default {
         name: 'entrustStatusPaneContent',
         computed: {
@@ -58,9 +62,13 @@
             add() {
                 this.$refs.aem.open();
             },
+            terminate() {
+                this.$refs.tem.open();
+            },
         },
         components: {
-            addForm: addEntrustModal
+            addForm: addEntrustModal,
+            terminateEntrustModal: terminateEntrustModal
         },
         mounted() {
             this.$store.dispatch('get_entrust_list', { ps: this.pageSize })
@@ -93,6 +101,20 @@
                     {
                         title: '状态',
                         key: 'status',
+                        render: (h, params) => {
+                            const row = params.row;
+                            const status = row.status === '0' ? '已委托' : row.status === '1' ? '未知' : '已解除';
+                            return h('span', status);
+                        }
+                    },
+                    {
+                        title: '商户类型',
+                        key: 'type',
+                        render: (h, params) => {
+                            const row = params.row;
+                            const type = row.merId === '945230148160197' ? '实时' : '批量';
+                            return h('span', type);
+                        }
                     },
                     {
                         title: '创建时间',
