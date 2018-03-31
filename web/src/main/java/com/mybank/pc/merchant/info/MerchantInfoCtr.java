@@ -6,9 +6,13 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.Taxonomy;
+import com.mybank.pc.admin.model.User;
+import com.mybank.pc.admin.model.UserRole;
 import com.mybank.pc.core.CoreController;
+import com.mybank.pc.kits.ext.BCrypt;
 import com.mybank.pc.merchant.model.MerchantFee;
 import com.mybank.pc.merchant.model.MerchantInfo;
+import com.mybank.pc.merchant.model.MerchantUser;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -57,6 +61,37 @@ public class MerchantInfoCtr extends CoreController {
         merInfo.setStatus(Consts.STATUS.enable.getVal());
         merInfo.setOperID(String.valueOf(currUser().getId()));
         merInfo.save();
+
+        //增加用户信息
+        User user = new User();
+        user.setLoginname("oper@"+merInfo.getMerchantNo());
+        user.setIdcard(merInfo.getCardID());
+        user.setNickname("商户"+merInfo.getMerchantNo());
+        user.setCAt(new Date());
+        user.setEmailStatus(Consts.YORN.no.isVal());
+        user.setPhoneStatus(Consts.YORN.no.isVal());
+        user.setMAt(new Date());
+        user.setStatus(Consts.STATUS.enable.getVal());
+        user.setSignature(merInfo.getMerchantName());
+        user.setSalt(BCrypt.gensalt());
+        user.setPassword(BCrypt.hashpw(merInfo.getMobile(), user.getSalt()));
+        String default_avart = CacheKit.get(Consts.CACHE_NAMES.paramCache.name(), "qn_url") + "image/avatar/dft-avatar.jpg";
+        user.setAvatar(default_avart);
+        user.save();
+
+        //建立商户和操作员关系
+        MerchantUser merchantUser = new MerchantUser();
+        merchantUser.setMerchantID(merInfo.getId());
+        merchantUser.setUserID(user.getId().intValue());
+        merchantUser.save();
+
+        //增加默认角色，5为商户操作员
+        UserRole ur = new UserRole();
+            ur.setRId(5);
+            ur.setUId(user.getLong("id"));
+            ur.save();
+
+
         renderSuccessJSON("新增商户信息成功。", "");
     }
 
@@ -76,7 +111,22 @@ public class MerchantInfoCtr extends CoreController {
         MerchantInfo merInfo=MerchantInfo.dao.findById(BigInteger.valueOf(id));
         merInfo.setDat(new Date());
         merInfo.update();
+
+        //删除关联操作员用户
+        List<MerchantUser> list = MerchantUser.dao.find("select * from merchant_user mu where mu.merchantID=? ",merInfo.getId());
+        if(list !=null && list.size()>0){
+            Integer userID = list.get(0).getUserID();
+            User user =new User();
+            user.setId(BigInteger.valueOf(userID));
+            user.setDAt(new Date());
+            user.update();
+            CacheKit.remove(Consts.CACHE_NAMES.user.name(),user.getId());
+            CacheKit.remove(Consts.CACHE_NAMES.userRoles.name(),user.getId());
+            CacheKit.remove(Consts.CACHE_NAMES.userReses.name(),user.getId());
+        }
+
         renderSuccessJSON("删除商户信息成功。");
+
     }
 
 
@@ -91,7 +141,15 @@ public class MerchantInfoCtr extends CoreController {
         merInfo.setId(id);
         merInfo.setStatus(Consts.STATUS.forbidden.getVal());
         merInfo.update();
-
+        //禁用关联操作员用户
+        List<MerchantUser> list = MerchantUser.dao.find("select * from merchant_user mu where mu.merchantID=? ",merInfo.getId());
+        if(list !=null && list.size()>0){
+            Integer userID = list.get(0).getUserID();
+            User user =new User();
+            user.setId(BigInteger.valueOf(userID));
+            user.setStatus(Consts.STATUS.forbidden.getVal());
+            user.update();
+            }
 
         renderSuccessJSON("禁用操作执行成功。", "");
     }
@@ -107,7 +165,15 @@ public class MerchantInfoCtr extends CoreController {
         merInfo.setId(id);
         merInfo.setStatus(Consts.STATUS.enable.getVal());
         merInfo.update();
-
+        //激活关联操作员用户
+        List<MerchantUser> list = MerchantUser.dao.find("select * from merchant_user mu where mu.merchantID=? ",merInfo.getId());
+        if(list !=null && list.size()>0){
+            Integer userID = list.get(0).getUserID();
+            User user =new User();
+            user.setId(BigInteger.valueOf(userID));
+            user.setStatus(Consts.STATUS.enable.getVal());
+            user.update();
+        }
         renderSuccessJSON("恢复操作执行成功。", "");
     }
 

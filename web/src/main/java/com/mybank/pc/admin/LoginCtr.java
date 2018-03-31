@@ -40,7 +40,7 @@ public class LoginCtr extends CoreController {
 			return;
 		}
 
-		User user = com.mybank.pc.admin.model.User.dao.findFirst("select * from s_user where loginname=? ", username);
+		User user = com.mybank.pc.admin.model.User.dao.findFirst("select * from s_user where loginname=? and d_at is null", username);
 
 		if (user == null) {
 			renderFailJSON("用户不存在!");

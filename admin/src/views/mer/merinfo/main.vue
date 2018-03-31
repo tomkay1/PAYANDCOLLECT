@@ -192,7 +192,7 @@
                     </RadioGroup>
 
                     <Input v-model="merFee.amount"  placeholder="请输入手续费金额或比例" style="width: 150px"/>
-                    <Button type="success" >增加</Button>
+                    <Button type="success" @click="addFee">增加</Button>
 
                 </FormItem>
 
@@ -462,6 +462,15 @@
                 })
 
             },
+            addFee(){
+
+                //获取输入的手续费数据
+
+                if(this.merFee.tradeType==='1'){
+                    this.$store.commit('add_merFee_list',{merFee:this.merFee})
+                }
+
+            },
         },
         mounted () {
             //页面加载时或数据方法
@@ -548,13 +557,13 @@
                         title: '商户编号',
                         key: 'merchantNo',
                         align:'center',
-                        width:90,
+
                     },
                     {
                         title: '商户类型',
                         key: 'merTypeTxt',
                         align:'center',
-                        width:90,
+
                     },
                     {
                         title: '负责人姓名',

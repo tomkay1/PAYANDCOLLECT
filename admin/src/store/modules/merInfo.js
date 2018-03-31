@@ -30,6 +30,10 @@ const merInfo = {
             state.merFeeListJ=map.feeListJ
             state.merFeeListB=map.feeListB
         },
+        add_merFee_list(state,merFee){
+            let vm = this._vm;
+            vm.$set(state.merFeeListJ, 1, {'amountUpper':merFee.amountUpper});
+        },
     },
     actions:{
         merInfo_list:function ({ commit,state },param) {

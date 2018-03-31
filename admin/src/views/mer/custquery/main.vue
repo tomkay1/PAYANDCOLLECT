@@ -14,7 +14,7 @@
                         <Input v-model="searchKey" placeholder="输入客户姓名/手机号" style="width: 200px"/>
                     <!--</Tooltip>-->
 
-                    <Input v-model="searchKey1" placeholder="商户编号" style="width: 200px"/>
+                    <Input v-model="searchKey1" v-if="isOper" placeholder="商户编号" style="width: 200px"/>
                     <span @click="search" style="margin: 0 10px;">
                         <Button type="primary" icon="search">搜索</Button></span>
                     </Col>
@@ -123,6 +123,8 @@
         return h('Poptip', {
             props: {
                 confirm: '',
+                placement:'top-end',
+                width:150,
                 title: '您确定要删除吗？'
             },
             style: {
@@ -167,6 +169,7 @@
                 'pageNumber': state => state.merCust.pageNumber,
                 'total': state => state.merCust.totalRow,
                 'merCust': state => state.merCust.merCust,
+                'isOper': state => state.merCust.isOper,
             })
         },
         methods: {

@@ -104,6 +104,17 @@ export const appRouter = [
         ]
     },
     {
+        path: '/mer1',
+        icon: 'monitor',
+        isCheck: 'yes',
+        name: 'mer1',
+        title: '商户操作管理',
+        component: Main,
+        children: [
+            { path: 'custquery', title: '商户客户查询', isCheck: 'yes', name: 'custquery', component: resolve => { require(['@/views/mer/custquery/main.vue'], resolve); } },
+        ]
+    },
+    {
         path: '/coll',
         icon: 'monitor',
         isCheck: 'no',
