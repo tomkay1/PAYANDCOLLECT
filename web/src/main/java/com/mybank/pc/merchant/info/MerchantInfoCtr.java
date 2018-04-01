@@ -1,5 +1,6 @@
 package com.mybank.pc.merchant.info;
 
+import cn.hutool.core.util.NumberUtil;
 import com.jfinal.aop.Before;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -14,6 +15,7 @@ import com.mybank.pc.merchant.model.MerchantFee;
 import com.mybank.pc.merchant.model.MerchantInfo;
 import com.mybank.pc.merchant.model.MerchantUser;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
@@ -180,23 +182,139 @@ public class MerchantInfoCtr extends CoreController {
     public void listFee() {
 
         String merID = getPara("id");
-        StringBuffer tradeType1 = new StringBuffer("select * from merchant_fee mf  where 1=1 and mf.dat is null  ");
-        tradeType1.append(" and mf.merID=? and mf.tradeType='1'");
+        StringBuffer tradeType1 = new StringBuffer("select * from merchant_fee mf  where 1=1 and mf.dat is null ");
+        tradeType1.append(" and mf.merID=? and mf.tradeType='1'  order by mf.amountLower desc ");
 
 
         StringBuffer tradeType2 = new StringBuffer("select * from merchant_fee mf  where 1=1 and mf.dat is null  ");
-        tradeType2.append(" and mf.merID=? and mf.tradeType='2'");
+        tradeType2.append(" and mf.merID=? and mf.tradeType='2'  order by mf.amountLower desc");
         List<MerchantFee> feeListJ = MerchantFee.dao.find(tradeType1.toString(),merID);
         List<MerchantFee> feeListB = MerchantFee.dao.find(tradeType2.toString(),merID);
 
         Map map = new HashMap();
         map.put("feeListJ",feeListJ);
         map.put("feeListB",feeListB);
-
+        map.put("merID",merID);
         renderJson(map);
 
     }
+    @Before({ Tx.class})
+    public void addFee(){
+        MerchantFee merFee   =  getModel(MerchantFee.class,"",true);
+        if(merFee.getFeeType().equals("2")){
+            merFee.setRatio(merFee.getAmount());
+            merFee.setAmount(null);
+        }
 
+        List<MerchantFee> feeList;
+        StringBuffer str = new StringBuffer("select * from merchant_fee mf  where 1=1 and mf.dat is null   and mf.merID=? and mf.tradeType=? order by mf.amountLower desc");
+        //检查最大值
+        if(merFee.getTradeType().equals("1")){
+            //加急
+             feeList = MerchantFee.dao.find(str.toString(),merFee.getMerID(),merFee.getTradeType());
+        }else{
+            //标准
+            feeList = MerchantFee.dao.find(str.toString(),merFee.getMerID(),merFee.getTradeType());
+        }
+
+        if(feeList!=null && feeList.size()>0) {
+            for (int i = 0; i < feeList.size(); i++) {
+                int a = merFee.getAmountUpper().compareTo(feeList.get(i).getAmountLower());
+                if (a > 0) {
+                    BigDecimal am =  feeList.get(i).getAmountLower();
+                    //修改本记录（金额下限），增加新记录
+                    MerchantFee mft = feeList.get(i);
+                    mft.setAmountLower(merFee.getAmountUpper());
+                    mft.update();
+
+                    merFee.setAmountLower(am);
+                    merFee.setCat(new Date());
+                    merFee.save();
+                    break;
+                }
+                if (merFee.getAmountUpper().compareTo(feeList.get(i).getAmountUpper()) == 0) {
+                    //更新记录
+                    MerchantFee mft = feeList.get(i);
+                    mft.setAmount(merFee.getAmount());
+                    mft.setRatio(merFee.getRatio());
+                    mft.setFeeType(merFee.getFeeType());
+                    mft.setMat(new Date());
+                    mft.update();
+                    break;
+                }
+            }
+        }else{
+            merFee.setAmountLower(new BigDecimal(0));
+            merFee.setAmountUpper(new BigDecimal(0));
+            merFee.setCat(new Date());
+            merFee.save();
+        }
+
+
+        StringBuffer tradeType1 = new StringBuffer("select * from merchant_fee mf  where 1=1 and mf.dat is null   and mf.merID=? and mf.tradeType='1' order by mf.amountLower desc");
+        StringBuffer tradeType2 = new StringBuffer("select * from merchant_fee mf  where 1=1 and mf.dat is null  and mf.merID=? and mf.tradeType='2'  order by mf.amountLower desc");
+        List<MerchantFee> feeListJ = MerchantFee.dao.find(tradeType1.toString(),merFee.getMerID());
+        List<MerchantFee> feeListB = MerchantFee.dao.find(tradeType2.toString(),merFee.getMerID());
+
+        Map map = new HashMap();
+        map.put("feeListJ",feeListJ);
+        map.put("feeListB",feeListB);
+
+        renderJson(map);
+    }
+
+    @Before({ Tx.class})
+    public void delFee(){
+        String feeID = getPara("id");
+        MerchantFee merFee   =  MerchantFee.dao.findById(feeID);
+        List<MerchantFee> feeList;
+        StringBuffer str = new StringBuffer("select * from merchant_fee mf  where 1=1 and mf.dat is null   and mf.merID=? and mf.tradeType=? order by mf.amountLower desc");
+        //检查最大值
+        if(merFee.getTradeType().equals("1")){
+            //加急
+            feeList = MerchantFee.dao.find(str.toString(),merFee.getMerID(),merFee.getTradeType());
+        }else{
+            //标准
+            feeList = MerchantFee.dao.find(str.toString(),merFee.getMerID(),merFee.getTradeType());
+        }
+
+        if(feeList!=null && feeList.size()>1) {
+            for (int i = 0; i < feeList.size(); i++) {
+                if (merFee.getAmountUpper().compareTo(new BigDecimal(0)) == 0) {
+                    //更新记录
+                    MerchantFee mft = feeList.get(i+1);
+                    mft.setAmountUpper(new BigDecimal(0));
+                    mft.setMat(new Date());
+                    mft.update();
+                    merFee.delete();
+                    break;
+                }
+                if (merFee.getAmountUpper().compareTo(feeList.get(i).getAmountUpper()) == 0) {
+                    //更新记录
+                    MerchantFee mft = feeList.get(i-1);
+                    mft.setAmountLower(merFee.getAmountLower());
+                    mft.setMat(new Date());
+                    mft.update();
+                    merFee.delete();
+                    break;
+                }
+            }
+        }else {
+            merFee.delete();
+        }
+
+
+        StringBuffer tradeType1 = new StringBuffer("select * from merchant_fee mf  where 1=1 and mf.dat is null   and mf.merID=? and mf.tradeType='1' order by mf.amountLower desc");
+        StringBuffer tradeType2 = new StringBuffer("select * from merchant_fee mf  where 1=1 and mf.dat is null  and mf.merID=? and mf.tradeType='2'  order by mf.amountLower desc");
+        List<MerchantFee> feeListJ = MerchantFee.dao.find(tradeType1.toString(),merFee.getMerID());
+        List<MerchantFee> feeListB = MerchantFee.dao.find(tradeType2.toString(),merFee.getMerID());
+
+        Map map = new HashMap();
+        map.put("feeListJ",feeListJ);
+        map.put("feeListB",feeListB);
+
+        renderJson(map);
+    }
 
 
 }

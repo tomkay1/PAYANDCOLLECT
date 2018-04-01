@@ -11,6 +11,7 @@ const merInfo = {
         merchantTypeList:[],
         merFeeListJ:[],
         merFeeListB:[],
+
     },
     mutations: {
 
@@ -29,10 +30,7 @@ const merInfo = {
         set_merFee_list(state,map){
             state.merFeeListJ=map.feeListJ
             state.merFeeListB=map.feeListB
-        },
-        add_merFee_list(state,merFee){
-            let vm = this._vm;
-            vm.$set(state.merFeeListJ, 1, {'amountUpper':merFee.amountUpper});
+
         },
     },
     actions:{
@@ -87,10 +85,27 @@ const merInfo = {
             return new Promise(function (resolve, reject) {
                 vm.$axios.post('/mer00/listFee', param).then((res) => {
                   commit("set_merFee_list",res)
+                    resolve(res);
                 })
             });
         },
+        add_merFee:function({commit,state},p){
+            let vm=this._vm;
 
+            return new Promise(function (resolve, reject) {
+                vm.$axios.post('/mer00/addFee',p).then((res) => {
+                    commit("set_merFee_list",res)
+                })
+            });
+        },
+        del_merFee:function({commit,state},p){
+            let vm=this._vm;
+            return new Promise(function (resolve, reject) {
+                vm.$axios.post('/mer00/delFee',{id:p}).then((res) => {
+                    commit("set_merFee_list",res)
+                })
+            });
+        },
 
     }
 };
