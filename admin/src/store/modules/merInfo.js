@@ -94,7 +94,12 @@ const merInfo = {
 
             return new Promise(function (resolve, reject) {
                 vm.$axios.post('/mer00/addFee',p).then((res) => {
-                    commit("set_merFee_list",res)
+                    if(res.resCode&&res.resCode=='success'){
+                        commit("set_merFee_list",res)
+                        resolve(res);
+                    }
+
+
                 })
             });
         },
@@ -102,7 +107,9 @@ const merInfo = {
             let vm=this._vm;
             return new Promise(function (resolve, reject) {
                 vm.$axios.post('/mer00/delFee',{id:p}).then((res) => {
-                    commit("set_merFee_list",res)
+                    if(res.resCode&&res.resCode=='success'){
+                        commit("set_merFee_list",res)
+                    }
                 })
             });
         },

@@ -5,6 +5,7 @@ import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.mybank.pc.Consts;
+import com.mybank.pc.admin.model.Role;
 import com.mybank.pc.admin.model.Taxonomy;
 import com.mybank.pc.admin.model.User;
 import com.mybank.pc.admin.model.UserRole;
@@ -87,10 +88,14 @@ public class MerchantInfoCtr extends CoreController {
         merchantUser.save();
 
         //增加默认角色，5为商户操作员
-        UserRole ur = new UserRole();
-            ur.setRId(5);
+        List <Role> list = Role.dao.findByPropEQ("name","user");
+        if(list !=null){
+            UserRole ur = new UserRole();
+            ur.setRId(list.get(0).getId().intValue());
             ur.setUId(user.getLong("id"));
             ur.save();
+        }
+
 
 
         renderSuccessJSON("新增商户信息成功。", "");
@@ -258,6 +263,8 @@ public class MerchantInfoCtr extends CoreController {
         Map map = new HashMap();
         map.put("feeListJ",feeListJ);
         map.put("feeListB",feeListB);
+        map.put("resCode",Consts.REQ_JSON_CODE.success.name());
+        map.put("resMsg","手续费增加成功");
 
         renderJson(map);
     }
@@ -311,6 +318,8 @@ public class MerchantInfoCtr extends CoreController {
         Map map = new HashMap();
         map.put("feeListJ",feeListJ);
         map.put("feeListB",feeListB);
+        map.put("resCode",Consts.REQ_JSON_CODE.success.name());
+        map.put("resMsg","手续费删除成功");
 
         renderJson(map);
     }
