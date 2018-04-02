@@ -15,8 +15,11 @@ import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.cron4j.Cron4jPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.plugin.ehcache.EhCachePlugin;
+import com.jfinal.render.JsonRender;
+import com.jfinal.render.Render;
 import com.jfinal.template.Engine;
 import com.mybank.pc.CMNCtr;
+import com.mybank.pc.Consts;
 import com.mybank.pc.admin.LoginCtr;
 import com.mybank.pc.admin.art.ArtCtr;
 import com.mybank.pc.admin.param.ParamCtr;
@@ -202,7 +205,9 @@ public class CoreConfig extends JFinalConfig{
     @Override
     public void afterJFinalStart() {
         super.afterJFinalStart();
-        CoreData.loadAllCache();//省市区 Cache 初始化
+        CoreData.loadAllCache();
+        //设置请求以json格式返回的时候，排除掉请求中用户身份信息相关的数据。
+        JsonRender.addExcludedAttrs(Consts.CURR_USER,Consts.CURR_USER_MER,Consts.CURR_USER_RESES,Consts.CURR_USER_ROLES);
         try {
 			// 初始化银联代收SDK
 			Class.forName("com.mybank.pc.kits.unionpay.acp.SDK");

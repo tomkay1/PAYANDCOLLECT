@@ -29,6 +29,10 @@ const collectionClear = {
             state.totalRow_cc = page.totalRow
             state.pageNumber_cc = page.pageNumber
         },
+        set_cc_list_sum(state, obj){
+            if(state.ccList.length>0)
+                state.ccList.push(obj)
+        },
         set_collectionClear(state, obj){
             if (obj != undefined)
                 state.collectionClear = Object.assign({},obj);
@@ -53,8 +57,16 @@ const collectionClear = {
             });
         },
         cc_list: function ({commit, state}, param) {
+            let self=this;
             this._vm.$axios.post('/cc/list', param).then((res) => {
                 commit('set_cc_list', res)
+                self.dispatch('cct_sum',param)
+            });
+        },
+        cc_sum: function ({commit, state}, param) {
+            this._vm.$axios.post('/cc/sum', param).then((res) => {
+                commit('set_cc_list_sum', res)
+
             });
         },
         hmClear: function ({commit, state}, param) {
@@ -63,6 +75,41 @@ const collectionClear = {
                 vm.$axios.post('/cc/hmClear', param).then((res) => {
                     resolve(res);
                 })
+            });
+        },
+        debit: function ({commit, state}, param) {
+            var vm=this._vm;
+            param=this.state.collectionClear;
+            return new Promise(function (resolve, reject) {
+                vm.$axios.post('/cc/debit', param).then((res) => {
+                    resolve(res);
+                })
+            });
+        },
+
+        cct_list_export: function ({commit, state}, param) {
+            let self=this;
+            return new Promise(function (resolve, reject) {
+                self._vm.$axios.post('/cc/exportTotalExcel', param).then((res) => {
+                   resolve(res)
+                });
+            });
+        },
+
+        cc_list_export: function ({commit, state}, param) {
+            let self=this;
+            return new Promise(function (resolve, reject) {
+                self._vm.$axios.post('/cc/exportExcel', param).then((res) => {
+                    resolve(res)
+                });
+            });
+        },
+        cc_list_export_4mer: function ({commit, state}, param) {
+            let self=this;
+            return new Promise(function (resolve, reject) {
+                self._vm.$axios.post('/cc/exportExcel4Mer', param).then((res) => {
+                    resolve(res)
+                });
             });
         },
 

@@ -1,17 +1,7 @@
 package com.mybank.pc.core;
 
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
-import com.mybank.pc.admin.model.Attachment;
-import com.mybank.pc.admin.model.Content;
-import com.mybank.pc.admin.model.Mapping;
-import com.mybank.pc.admin.model.Param;
-import com.mybank.pc.admin.model.Res;
-import com.mybank.pc.admin.model.Role;
-import com.mybank.pc.admin.model.RoleRes;
-import com.mybank.pc.admin.model.Taxonomy;
-import com.mybank.pc.admin.model.Ufile;
-import com.mybank.pc.admin.model.User;
-import com.mybank.pc.admin.model.UserRole;
+import com.mybank.pc.admin.model.*;
 import com.mybank.pc.collection.model.CollectionClear;
 import com.mybank.pc.collection.model.CollectionEntrust;
 import com.mybank.pc.collection.model.CollectionTrade;
@@ -54,5 +44,6 @@ public class _MappingKit {
 		arp.addMapping("s_ufile", Ufile.class);
 		arp.addMapping("collection_entrust", CollectionEntrust.class);
 		arp.addMapping("unionpay_entrust", UnionpayEntrust.class);
+		arp.addMapping("log_op", LogOp.class);
 	}
 }

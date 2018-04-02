@@ -195,12 +195,26 @@
                     },
                     {
                         title: '预存抵扣手续费金额',
-                        key: 'profit',
+                        key: 'accountFee',
                     },
                     {
                         title: '交易抵扣手续费金额',
-                        key: 'profit',
+                        key: 'tradeFee',
                     },
+                    {
+                        title: '出账金额',
+                        key: 'chargeOff',
+                    },
+                    {
+                        title: '出账时间',
+                        key: 'chargeAtTxt',
+                    },
+                    {
+                        title: '出账单据流水号',
+                        key: 'chargeAOffTradeNo',
+                    },
+
+
 
                 ],
                 chargetOffData: [
@@ -255,16 +269,40 @@
                 this.$store.dispatch("cc_list", param);
             },
             export_cct(){
+                let param = {
+                    'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
+                    'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd')
+                }
+                this.$store.dispatch("cct_list_export",param).then((res)=>{
+                    if(res&&res.resCode&&res.resCode=='success'){
+                        let url=res.resData;
+                        window.open(url,'_blank')
+                    }else if(res&&res.resCode&&res.resCode=='fail'){
+                        // this.$Message.success("导出失败>>"+res.resMsg);
+                    }
 
+                })
             },
             export_cc(){
+                let param = {
+                    'bTime': dateKit.formatDate(this.bTime_cc, 'yyyy-MM-dd'),
+                    'eTime': dateKit.formatDate(this.eTime_cc, 'yyyy-MM-dd'),
+                    merNO: this.merNO,
+                    chargetOff: this.chargeOff
+                }
+                this.$store.dispatch("cc_list_export", param).then((res)=>{
+                    if(res&&res.resCode&&res.resCode=='success'){
+                        let url=res.resData;
+                        window.open(url,'_blank')
+                    }else if(res&&res.resCode&&res.resCode=='fail'){
+                        // this.$Message.success("导出失败>>"+res.resMsg);
+                    }
 
+                });
             }
         },
         components: {Input},
         mounted() {
-            // let param = {'bTime': this.now, 'eTime': this.now}
-            // this.$store.dispatch("cct_list", param);
         }
 
     }

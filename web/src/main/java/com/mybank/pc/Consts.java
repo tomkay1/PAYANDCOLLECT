@@ -119,7 +119,7 @@ public class Consts {
     }
 
     public enum CACHE_NAMES {
-        paramCache,ssq,userRoles,user,userReses,taxonomy,art,carouselsetting
+        paramCache,ssq,userRoles,user,userReses,taxonomy,art,carouselsetting,login
     }
 
 }

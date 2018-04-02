@@ -26,6 +26,16 @@
                                 </span>
                             </Input>
                         </FormItem>
+                        <FormItem prop="checkCode">
+                            <Input  v-model="form.checkCode" placeholder="请输入验证码">
+                            <span slot="prepend">
+                                    <Icon :size="14" type="flash"></Icon>
+                                </span>
+                            </Input>
+                        </FormItem>
+                        <FormItem >
+                            <img :src="getCaptchUrl" @click="createCaptchUrl">
+                        </FormItem>
                         <FormItem>
                             <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>
@@ -40,33 +50,49 @@
 
 <script>
 import Cookies from 'js-cookie';
+import consts from '../libs/consts'
 export default {
     data () {
         return {
             spinShow:false,
             form: {
                 userName: '',
-                password: ''
+                password: '',
+                checkCode:'',
             },
+            getCaptchUrl:'',
             rules: {
                 userName: [
                     { required: true, message: '账号不能为空', trigger: 'blur' }
                 ],
                 password: [
                     { required: true, message: '密码不能为空', trigger: 'blur' }
+                ],
+                checkCode: [
+                    { required: true, message: '验证码不能为空', trigger: 'blur' }
                 ]
             }
         };
     },
+    mounted () {
+        this.createCaptchUrl();
+    },
     methods: {
+
+        createCaptchUrl(){
+            let now = new Date().getTime();
+            let url=consts.env+'/ad06/createCaptch'
+            this.getCaptchUrl=url+'?tt='+now
+        },
+
         handleSubmit () {
             let vm=this;
             this.$refs.loginForm.validate((valid) => {
                 if (valid) {
 
                     this.spinShow=true;
-                    this.$store.commit('setAvator', 'http://p2qdi4xy4.bkt.clouddn.com/head.png');
-                    this.$store.dispatch('user_login',{user:this.form.userName,password:this.form.password}).then((res)=>{
+                    this.$store.commit('setAvator', 'http://images.cichlid.cc/img/cmn/head.png');
+                    this.$store.dispatch('user_login',{user:this.form.userName,password:this.form.password,checkCode:this.form.checkCode}).then((res)=>{
                         vm.spinShow=false;
                         if(res.resCode&&res.resCode=='success'){
 
@@ -106,7 +132,7 @@ export default {
                                 name: 'home_index'
                             });
                         }else if(res.resCode&&res.resCode=='fail'){
-
+                            this.createCaptchUrl();
                         }
                     }).catch(()=>{
                         vm.spinShow=false;

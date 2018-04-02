@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Clear;
+import com.jfinal.ext.interceptor.LogInterceptor;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -18,6 +19,7 @@ import com.mybank.pc.admin.model.RoleRes;
 import com.mybank.pc.admin.model.UserRole;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.interceptors.AdminAAuthInterceptor;
+import com.mybank.pc.interceptors.OpLogInterceptor;
 import com.mybank.swagger.fz.annotation.Api;
 import com.mybank.swagger.fz.annotation.ApiOperation;
 import com.mybank.swagger.fz.annotation.Param;
@@ -49,7 +51,7 @@ public class RoleCtr extends CoreController {
 		renderJson(page);
 	}
 
-	@Before({ RoleValidator.class, Tx.class })
+	@Before({OpLogInterceptor.class,RoleValidator.class, Tx.class })
 	public void save() {
 		Role role = getModel(Role.class, "", true);
 		role.save();

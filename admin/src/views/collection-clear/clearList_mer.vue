@@ -1,6 +1,6 @@
 <template>
     <Tabs type="card">
-        <TabPane label="清分明细查询">
+        <TabPane label="清分明细查询" style="min-height: 400px">
             <Card>
                 <Row>
                     <Col span="24"  align="right">
@@ -8,7 +8,6 @@
                         <Option v-for="item in chargetOffData" :value="item.value" :key="item.value">{{ item.label }}
                         </Option>
                     </Select>
-                    <Input v-model="merNO" placeholder="商户号" style="width: 200px"></Input>
                     <DatePicker type="date" placeholder="查询开始日期" style="width: 200px" v-model="bTime_cc"
                                 format="yyyy-MM-dd" :clearable="false"></DatePicker>
                     <DatePicker type="date" placeholder="查询结束日期" style="width: 200px" v-model="eTime_cc"
@@ -43,7 +42,6 @@
     export default {
         computed: {
             ...mapState({
-
                 'ccList': state => state.cc.ccList,
                 'totalPage_cc': state => state.cc.totalPage_cc,
                 'total_cc': state => state.cc.totalRow_cc,
@@ -54,42 +52,9 @@
             return {
                 now: new Date(),
                 self: this,
-                merNO: '',
                 chargeOff: '',
                 bTime_cc: new Date(),
                 eTime_cc: new Date(),
-                tableColums: [
-
-                    {
-                        title: '清分日期',
-                        key: 'cleartotleTimeTxt',
-                    },
-                    {
-                        title: '交易笔数',
-                        key: 'tradeCount',
-                    },
-                    {
-                        title: '交易金额',
-                        key: 'amountSum',
-                    },
-                    {
-                        title: '出账金额',
-                        key: 'amountOff',
-                    },
-                    {
-                        title: '交易手续费金额',
-                        key: 'amountFeeSum',
-                    },
-                    {
-                        title: '银行代收手续费金额',
-                        key: 'bankFee',
-                    },
-                    {
-                        title: '利润',
-                        key: 'profit',
-                    },
-
-                ],
                 tableColums_cc: [
 
                     {
@@ -130,20 +95,24 @@
                         key: 'amountFeeSum',
                     },
                     {
-                        title: '银行代收手续费金额',
-                        key: 'bankFee',
-                    },
-                    {
-                        title: '利润',
-                        key: 'profit',
-                    },
-                    {
                         title: '预存抵扣手续费金额',
-                        key: 'profit',
+                        key: 'accountFee',
                     },
                     {
                         title: '交易抵扣手续费金额',
-                        key: 'profit',
+                        key: 'tradeFee',
+                    },
+                    {
+                        title: '出账金额',
+                        key: 'chargeOff',
+                    },
+                    {
+                        title: '出账时间',
+                        key: 'chargeAtTxt',
+                    },
+                    {
+                        title: '出账单据流水号',
+                        key: 'chargeAOffTradeNo',
                     },
 
                 ],
@@ -161,15 +130,6 @@
             }
         },
         methods: {
-            search() {
-
-                let param = {
-                    'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
-                    'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd')
-                }
-                this.$store.dispatch("cct_list", param);
-            }
-            ,
             search_cc() {
                 let param = {
                     'bTime': dateKit.formatDate(this.bTime_cc, 'yyyy-MM-dd'),
@@ -179,11 +139,21 @@
                 }
                 this.$store.dispatch("cc_list", param);
             },
-            export_cct(){
-
-            },
             export_cc(){
+                let param = {
+                    'bTime': dateKit.formatDate(this.bTime_cc, 'yyyy-MM-dd'),
+                    'eTime': dateKit.formatDate(this.eTime_cc, 'yyyy-MM-dd'),
+                    chargetOff: this.chargeOff
+                }
+                this.$store.dispatch("cc_list_export_4mer", param).then((res)=>{
+                    if(res&&res.resCode&&res.resCode=='success'){
+                        let url=res.resData;
+                        window.open(url,'_blank')
+                    }else if(res&&res.resCode&&res.resCode=='fail'){
+                        // this.$Message.success("导出失败>>"+res.resMsg);
+                    }
 
+                });
             }
         },
         components: {Input},

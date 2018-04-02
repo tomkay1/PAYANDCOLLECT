@@ -102,5 +102,8 @@
                 this.artViewModal=true;
             }
         }
+
+
+
     }
 </script>
