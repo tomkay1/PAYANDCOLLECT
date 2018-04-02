@@ -17,6 +17,7 @@ public class CoreData {
 	public static void loadAllCache() {
 		loadParam();
 		loadTax();
+		loadCardBin();
 	}
 
 	public static void loadParam() {
