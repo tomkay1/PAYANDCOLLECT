@@ -3,6 +3,7 @@ package com.mybank.pc.core;
 import cn.hutool.log.StaticLog;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.mybank.pc.Consts;
+import com.mybank.pc.admin.model.CardBin;
 import com.mybank.pc.admin.model.Param;
 import com.mybank.pc.admin.model.Taxonomy;
 
@@ -39,6 +40,14 @@ public class CoreData {
 			for (Taxonomy taxonomy1 : list1) {
 				CacheKit.put(Consts.CACHE_NAMES.taxonomy.name(), taxonomy1.getId().toString(), taxonomy1);
 			}
+		}
+	}
+
+	public static void loadCardBin(){
+		CacheKit.removeAll(Consts.CACHE_NAMES.cardBin.name());
+		List<CardBin> list=CardBin.dao.find("select * from card_bin");
+		for (CardBin cardBin:list){
+			CacheKit.put(Consts.CACHE_NAMES.cardBin.name(),cardBin.getCBin(),cardBin);
 		}
 	}
 }
