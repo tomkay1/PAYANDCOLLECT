@@ -1,16 +1,12 @@
 package com.mybank.pc.collection.clear;
 
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson.JSON;
-import com.cybermkd.mongo.kit.MongoBean;
-import com.cybermkd.mongo.kit.MongoKit;
 import com.jfinal.aop.Duang;
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.LogKit;
@@ -19,11 +15,7 @@ import com.jfinal.plugin.activerecord.ActiveRecordException;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.SqlPara;
-import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.upload.UploadFile;
-import com.mongodb.Mongo;
-import com.mongodb.gridfs.GridFSDBFile;
-import com.mongodb.gridfs.GridFSFile;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.User;
 import com.mybank.pc.collection.model.CollectionClear;
@@ -34,10 +26,11 @@ import com.mybank.pc.kits.AppKit;
 import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.json.filter.BigDecimalValueFilter;
 import com.mybank.pc.merchant.model.MerchantInfo;
-import sun.rmi.runtime.Log;
 
-import java.io.*;
-import java.math.BigDecimal;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.*;
 
 /**

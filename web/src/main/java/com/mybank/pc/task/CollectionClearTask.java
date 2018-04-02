@@ -2,16 +2,13 @@ package com.mybank.pc.task;
 
 import com.jfinal.aop.Duang;
 import com.jfinal.kit.LogKit;
-import com.jfinal.kit.PropKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.ActiveRecordException;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.plugin.ehcache.CacheKit;
-import com.jfinal.plugin.ehcache.CacheName;
 import com.mybank.pc.Consts;
 import com.mybank.pc.collection.clear.CClearSrv;
 import com.mybank.pc.kits.DateKit;
-import com.mybank.pc.kits.ResKit;
 
 import java.util.Date;
 

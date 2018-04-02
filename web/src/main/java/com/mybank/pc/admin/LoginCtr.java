@@ -1,17 +1,11 @@
 package com.mybank.pc.admin;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.jfinal.aop.Clear;
-import com.jfinal.aop.Interceptor;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.ehcache.CacheKit;
@@ -24,9 +18,13 @@ import com.mybank.pc.core.CoreController;
 import com.mybank.pc.interceptors.AdminAAuthInterceptor;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.kits.CookieKit;
-import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.ResKit;
 import com.mybank.pc.kits.ext.BCrypt;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yuhaihui8913 on 2018/1/26. 登录请求 处理

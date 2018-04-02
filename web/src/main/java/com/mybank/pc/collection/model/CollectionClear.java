@@ -1,6 +1,5 @@
 package com.mybank.pc.collection.model;
 
-import cn.hutool.core.util.StrUtil;
 import com.mybank.pc.Consts;
 import com.mybank.pc.collection.model.base.BaseCollectionClear;
 import com.mybank.pc.kits.DateKit;

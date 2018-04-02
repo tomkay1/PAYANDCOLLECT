@@ -1,12 +1,11 @@
 package com.mybank.pc.core;
 
-import java.util.List;
-import java.util.Map;
-
-import org.jsoup.Jsoup;
-
 import com.jfinal.plugin.activerecord.Model;
 import com.mybank.pc.Consts;
+import org.jsoup.Jsoup;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by 于海慧（125227112@qq.com） on 2016/11/30.

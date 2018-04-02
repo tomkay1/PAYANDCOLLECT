@@ -5,17 +5,15 @@ import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.render.JsonRender;
-import com.jfinal.render.RenderManager;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.LogOp;
 import com.mybank.pc.admin.model.User;
 import com.mybank.pc.core.CoreController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
-import static cn.hutool.core.util.StrUtil.isBlankIfStr;
+import java.util.Date;
+import java.util.Map;
+
 import static cn.hutool.core.util.StrUtil.isNotBlank;
-import static cn.hutool.core.util.StrUtil.isNotEmpty;
 
 public class OpLogInterceptor implements Interceptor {
     @Override

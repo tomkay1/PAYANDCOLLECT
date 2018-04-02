@@ -15,46 +15,18 @@
  */
 package com.mybank.pc.kits.unionpay.acp;
 
-import static com.mybank.pc.kits.unionpay.acp.SDKConstants.UNIONPAY_CNNAME;
-import static com.mybank.pc.kits.unionpay.acp.SDKUtil.isEmpty;
+import com.jfinal.kit.LogKit;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.PublicKey;
-import java.security.Security;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertPathBuilder;
-import java.security.cert.CertStore;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.CollectionCertStoreParameters;
-import java.security.cert.PKIXBuilderParameters;
-import java.security.cert.PKIXCertPathBuilderResult;
-import java.security.cert.TrustAnchor;
-import java.security.cert.X509CertSelector;
-import java.security.cert.X509Certificate;
+import java.security.*;
+import java.security.cert.*;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.jfinal.kit.LogKit;
+import static com.mybank.pc.kits.unionpay.acp.SDKConstants.UNIONPAY_CNNAME;
+import static com.mybank.pc.kits.unionpay.acp.SDKUtil.isEmpty;
 
 /**
  * @ClassName: CertUtil

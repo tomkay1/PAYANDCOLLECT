@@ -1,10 +1,5 @@
 package com.mybank.pc.admin.model;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import cn.hutool.core.collection.CollUtil;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.ehcache.CacheKit;
@@ -12,6 +7,11 @@ import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.base.BaseUser;
 import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits._StrKit;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 /**

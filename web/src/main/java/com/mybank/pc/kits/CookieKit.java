@@ -15,13 +15,13 @@
  */
 package com.mybank.pc.kits;
 
-import java.math.BigInteger;
-
 import com.jfinal.core.Controller;
 import com.jfinal.kit.HashKit;
 import com.jfinal.kit.LogKit;
 import com.jfinal.kit.StrKit;
 import com.mybank.pc.Consts;
+
+import java.math.BigInteger;
 
 /**
  * 参考：spring-security https://github.com/spring-projects/spring-security/

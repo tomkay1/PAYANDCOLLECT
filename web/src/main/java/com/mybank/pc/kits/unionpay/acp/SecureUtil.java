@@ -15,19 +15,17 @@
  */
 package com.mybank.pc.kits.unionpay.acp;
 
+import com.jfinal.kit.LogKit;
+import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.crypto.digests.SM3Digest;
+
+import javax.crypto.Cipher;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
-
-import javax.crypto.Cipher;
-
-import org.apache.commons.codec.binary.Base64;
-import org.bouncycastle.crypto.digests.SM3Digest;
-
-import com.jfinal.kit.LogKit;
 
 /**
  * 

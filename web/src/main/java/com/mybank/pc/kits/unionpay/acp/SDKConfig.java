@@ -15,12 +15,12 @@
  */
 package com.mybank.pc.kits.unionpay.acp;
 
-import java.io.File;
-
 import com.jfinal.kit.LogKit;
 import com.jfinal.kit.PathKit;
 import com.jfinal.kit.Prop;
 import com.jfinal.kit.PropKit;
+
+import java.io.File;
 
 /**
  * 

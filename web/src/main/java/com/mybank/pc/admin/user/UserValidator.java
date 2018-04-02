@@ -1,13 +1,13 @@
 package com.mybank.pc.admin.user;
 
-import java.math.BigInteger;
-import java.util.List;
-
 import com.jfinal.core.Controller;
 import com.jfinal.kit.LogKit;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.User;
 import com.mybank.pc.core.CoreValidator;
+
+import java.math.BigInteger;
+import java.util.List;
 
 /**
  * Created by yuhaihui8913 on 2017/12/1.

@@ -1,9 +1,5 @@
 package com.mybank.pc.admin.user;
 
-import java.math.BigInteger;
-import java.util.Date;
-import java.util.List;
-
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -20,6 +16,10 @@ import com.mybank.pc.admin.model.UserRole;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.interceptors.AdminAAuthInterceptor;
 import com.mybank.pc.kits.ext.BCrypt;
+
+import java.math.BigInteger;
+import java.util.Date;
+import java.util.List;
 
 
 /**

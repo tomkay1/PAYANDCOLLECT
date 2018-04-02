@@ -1,7 +1,5 @@
 package com.mybank.pc.interceptors;
 
-import java.math.BigInteger;
-
 import cn.hutool.core.util.StrUtil;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
@@ -14,8 +12,8 @@ import com.mybank.pc.core.CoreException;
 import com.mybank.pc.kits.CookieKit;
 import com.mybank.pc.kits.ReqKit;
 import com.mybank.pc.kits.ResKit;
-import com.mybank.pc.merchant.model.MerchantInfo;
-import com.mybank.pc.merchant.model.MerchantUser;
+
+import java.math.BigInteger;
 
 /**
  *

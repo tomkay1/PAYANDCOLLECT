@@ -10,7 +10,6 @@ import com.mybank.swagger.fz.model.SwaggerDoc;
 import com.mybank.swagger.fz.model.SwaggerPath;
 import com.mybank.swagger.fz.model.SwaggerResponse;
 
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

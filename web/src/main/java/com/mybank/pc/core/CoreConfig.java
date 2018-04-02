@@ -16,7 +16,6 @@ import com.jfinal.plugin.cron4j.Cron4jPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.plugin.ehcache.EhCachePlugin;
 import com.jfinal.render.JsonRender;
-import com.jfinal.render.Render;
 import com.jfinal.template.Engine;
 import com.mybank.pc.CMNCtr;
 import com.mybank.pc.Consts;

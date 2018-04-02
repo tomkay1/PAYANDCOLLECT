@@ -15,26 +15,14 @@
  */
 package com.mybank.pc.kits.unionpay.acp;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.net.ssl.HttpsURLConnection;
-
 import com.jfinal.kit.LogKit;
 import com.mybank.pc.kits.unionpay.acp.BaseHttpSSLSocketFactory.TrustAnyHostnameVerifier;
+
+import javax.net.ssl.HttpsURLConnection;
+import java.io.*;
+import java.net.*;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * 

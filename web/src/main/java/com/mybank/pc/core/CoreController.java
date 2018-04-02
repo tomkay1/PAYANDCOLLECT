@@ -1,7 +1,5 @@
 package com.mybank.pc.core;
 
-import java.util.List;
-
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.ValueFilter;
@@ -9,6 +7,8 @@ import com.jfinal.core.Controller;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.Role;
 import com.mybank.pc.admin.model.User;
+
+import java.util.List;
 
 /**
  * Created by 于海慧（125227112@qq.com） on 2016/12/1.

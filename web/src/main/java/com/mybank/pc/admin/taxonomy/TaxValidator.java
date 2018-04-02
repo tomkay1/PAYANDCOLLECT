@@ -1,11 +1,11 @@
 package com.mybank.pc.admin.taxonomy;
 
-import java.util.List;
-
 import com.jfinal.core.Controller;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.Taxonomy;
 import com.mybank.pc.core.CoreValidator;
+
+import java.util.List;
 
 /**
  * 简介

@@ -1,6 +1,5 @@
 package com.mybank.pc.collection.model.base;
 
-import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.activerecord.IBean;
 import com.mybank.pc.core.CoreModel;
 

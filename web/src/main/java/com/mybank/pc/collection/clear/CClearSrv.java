@@ -1,10 +1,7 @@
 package com.mybank.pc.collection.clear;
 
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.StrUtil;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.LogKit;
-import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -12,7 +9,6 @@ import com.mybank.pc.Consts;
 import com.mybank.pc.collection.model.CollectionClear;
 import com.mybank.pc.collection.model.CollectionCleartotle;
 import com.mybank.pc.collection.model.CollectionTrade;
-import com.mybank.pc.core.CoreController;
 import com.mybank.pc.core.CoreException;
 import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.merchant.model.MerchantInfo;

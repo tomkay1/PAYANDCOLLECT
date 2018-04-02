@@ -1,8 +1,6 @@
 package com.mybank.pc.admin.res;
 
 
-import java.util.List;
-
 import com.jfinal.aop.Before;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.plugin.ehcache.CacheKit;
@@ -11,6 +9,8 @@ import com.mybank.pc.admin.model.Res;
 import com.mybank.pc.admin.model.RoleRes;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
+
+import java.util.List;
 
 /**
  * 简介

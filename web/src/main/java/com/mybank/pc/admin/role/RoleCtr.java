@@ -1,13 +1,9 @@
 package com.mybank.pc.admin.role;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Clear;
-import com.jfinal.ext.interceptor.LogInterceptor;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -24,6 +20,9 @@ import com.mybank.swagger.fz.annotation.Api;
 import com.mybank.swagger.fz.annotation.ApiOperation;
 import com.mybank.swagger.fz.annotation.Param;
 import com.mybank.swagger.fz.annotation.Params;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**

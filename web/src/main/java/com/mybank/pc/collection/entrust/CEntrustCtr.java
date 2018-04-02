@@ -1,7 +1,5 @@
 package com.mybank.pc.collection.entrust;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.jfinal.aop.Clear;
 import com.jfinal.aop.Duang;
 import com.jfinal.core.ActionKey;
@@ -16,6 +14,7 @@ import com.mybank.pc.core.CoreController;
 import com.mybank.pc.core.CoreException;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.kits.CookieKit;
+import org.apache.commons.lang.StringUtils;
 
 @Clear({ AdminIAuthInterceptor.class })
 public class CEntrustCtr extends CoreController {
