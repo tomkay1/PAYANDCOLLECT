@@ -112,6 +112,7 @@ public class CoreConfig extends JFinalConfig{
             }
         });
 
+
         //清分模块路由
         routes.add(new Routes() {
             @Override

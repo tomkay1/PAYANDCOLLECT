@@ -9,6 +9,9 @@
                 </p>
                 <Row>
                     <Col span="24" align="right">
+                    <Select v-model="txnType" style="width: 120px; text-align: center;">
+                        <Option v-for="item in txnTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    </Select>
                     <DatePicker type="date" placeholder="开始日期" style="width: 200px" v-model="bTime" format="yyyy-MM-dd" :clearable="false"></DatePicker>
                     <DatePicker type="date" placeholder="结束日期" style="width: 200px" v-model="eTime" format="yyyy-MM-dd" :clearable="false"></DatePicker>
                     <Input v-model="searchKey" placeholder="请输入..." style="width: 200px" />
@@ -22,7 +25,7 @@
                 </Row>
                 <div style="margin: 10px;overflow: hidden">
                     <div style="float: right;">
-                        <Page page-size="10" :total="total" :current="pageNumber" @on-change="search" show-total show-elevator></Page>
+                        <Page :page-size="pageSize" :total="total" :current="pageNumber" @on-change="search" show-total show-elevator></Page>
                     </div>
                 </div>
             </Card>
@@ -52,19 +55,41 @@
                     'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
                     search: this.searchKey,
                     pn: pn,
-                    ps: '10'
+                    ps: this.pageSize,
+                    txnType: this.txnType === '0' ? '72' : '74',
+                    txnSubType: this.txnType === '0' ? '11' : '04'
                 }
                 this.$store.dispatch('get_entrust_trade_list', param)
             }
         },
         mounted() {
-            this.$store.dispatch('get_entrust_trade_list')
+            let param = {
+                'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
+                'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
+                search: this.searchKey,
+                ps: this.pageSize,
+                txnType: this.txnType === '0' ? '72' : '74',
+                txnSubType: this.txnType === '0' ? '11' : '04'
+            }
+            this.$store.dispatch('get_entrust_trade_list', param)
         },
         data() {
             return {
                 bTime: new Date(),
                 eTime: new Date(),
                 searchKey: '',
+                pageSize: 10,
+                txnType: '0',
+                txnTypeList: [
+                    {
+                        value: '0',
+                        label: '建立委托关系'
+                    },
+                    {
+                        value: '1',
+                        label: '解除委托关系'
+                    }
+                ],
                 tableColums: [
                     {
                         title: '姓名',
@@ -93,6 +118,15 @@
                     {
                         title: '应答信息',
                         key: 'respMsg',
+                    },
+                    {
+                        title: '商户类型',
+                        key: 'type',
+                        render: (h, params) => {
+                            const row = params.row;
+                            const type = row.merId === '945230148160197' ? '实时' : '批量';
+                            return h('span', type);
+                        }
                     },
                     {
                         title: '创建时间',

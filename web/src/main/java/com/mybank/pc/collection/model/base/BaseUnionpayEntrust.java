@@ -89,6 +89,22 @@ public abstract class BaseUnionpayEntrust<M extends BaseUnionpayEntrust<M>> exte
 		return getStr("orderId");
 	}
 
+	public void setTxnType(java.lang.String txnType) {
+		set("txnType", txnType);
+	}
+
+	public java.lang.String getTxnType() {
+		return getStr("txnType");
+	}
+
+	public void setTxnSubType(java.lang.String txnSubType) {
+		set("txnSubType", txnSubType);
+	}
+
+	public java.lang.String getTxnSubType() {
+		return getStr("txnSubType");
+	}
+
 	public void setTxnTime(java.lang.String txnTime) {
 		set("txnTime", txnTime);
 	}

@@ -126,18 +126,104 @@
                  </FormItem>
             </Form>
             <div slot="footer">
-                <Button type="success" :loading="modalLoading" @click="save">保存</Button>
                 <Button type="error" @click="merInfoModal=false">关闭</Button>
             </div>
         </Modal>
 
-        <Modal v-model="merFeeModal"  :mask-closable="false" >
+        <Modal v-model="merFeeModal"  :mask-closable="false" width=700 >
             <p slot="header">
                 <Icon type="information-circled"></Icon>
-                <span>{{merFeeTitle}}</span>
+                <span>{{merFeeTitle}} {{merName}}</span>
             </p>
+            <Row>
+                <Col span="12" align="center"><div style="font-size: 14px; font-weight: bold; background-color: #ccc; padding: 5px; ;margin: 5px; ">加急</div>
+                <table>
+                    <div  v-for="item in merFeeListJ" class="feeList" >
+                    <tr>
+                        <td width="230" align="center">
+
+                                <span v-if="item.amountLower > '0'">{{ item.amountLower }}<</span>
+                                交易金额
+                                <span v-if="item.amountUpper > '0'"><={{ item.amountUpper }}</span>
+                        </td>
+                        <td width="80" align="center">
+                            <span v-if="item.feeType === '1'">每笔{{ item.amount }}元</span>
+                            <span v-else-if="item.feeType  === '2'">{{item.ratio*100}}%</span>
+                        </td>
+                        <td align="center" width="50">
+                            <Button type="error" shape="circle" size="small" @click="delFee(item.id)">删除</Button>
+                        </td>
+                    </tr>
+                    </div>
+                </table>
+
+                </Col>
+                <Col span="12" align="center"><div style="font-size: 14px; font-weight: bold; background-color: #ccc; padding: 5px;margin: 5px;">标准</div>
+                <table>
+                    <div  v-for="item in merFeeListB" class="feeList" >
+                        <tr>
+                            <td width="230" align="center">
+
+                                <span v-if="item.amountLower > '0'">{{ item.amountLower }}<</span>
+                                交易金额
+                                <span v-if="item.amountUpper > '0'"><={{ item.amountUpper }}</span>
+                            </td>
+                            <td width="80" align="center">
+                                <span v-if="item.feeType === '1'">每笔{{ item.amount }}元</span>
+                                <span v-else-if="item.feeType  === '2'">{{item.ratio*100}}%</span>
+                            </td>
+                            <td align="center" width="50">
+                                <Button type="error" shape="circle" size="small" @click="delFee(item.id)">删除</Button>
+                            </td>
+                        </tr>
+                    </div>
+                </table>
+                </Col>
+            </Row>
+            <Row>
+                <Col span="24" align="center">
+                <div style="margin-top: 30px;">
+            <Form  :model="merFee" >
+                <FormItem  prop="merchantName">
+                    <RadioGroup v-model="merFee.tradeType" type="button" >
+                        <Radio label="1">
+
+                            <span>加急</span>
+                        </Radio>
+                        <Radio label="2">
+
+                            <span>标准</span>
+                        </Radio>
+                    </RadioGroup>
+
+                    <Tooltip placement="bottom">
+                        <Input v-model="merFee.amountUpper"  placeholder="请输入金额上限" style="width: 150px" />
+                        <div slot="content">
+                            <p>输入0表示基础手续费设定</p>
+                            <p>商户至少需要一个基础手续费</p>
+                        </div>
+                    </Tooltip>
+
+                    <RadioGroup v-model="merFee.feeType"  type="button" >
+                        <Radio label="1" >
+                            <span>定额</span>
+                        </Radio>
+                        <Radio label="2">
+                            <span>比例</span>
+                        </Radio>
+                    </RadioGroup>
+
+                    <Input v-model="merFee.amount"  placeholder="请输入手续费金额或比例" style="width: 150px"/>
+
+                    <Button type="success" @click="addFee">增加</Button>
+
+                </FormItem>
+
+            </Form>
+                </div>
+                </Col>
+            </Row>
             <div slot="footer">
-                <Button type="success" :loading="feeModalLoading" @click="save">保存</Button>
                 <Button type="error" @click="merFeeModal=false">关闭</Button>
             </div>
         </Modal>
@@ -246,7 +332,7 @@
             },
             on: {
                 click: () => {
-                    vm.fee(param.row.id)
+                    vm.fee(param.row)
                 }
             }
         }, '手续费管理')
@@ -262,6 +348,8 @@
                 'total': state => state.merInfo.totalRow,
                 'merInfo': state => state.merInfo.merInfo,
                 'merchantTypeList' :state => state.merInfo.merchantTypeList,
+                'merFeeListJ' :state => state.merInfo.merFeeListJ,
+                'merFeeListB' :state => state.merInfo.merFeeListB,
             })
         },
         methods: {
@@ -388,8 +476,29 @@
                     desc: '文件 ' + file.name + ' 太大，不能超过 4M。'
                 });
             },
+
             fee(i){
-                this.merFeeModal=true
+
+                this.$store.dispatch('merFee_list',{id:i.id}).then((res)=>{
+                    this.merFeeModal=true
+                    this.merFee.merID =i.id
+                    this.merName = i.merchantName
+                    //vm.search()
+                })
+
+            },
+            addFee(){
+
+                //获取输入的手续费数据
+                this.$store.dispatch('add_merFee',this.merFee).then((res)=>{
+                })
+
+
+            },
+            delFee(id){
+                this.$store.dispatch('del_merFee',id).then((res)=>{
+                })
+
             },
         },
         mounted () {
@@ -399,6 +508,8 @@
         },
         data () {
             return {
+                merName:'',
+                merFee:{},
                 merFeeTitle:'手续费管理',
                 merFeeModal:false,
                 feeModalLoading:false,
@@ -476,13 +587,13 @@
                         title: '商户编号',
                         key: 'merchantNo',
                         align:'center',
-                        width:90,
+
                     },
                     {
                         title: '商户类型',
                         key: 'merTypeTxt',
                         align:'center',
-                        width:90,
+
                     },
                     {
                         title: '负责人姓名',
@@ -571,4 +682,8 @@
 </script>
 <style lang="less">
     @import '../../../styles/common.less';
+
+    .feeList{
+        font-size: 12px; line-height: 30px;
+    }
 </style>

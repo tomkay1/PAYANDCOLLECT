@@ -9,14 +9,15 @@
                 </p>
                 <Row>
                     <Col span="8">
-                        <Button type="primary" icon="person-add" @click="add">建立委托</Button>
-                        <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
+                    <Button type="primary" icon="person-add" @click="add">建立委托</Button>
+                    <Button type="primary" icon="person-add" @click="terminate">解除委托</Button>
+                    <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
                     </Col>
                     <Col span="8" offset="8" align="right">
-                        <Input v-model="searchKey" placeholder="请输入..." style="width: 200px" />
-                        <span @click="search" style="margin: 0 10px;">
-                            <Button type="primary" icon="search">搜索</Button>
-                        </span>
+                    <Input v-model="searchKey" placeholder="请输入..." style="width: 200px" />
+                    <span @click="search" style="margin: 0 10px;">
+                        <Button type="primary" icon="search">搜索</Button>
+                    </span>
                     </Col>
                 </Row>
                 <Row class="margin-top-10">
@@ -24,19 +25,22 @@
                 </Row>
                 <div style="margin: 10px;overflow: hidden">
                     <div style="float: right;">
-                        <Page page-size="10" :total="total" :current="pageNumber" @on-change="search" show-total show-elevator></Page>
+                        <Page :page-size="pageSize" :total="total" :current="pageNumber" @on-change="search" show-total show-elevator></Page>
                     </div>
                 </div>
             </Card>
             </Col>
         </Row>
-        <addForm ref="aem"></addForm>
+        <addForm ref="aem" :pageSize="pageSize"></addForm>
+        <terminateEntrustModal ref="tem" :pageSize="pageSize"></terminateEntrustModal>
     </div>
 </template>
 
 <script>
     import { mapState } from 'vuex'
     import addEntrustModal from './addForm.vue'
+    import terminateEntrustModal from './terminateForm.vue'
+
     export default {
         name: 'entrustStatusPaneContent',
         computed: {
@@ -50,24 +54,29 @@
         },
         methods: {
             search(pn) {
-                this.$store.dispatch('get_entrust_list', { search: this.searchKey, pn: pn })
+                this.$store.dispatch('get_entrust_list', { search: this.searchKey, pn: pn, ps: this.pageSize })
             },
             refresh() {
-                this.$store.dispatch('get_entrust_list', { search: this.searchKey })
+                this.$store.dispatch('get_entrust_list', { search: this.searchKey, ps: this.pageSize })
             },
             add() {
                 this.$refs.aem.open();
             },
+            terminate() {
+                this.$refs.tem.open();
+            },
         },
         components: {
-            addForm: addEntrustModal
+            addForm: addEntrustModal,
+            terminateEntrustModal: terminateEntrustModal
         },
         mounted() {
-            this.$store.dispatch('get_entrust_list')
+            this.$store.dispatch('get_entrust_list', { ps: this.pageSize })
         },
         data() {
             return {
                 searchKey: '',
+                pageSize: 10,
                 tableColums: [
                     {
                         title: '姓名',
@@ -92,6 +101,20 @@
                     {
                         title: '状态',
                         key: 'status',
+                        render: (h, params) => {
+                            const row = params.row;
+                            const status = row.status === '0' ? '已委托' : row.status === '1' ? '未知' : '已解除';
+                            return h('span', status);
+                        }
+                    },
+                    {
+                        title: '商户类型',
+                        key: 'type',
+                        render: (h, params) => {
+                            const row = params.row;
+                            const type = row.merId === '945230148160197' ? '实时' : '批量';
+                            return h('span', type);
+                        }
                     },
                     {
                         title: '创建时间',

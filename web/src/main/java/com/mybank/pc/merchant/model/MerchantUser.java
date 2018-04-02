@@ -8,4 +8,9 @@ import com.mybank.pc.merchant.model.base.BaseMerchantUser;
 @SuppressWarnings("serial")
 public class MerchantUser extends BaseMerchantUser<MerchantUser> {
 	public static final MerchantUser dao = new MerchantUser().dao();
+
+	@Override
+	public String getTableName() {
+		return "merchant_user";
+	}
 }

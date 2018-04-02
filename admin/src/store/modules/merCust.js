@@ -6,15 +6,17 @@ const merCust = {
         pageNumber:1,
         totalRow:0,
         merCust:{},
+        isOper:true,
 
     },
     mutations: {
 
-        set_merCust_list(state,page){
-            state.merCustList=page.list
-            state.totalPage=page.totalPage
-            state.pageNumber=page.pageNumber
-            state.totalRow=page.totalRow
+        set_merCust_list(state,map){
+            state.merCustList=map.page.list
+            state.totalPage=map.page.totalPage
+            state.pageNumber=map.page.pageNumber
+            state.totalRow=map.page.totalRow
+            state.isOper = map.isOper
 
         },
         merCust_info:function(state,param){

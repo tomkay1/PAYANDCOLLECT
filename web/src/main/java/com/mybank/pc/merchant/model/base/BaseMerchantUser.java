@@ -33,4 +33,5 @@ public abstract class BaseMerchantUser<M extends BaseMerchantUser<M>> extends Mo
 		return getInt("userID");
 	}
 
+	public abstract String getTableName();
 }
