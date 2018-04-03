@@ -6,6 +6,7 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.jfinal.plugin.activerecord.tx.Tx;
+import com.mybank.pc.Consts;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.merchant.info.MerchantInfoSrv;
 import com.mybank.pc.merchant.model.MerchantCust;
@@ -33,8 +34,7 @@ public class MerchantCustCtr extends CoreController {
         Boolean isOper=true;
 
         //获取当前登录用户信息
-
-        MerchantInfo merInfo = merchantInfoSrv.getMerchantInfoByUserID(currUser().getId().intValue());
+        MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
         if(merInfo!=null){
             search1 =merInfo.getMerchantNo();
             isOper=false;
