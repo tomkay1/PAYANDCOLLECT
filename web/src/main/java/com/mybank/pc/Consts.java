@@ -98,6 +98,23 @@ public interface Consts {
         success, fail, unauthorized;
     }
 
+    enum CardBinType{
+        jj("0"),dj("1"),other("3");
+        String val;
+
+        private CardBinType(String val){
+            this.val=val;
+        }
+
+        public String getVal() {
+            return val;
+        }
+
+        public void setVal(String val) {
+            this.val = val;
+        }
+    }
+
     enum CHECK_STATUS {
         normal("00"), waitingCheck("01"), revokeCheck("02");
         String val;
@@ -123,7 +140,7 @@ public interface Consts {
     }
 
     enum CACHE_NAMES {
-        paramCache, ssq, userRoles, user, userReses, taxonomy, art, carouselsetting, login
+        paramCache, ssq, userRoles, user, userReses, taxonomy, art, carouselsetting, login,cardBin
     }
 
 }
