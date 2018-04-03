@@ -79,13 +79,7 @@
            diskPersistent="true"
            memoryStoreEvictionPolicy="FIFO"
     />
-    <cache name="carouselsetting"
-           maxEntriesLocalHeap="5000"
-           eternal="true"
-           overflowToDisk="true"
-           diskPersistent="true"
-           memoryStoreEvictionPolicy="FIFO"
-    />
+
     <cache name="login"
            maxEntriesLocalHeap="5000"
            eternal="true"

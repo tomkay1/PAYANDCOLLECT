@@ -9,7 +9,6 @@ import com.mybank.pc.core.CoreController;
 import com.mybank.pc.core.CoreException;
 import com.mybank.pc.kits.ReqKit;
 import com.mybank.pc.kits.ResKit;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -19,6 +18,8 @@ import java.util.List;
  *
  */
 public class AdminAAuthInterceptor implements Interceptor{
+
+
     @Override
     public void intercept(Invocation invocation) {
         CoreController controller=(CoreController) invocation.getController();

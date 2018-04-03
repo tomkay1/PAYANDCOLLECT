@@ -1,6 +1,7 @@
 package com.mybank.pc.interceptors;
 
 import cn.hutool.core.util.StrUtil;
+import com.jfinal.aop.Duang;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.mybank.pc.Consts;
@@ -12,6 +13,7 @@ import com.mybank.pc.core.CoreException;
 import com.mybank.pc.kits.CookieKit;
 import com.mybank.pc.kits.ReqKit;
 import com.mybank.pc.kits.ResKit;
+import com.mybank.pc.merchant.info.MerchantInfoSrv;
 
 import java.math.BigInteger;
 
@@ -22,7 +24,7 @@ import java.math.BigInteger;
  *
  */
 public class AdminIAuthInterceptor implements Interceptor {
-
+	private MerchantInfoSrv merchantInfoSrv= Duang.duang(MerchantInfoSrv.class.getSimpleName(),MerchantInfoSrv.class);
 	public void intercept(Invocation inv) {
 		CoreController controller = (CoreController) inv.getController();
 		String userId = CookieKit.get(controller, Consts.USER_ACCESS_TOKEN);
@@ -44,7 +46,7 @@ public class AdminIAuthInterceptor implements Interceptor {
 			controller.setAttr(Consts.CURR_USER, user);
 
 			//调用商户接口提供的服务
-			controller.setAttr(Consts.CURR_USER_MER,null);
+			controller.setAttr(Consts.CURR_USER_MER,merchantInfoSrv.getMerchantInfoByUserID(user.getId().intValue()));
 
 			controller.setAttr(Consts.CURR_USER_ROLES, Role.dao.findRolesByUserId(user.getId()));
 			controller.setAttr(Consts.CURR_USER_RESES, Res.dao.findResesByUserId(user.getId()));
