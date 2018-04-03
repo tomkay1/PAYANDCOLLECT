@@ -1,3 +1,25 @@
+#sql("findCollectionEntrustPage")
+	SELECT ce.* FROM collection_entrust ce,merchant_cust mc WHERE 1=1 AND ce.certifId = mc.cardID
+		 #if(merID)
+	    	AND mc.merID = #para(merID)
+	    #end
+	    #if(search)
+	        AND (instr(customerNm, #para(search) )>0 OR instr(certifId, #para(search) )>0 OR instr(accNo, #para(search) )>0 OR instr(phoneNo, #para(search) )>0) 
+	    #end
+	    #if(bTime)
+	    	AND DATE(cat) >= #para(bTime)
+	    #end
+	    #if(eTime)
+	    	AND DATE(cat) <= #para(eTime)
+	    #end
+	    #if(txnType)
+	    	AND txnType = #para(txnType)
+	    #end
+	    #if(txnSubType)
+	    	AND txnSubType = #para(txnSubType)
+	    #end
+	  ORDER BY mat DESC,cat DESC
+#end
 #sql("findUnionpayEntrustPage")
 	SELECT * FROM unionpay_entrust  WHERE 1=1
 	    #if(search)
@@ -15,10 +37,13 @@
 	    #if(txnSubType)
 	    	AND txnSubType = #para(txnSubType)
 	    #end
+	    #if(merchantID)
+	    	AND merchantID = #para(merchantID)
+	    #end
 	  ORDER BY mat DESC,cat DESC
 #end
 #sql("findOne")
-	SELECT * FROM collection_entrust  WHERE 1=1
+	SELECT * FROM collection_entrust ce WHERE 1=1
 	    #if(customerNm)
 	        AND customerNm = #para(customerNm)
 	    #end
@@ -30,9 +55,6 @@
 	    #end
 	    #if(merId)
 	        AND merId = #para(merId)
-	    #end
-	    #if(merchantID)
-	        AND merchantID = #para(merchantID)
 	    #end
 #end
 

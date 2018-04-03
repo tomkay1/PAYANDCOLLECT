@@ -14,7 +14,7 @@ import com.mybank.pc.core.CoreController;
 import com.mybank.pc.core.CoreException;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.kits.CookieKit;
-import org.apache.commons.lang.StringUtils;
+import com.mybank.pc.merchant.model.MerchantInfo;
 
 @Clear({ AdminIAuthInterceptor.class })
 public class CEntrustCtr extends CoreController {
@@ -24,19 +24,18 @@ public class CEntrustCtr extends CoreController {
 	@ActionKey("/coll/entrust/list")
 	public void list() {
 		Page<CollectionEntrust> page;
+		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
+
 		String serach = getPara("search");
 
-		StringBuffer where = new StringBuffer("from collection_entrust where 1=1 ");
-		if (StringUtils.isNotBlank(serach)) {
-			where.append(
-					"AND (instr(customerNm,?)>0 OR instr(certifId,?)>0 OR instr(accNo,?)>0 OR instr(phoneNo,?)>0) ");
-			where.append("ORDER BY mat DESC,cat DESC");
-			page = CollectionEntrust.dao.paginate(getPN(), getPS(), "select * ", where.toString(), serach, serach,
-					serach, serach);
-		} else {
-			where.append("ORDER BY mat DESC,cat DESC");
-			page = CollectionEntrust.dao.paginate(getPN(), getPS(), "select * ", where.toString());
+		Kv kv = Kv.create();
+		kv.set("search", serach);
+		if (merInfo != null) {
+			kv.set("merID", merInfo.getId());
 		}
+
+		SqlPara sqlPara = Db.getSqlPara("collection_entrust.findCollectionEntrustPage", kv);
+		page = CollectionEntrust.dao.paginate(getPN(), getPS(), sqlPara);
 
 		renderJson(page);
 	}
@@ -44,6 +43,8 @@ public class CEntrustCtr extends CoreController {
 	@ActionKey("/coll/entrust/trade/list")
 	public void tradeList() {
 		Page<UnionpayEntrust> page;
+		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
+
 		String serach = getPara("search");
 		String bTime = getPara("bTime");
 		String eTime = getPara("eTime");
@@ -53,6 +54,10 @@ public class CEntrustCtr extends CoreController {
 		Kv kv = Kv.create();
 		kv.set("search", serach).set("bTime", bTime).set("eTime", eTime).set("txnType", txnType).set("txnSubType",
 				txnSubType);
+		if (merInfo != null) {
+			kv.set("merchantID", merInfo.getId());
+		}
+
 		SqlPara sqlPara = Db.getSqlPara("collection_entrust.findUnionpayEntrustPage", kv);
 		page = UnionpayEntrust.dao.paginate(getPN(), getPS(), sqlPara);
 
@@ -61,6 +66,8 @@ public class CEntrustCtr extends CoreController {
 
 	@ActionKey("/coll/entrust/establish")
 	public void establish() {
+		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
+
 		String merCode = getPara("merCode");
 
 		String accNo = getPara("accNo");
@@ -76,6 +83,9 @@ public class CEntrustCtr extends CoreController {
 			kv.set("accNo", accNo).set("certifTp", certifTp).set("certifId", certifId).set("customerNm", customerNm)
 					.set("phoneNo", phoneNo).set("cvn2", cvn2 == null ? "" : cvn2)
 					.set("expired", expired == null ? "" : expired);
+			if (merInfo != null) {
+				kv.set("merchantID", merInfo.getId());
+			}
 
 			String userId = CookieKit.get(this, Consts.USER_ACCESS_TOKEN);
 
@@ -112,12 +122,17 @@ public class CEntrustCtr extends CoreController {
 
 	@ActionKey("/coll/entrust/terminate")
 	public void terminate() {
+		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
+
 		String merCode = getPara("merCode");
 		String accNo = getPara("accNo");
 
 		try {
 			Kv kv = Kv.create();
 			kv.set("accNo", accNo);
+			if (merInfo != null) {
+				kv.set("merchantID", merInfo.getId());
+			}
 
 			String userId = CookieKit.get(this, Consts.USER_ACCESS_TOKEN);
 

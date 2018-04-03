@@ -15,19 +15,40 @@
  */
 package com.mybank.pc.kits.unionpay.acp;
 
-import com.jfinal.kit.LogKit;
-import org.apache.commons.lang.StringUtils;
+import static com.mybank.pc.kits.unionpay.acp.SDKConstants.CERTTYPE_01;
+import static com.mybank.pc.kits.unionpay.acp.SDKConstants.CERTTYPE_02;
+import static com.mybank.pc.kits.unionpay.acp.SDKConstants.POINT;
+import static com.mybank.pc.kits.unionpay.acp.SDKConstants.SIGNMETHOD_RSA;
+import static com.mybank.pc.kits.unionpay.acp.SDKConstants.SIGNMETHOD_SHA256;
+import static com.mybank.pc.kits.unionpay.acp.SDKConstants.SIGNMETHOD_SM3;
+import static com.mybank.pc.kits.unionpay.acp.SDKConstants.VERSION_1_0_0;
+import static com.mybank.pc.kits.unionpay.acp.SDKConstants.VERSION_5_0_0;
+import static com.mybank.pc.kits.unionpay.acp.SDKConstants.VERSION_5_0_1;
+import static com.mybank.pc.kits.unionpay.acp.SDKConstants.VERSION_5_1_0;
+import static com.mybank.pc.kits.unionpay.acp.SDKConstants.param_signMethod;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-import static com.mybank.pc.kits.unionpay.acp.SDKConstants.*;
+import org.apache.commons.lang.StringUtils;
+
+import com.jfinal.kit.LogKit;
 
 /**
  * 

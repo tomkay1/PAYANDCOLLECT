@@ -7,3 +7,6 @@
 #namespace("merchant")
   #include("merchant.sql")
 #end
+#namespace("collection_trade")
+  #include("collection_trade.sql")
+#end

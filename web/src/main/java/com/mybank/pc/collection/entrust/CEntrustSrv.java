@@ -1,5 +1,13 @@
 package com.mybank.pc.collection.entrust;
 
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Invocation;
 import com.jfinal.kit.JsonKit;
@@ -14,13 +22,6 @@ import com.mybank.pc.interceptors.EntrustExceptionInterceptor;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.kits.unionpay.acp.SDKConfig;
-import org.apache.commons.lang.StringUtils;
-
-import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class CEntrustSrv {
 
@@ -38,6 +39,8 @@ public class CEntrustSrv {
 			String phoneNo = kv.getStr("phoneNo");
 			String cvn2 = kv.getStr("cvn2");
 			String expired = kv.getStr("expired");
+
+			int merchantID = kv.getInt("merchantID");
 
 			Date now = new Date();
 			String orderId = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(now) + accNo;
@@ -58,6 +61,7 @@ public class CEntrustSrv {
 			unionpayEntrust.setTxnType("72");
 			unionpayEntrust.setTxnSubType("11");
 			unionpayEntrust.setTxnTime(txnTime);
+			unionpayEntrust.setMerchantID(String.valueOf(merchantID));
 			unionpayEntrust.setCat(now);
 			unionpayEntrust.setMat(now);
 			unionpayEntrust.setOperID(userId);
@@ -219,6 +223,7 @@ public class CEntrustSrv {
 		try {
 			String merCode = kv.getStr("merCode");
 			String accNo = kv.getStr("accNo");
+			int merchantID = kv.getInt("merchantID");
 
 			SDK sdk = getSDK(merCode);
 			SDKConfig sdkConfig = sdk.getSdkConfig();
@@ -256,6 +261,7 @@ public class CEntrustSrv {
 			unionpayEntrust.setTxnType("74");
 			unionpayEntrust.setTxnSubType("04");
 			unionpayEntrust.setTxnTime(txnTime);
+			unionpayEntrust.setMerchantID(String.valueOf(merchantID));
 			unionpayEntrust.setCat(now);
 			unionpayEntrust.setMat(now);
 			unionpayEntrust.setOperID(userId);
