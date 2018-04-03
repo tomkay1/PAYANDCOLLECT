@@ -7,14 +7,13 @@ import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import com.mybank.pc.core.CoreController;
+import com.mybank.pc.merchant.info.MerchantInfoSrv;
 import com.mybank.pc.merchant.model.MerchantCust;
 import com.mybank.pc.merchant.model.MerchantInfo;
-import com.mybank.pc.merchant.model.MerchantUser;
 
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -23,7 +22,7 @@ import java.util.Map;
  */
 
 public class MerchantCustCtr extends CoreController {
-
+    private MerchantInfoSrv merchantInfoSrv =enhance(MerchantInfoSrv.class);
     public void list() {
         Page<MerchantCust> page;
         String search = getPara("search");
@@ -35,10 +34,8 @@ public class MerchantCustCtr extends CoreController {
 
         //获取当前登录用户信息
 
-        List<MerchantUser> list = MerchantUser.dao.find("select * from merchant_user mu where mu.userID=? ",currUser().getId());
-        MerchantInfo merInfo = null;
-        if(list!=null&&list.size()>0){
-            merInfo = MerchantInfo.dao.findById(list.get(0).getMerchantID()) ;
+        MerchantInfo merInfo = merchantInfoSrv.getMerchantInfoByUserID(currUser().getId().intValue());
+        if(merInfo!=null){
             search1 =merInfo.getMerchantNo();
             isOper=false;
         }

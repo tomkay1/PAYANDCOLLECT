@@ -93,5 +93,12 @@
            diskPersistent="true"
            memoryStoreEvictionPolicy="FIFO"
     />
+    <cache name="merInfo"
+           maxEntriesLocalHeap="5000"
+           eternal="true"
+           overflowToDisk="true"
+           diskPersistent="true"
+           memoryStoreEvictionPolicy="FIFO"
+    />
 
 </ehcache>

@@ -108,6 +108,7 @@ public class MerchantInfoCtr extends CoreController {
         merInfo.setMat(new Date());
         merInfo.setOperID(String.valueOf(currUser().getId()));
         merInfo.update();
+        merchantInfoSrv.removeCacheMerchantInfo(merInfo.getId());
         renderSuccessJSON("更新商户信息成功。", "");
     }
 
@@ -117,7 +118,7 @@ public class MerchantInfoCtr extends CoreController {
         MerchantInfo merInfo=MerchantInfo.dao.findById(BigInteger.valueOf(id));
         merInfo.setDat(new Date());
         merInfo.update();
-
+        merchantInfoSrv.removeCacheMerchantInfo(merInfo.getId());
         //删除关联操作员用户
         List<MerchantUser> list = MerchantUser.dao.find("select * from merchant_user mu where mu.merchantID=? ",merInfo.getId());
         if(list !=null && list.size()>0){
