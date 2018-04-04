@@ -28,18 +28,19 @@ import com.mybank.pc.kits.FeeKit;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.kits.unionpay.acp.SDKConfig;
+import com.mybank.pc.merchant.model.MerchantInfo;
 
 public class CTradeSrv {
 
 	@TxnKey("realtime")
-	public boolean realtime(Kv kv, String userId) {
+	public boolean realtime(Kv kv, String userId, MerchantInfo merInfo) {
 		boolean isSuccess = false;
 
 		UnionpayCollection unionpayCollection = new UnionpayCollection();
 		CollectionTrade collectionTrade = new CollectionTrade();
 		Map<String, String> reqData = null;
 		try {
-			reqData = saveOrder(kv, userId, unionpayCollection, collectionTrade);
+			reqData = saveOrder(kv, userId, merInfo, unionpayCollection, collectionTrade);
 		} catch (TradeRuntimeException e) {
 			throw e;
 		} catch (Exception e) {
@@ -72,8 +73,8 @@ public class CTradeSrv {
 	 */
 	@Before({ TradeExceptionInterceptor.class, Tx.class })
 	@TxnKey("realtime-saveOrder")
-	public Map<String, String> saveOrder(Kv kv, String userId, UnionpayCollection unionpayCollection,
-			CollectionTrade collectionTrade) {
+	public Map<String, String> saveOrder(Kv kv, String userId, MerchantInfo merInfo,
+			UnionpayCollection unionpayCollection, CollectionTrade collectionTrade) {
 		// 银联调用相关参数
 		String txnType = "11"; // 交易类型
 		String txnSubType = "02"; // 交易子类型
@@ -94,7 +95,6 @@ public class CTradeSrv {
 			unionpayCollection.setChannelType(channelType);
 			unionpayCollection.setAccessType(accessType);
 
-			String merCode = kv.getStr("merCode");
 			String accNo = kv.getStr("accNo");
 			String txnAmt = kv.getStr("txnAmt");
 			String custID = kv.getStr("custID");
@@ -106,7 +106,7 @@ public class CTradeSrv {
 			unionpayCollection.setAccNo(accNo);
 			unionpayCollection.setTxnAmt(txnAmt);
 
-			SDK sdk = getSDK(merCode);
+			SDK sdk = SDK.REALTIME_SDK;
 			SDKConfig sdkConfig = sdk.getSdkConfig();
 			AcpService acpService = sdk.getAcpService();
 			String encoding = "UTF-8";
@@ -169,7 +169,11 @@ public class CTradeSrv {
 				throw new RuntimeException("不支持的卡类型!!");
 			}
 			collectionTrade.setBankFee(FeeKit.getBankFeeByYuan(originaltxnAmt, cardBin, merId));
-			collectionTrade.setMerFee(FeeKit.getMerchantFee(originaltxnAmt, Integer.valueOf(merchantID), "1"));
+			if (merInfo != null && "1".equals(merInfo.getMerchantType())) {
+				collectionTrade.setMerFee(FeeKit.getMerchantFee(originaltxnAmt, Integer.valueOf(merchantID), "1"));
+			} else {
+				collectionTrade.setMerFee(new BigDecimal(0));
+			}
 
 			Map<String, String> contentData = new HashMap<String, String>();
 
@@ -251,7 +255,7 @@ public class CTradeSrv {
 		try {
 			String merCode = kv.getStr("merCode");
 
-			SDK sdk = getSDK(merCode);
+			SDK sdk = SDK.REALTIME_SDK;
 			SDKConfig sdkConfig = sdk.getSdkConfig();
 			AcpService acpService = sdk.getAcpService();
 			String encoding = "UTF-8";
@@ -354,7 +358,11 @@ public class CTradeSrv {
 			String txnKeyValue = txnKey.value();
 
 			if (txnKeyValue.equals("realtime-saveOrder")) {
-				collectionTrade.save();
+				try {
+					collectionTrade.save();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			} else if (txnKeyValue.equals("realtime-sendOrder")) {
 				try {
 					String finalCode = collectionTrade.getFinalCode();

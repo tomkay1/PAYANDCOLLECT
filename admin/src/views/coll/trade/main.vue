@@ -7,9 +7,9 @@
                     <Icon type="ionic"></Icon>
                     交易查询
                 </p>
-                <!-- <Row>
+                <Row>
                     <Col span="8">
-                    <Button type="primary" icon="person-add" @click="add">新增用户</Button>
+                    <Button type="primary" icon="person-add" @click="initiate">发起交易</Button>
                     <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
                     </Col>
                     <Col span="8" offset="8" align="right">
@@ -17,9 +17,8 @@
                     <span @click="search" style="margin: 0 10px;">
                         <Button type="primary" icon="search">搜索</Button>
                     </span>
-
                     </Col>
-                </Row> -->
+                </Row>
                 <Row class="margin-top-10">
                     <Table border :data="tradeList" :columns="tableColums" stripe></Table>
                 </Row>
@@ -31,33 +30,13 @@
             </Card>
             </Col>
         </Row>
+        <addForm ref="aem" :pageSize="pageSize"></addForm>
     </div>
 </template>
 
 <script>
     import { mapState } from 'vuex'
-
-    const delBtn = (vm, h, param) => {
-        return h('Poptip', {
-            props: {
-                confirm: '',
-                title: '您确定要删除这个用户信息吗？'
-            },
-            style: {
-                marginRight: '5px'
-            },
-            on: {
-                'on-ok': () => {
-                    vm.del(param.row.id)
-                }
-            }
-        }, [h('Button', {
-            props: {
-                type: 'error',
-                size: 'small'
-            }
-        }, '删除')]);
-    }
+    import addTradeModal from './addTradeForm.vue'
 
     export default {
         computed: {
@@ -71,11 +50,17 @@
         },
         methods: {
             search(pn) {
-                this.$store.dispatch('trade_list', { search: this.searchKey, pn: pn })
+                this.$store.dispatch('trade_list', { search: this.searchKey, pn: pn, ps: this.pageSize })
             },
             refresh() {
-                this.$store.dispatch('trade_list', { search: this.searchKey })
-            }
+                this.$store.dispatch('trade_list', { search: this.searchKey, ps: this.pageSize })
+            },
+            initiate() {
+                this.$refs.aem.open();
+            },
+        },
+        components: {
+            addForm: addTradeModal
         },
         mounted() {
             this.$store.dispatch('trade_list')
@@ -83,6 +68,7 @@
         data() {
             return {
                 searchKey: '',
+                pageSize: 10,
                 tableColums: [
                     {
                         title: '交易流水号',
