@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 
+import com.jfinal.core.ActionKey;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.LogKit;
 import com.mybank.pc.collection.model.UnionpayCallbackLog;
@@ -40,6 +41,7 @@ import com.mybank.pc.kits.unionpay.acp.SDKConstants;
 
 public class BackRcvResponse extends CoreController {
 
+	@ActionKey("/coll/backRcvResponse/receive")
 	public void receive() {
 		LogKit.info("BackRcvResponse接收后台通知开始");
 		HttpServletRequest request = getRequest();

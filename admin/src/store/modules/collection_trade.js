@@ -1,4 +1,4 @@
-
+import kit from '../../libs/kit';
 const collTrade = {
     state: {
         tradeList: [],
@@ -13,6 +13,11 @@ const collTrade = {
             state.totalPage = page.totalPage;
             state.pageNumber = page.pageNumber;
             state.totalRow = page.totalRow;
+        },
+        collTrade_set(state, obj) {
+            if (obj !== undefined) {
+                state.collTrade = kit.clone(obj);
+            }
         }
     },
     actions: {
@@ -23,7 +28,18 @@ const collTrade = {
             this._vm.$axios.post('/coll/trade/list', param).then((res) => {
                 commit('set_trade_list', res);
             });
-        }
+        },
+        collTrade_set: function ({ commit, state }, param) {
+            commit('collTrade_set', param);
+        },
+        trade_save: function ({ commit, state }) {
+            let vm = this._vm;
+            return new Promise(function (resolve, reject) {
+                vm.$axios.post('/coll/trade/initiate', state.collTrade).then((res) => {
+                    resolve(res.resCode);
+                });
+            });
+        },
     }
 };
 
