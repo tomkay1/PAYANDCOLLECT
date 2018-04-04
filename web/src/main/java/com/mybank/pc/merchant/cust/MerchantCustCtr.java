@@ -70,7 +70,7 @@ public class MerchantCustCtr extends CoreController {
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
     public void cust(){
 
-        render("/WEB-INF/template/cust-error.html");
+        render("/WEB-INF/template/www/cust.html");
 
     }
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
@@ -107,16 +107,16 @@ public class MerchantCustCtr extends CoreController {
                mc.save();
            }else{
                 //商户编号输入错误，商户不存在
-               render("/WEB-INF/template/cust-error.html");
+               render("/WEB-INF/template/www/cust-error.html");
            }
 
         } catch (Exception e) {
             e.printStackTrace();
-            render("/WEB-INF/template/cust-error.html");
+            render("/WEB-INF/template/www/cust-error.html");
 
         }
 
-        render("/WEB-INF/template/cust-success.html");
+        render("/WEB-INF/template/www/cust-success.html");
 
     }
 }
