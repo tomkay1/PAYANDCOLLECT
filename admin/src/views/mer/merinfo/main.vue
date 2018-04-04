@@ -22,7 +22,7 @@
                 </Row>
                 <Row class="margin-top-10">
                     <Col span="24" align="right">
-                    <Page :total="total" :current="pageNumber" @on-change="search" show-total show-sizer></Page>
+                    <Page :total="total" :current="pageNumber"  :page-size="pageSize" @on-change="search" show-total ></Page>
                     </Col>
                 </Row>
             </Card>
@@ -357,6 +357,7 @@
                 'merInfoList': state => state.merInfo.merInfoList,
                 'totalPage': state => state.merInfo.totalPage,
                 'pageNumber': state => state.merInfo.pageNumber,
+                'pageSize': state => state.merInfo.pageSize,
                 'total': state => state.merInfo.totalRow,
                 'merInfo': state => state.merInfo.merInfo,
                 'merchantTypeList': state => state.merInfo.merchantTypeList,
@@ -612,8 +613,8 @@
                         {type: 'string', required: true, message: '金额上限不能为空', trigger: 'blur'},
                         {
                             type: 'string',
-                            message: '金额上限输入无效',
-                            pattern: /^(?=\d+.?\d+$)[\d.]{0,20}$/,
+                            message: '请输入0或整数',
+                            pattern: /^\d+$/,
                             trigger: 'blur'
                         }
                     ],

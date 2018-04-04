@@ -4,6 +4,7 @@ const merCust = {
         merCustList:[],
         totalPage:0,
         pageNumber:1,
+        pageSize:15,
         totalRow:0,
         merCust:{},
         isOper:true,
@@ -14,6 +15,7 @@ const merCust = {
         set_merCust_list(state,map){
             state.merCustList=map.page.list
             state.totalPage=map.page.totalPage
+            state.pageSize=map.pageSize
             state.pageNumber=map.page.pageNumber
             state.totalRow=map.page.totalRow
             state.isOper = map.isOper

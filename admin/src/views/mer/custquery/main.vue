@@ -24,7 +24,7 @@
                 </Row>
                 <Row class="margin-top-10">
                     <Col span="24" align="right">
-                    <Page :total="total" :current="pageNumber" @on-change="search" show-total show-sizer></Page>
+                    <Page :total="total" :current="pageNumber"  :page-size="pageSize" @on-change="search" show-total ></Page>
                     </Col>
                 </Row>
             </Card>
@@ -166,6 +166,7 @@
             ...mapState({
                 'merCustList': state => state.merCust.merCustList,
                 'totalPage': state => state.merCust.totalPage,
+                'pageSize': state => state.merInfo.pageSize,
                 'pageNumber': state => state.merCust.pageNumber,
                 'total': state => state.merCust.totalRow,
                 'merCust': state => state.merCust.merCust,

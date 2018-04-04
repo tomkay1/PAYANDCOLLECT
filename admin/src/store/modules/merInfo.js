@@ -6,6 +6,7 @@ const merInfo = {
         merInfoList:[],
         totalPage:0,
         pageNumber:1,
+        pageSize:15,
         totalRow:0,
         merInfo:{},
         merchantTypeList:[],
@@ -14,10 +15,10 @@ const merInfo = {
 
     },
     mutations: {
-
         set_merInfo_list(state,page){
             state.merInfoList=page.page.list
             state.totalPage=page.page.totalPage
+            state.pageSize=page.page.pageSize
             state.pageNumber=page.page.pageNumber
             state.totalRow=page.page.totalRow
             state.merchantTypeList =page.tList

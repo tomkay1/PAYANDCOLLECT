@@ -3,8 +3,6 @@ package com.mybank.pc.merchant.cust;
 import cn.hutool.core.io.FileUtil;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.Kv;
-import com.jfinal.kit.LogKit;
-import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.SqlPara;
@@ -72,7 +70,7 @@ public class MerchantCustCtr extends CoreController {
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
     public void cust(){
 
-        render("/WEB-INF/template/cust.html");
+        render("/WEB-INF/template/cust-error.html");
 
     }
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
