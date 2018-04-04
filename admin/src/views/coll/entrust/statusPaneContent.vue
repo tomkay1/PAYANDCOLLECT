@@ -3,10 +3,6 @@
         <Row>
             <Col span="24">
             <Card>
-                <p slot="title">
-                    <Icon type="help-buoy"></Icon>
-                    委托状态
-                </p>
                 <Row>
                     <Col span="8">
                     <Button type="primary" icon="person-add" @click="add">建立委托</Button>

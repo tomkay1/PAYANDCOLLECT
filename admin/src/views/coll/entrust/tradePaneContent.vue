@@ -3,10 +3,6 @@
         <Row>
             <Col span="24">
             <Card>
-                <p slot="title">
-                    <Icon type="help-buoy"></Icon>
-                    交易流水
-                </p>
                 <Row>
                     <Col span="24" align="right">
                     <Select v-model="txnType" style="width: 120px; text-align: center;">

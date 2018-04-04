@@ -82,7 +82,7 @@
         data() {
             return {
                 self: this,
-                terminateEntrustModal: false,
+                initiateTradeModal: false,
                 modalTitle: '发起交易',
                 modalLoading: false,
                 bussTypeList: [
@@ -97,7 +97,7 @@
                 ],
                 ruleValidate: {
                     bussType: [
-                        { type: 'string', required: true, message: '商户类型不能为空', trigger: 'blur' },
+                        { type: 'string', required: true, message: '业务类型不能为空', trigger: 'blur' },
                     ],
                     accNo: [
                         { type: 'string', required: true, message: '卡号不能为空', trigger: 'blur' },

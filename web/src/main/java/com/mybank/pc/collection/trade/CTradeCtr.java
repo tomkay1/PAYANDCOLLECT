@@ -29,12 +29,15 @@ public class CTradeCtr extends CoreController {
 		if (merInfo == null || merInfo.getId() == null) {
 			page = new Page<CollectionTrade>(new ArrayList<CollectionTrade>(), getPN(), getPS(), 0, 0);
 		} else {
-			String serach = getPara("search");
+
+			String finalCode = getPara("finalCode");
 			String bTime = getPara("bTime");
 			String eTime = getPara("eTime");
+			String serach = getPara("search");
 
 			Kv kv = Kv.create();
-			kv.set("search", serach).set("bTime", bTime).set("eTime", eTime).set("merchantID", merInfo.getId());
+			kv.set("search", serach).set("finalCode", finalCode).set("bTime", bTime).set("eTime", eTime)
+					.set("merchantID", merInfo.getId());
 
 			SqlPara sqlPara = Db.getSqlPara("collection_trade.findTradeListPage", kv);
 			page = CollectionTrade.dao.paginate(getPN(), getPS(), sqlPara);
