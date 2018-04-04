@@ -1,6 +1,5 @@
 package com.mybank.pc.collection.entrust;
 
-import com.jfinal.aop.Clear;
 import com.jfinal.aop.Duang;
 import com.jfinal.core.ActionKey;
 import com.jfinal.kit.Kv;
@@ -12,11 +11,9 @@ import com.mybank.pc.collection.model.CollectionEntrust;
 import com.mybank.pc.collection.model.UnionpayEntrust;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.core.CoreException;
-import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.kits.CookieKit;
 import com.mybank.pc.merchant.model.MerchantInfo;
 
-@Clear({ AdminIAuthInterceptor.class })
 public class CEntrustCtr extends CoreController {
 
 	private CEntrustSrv cEntrustSrv = Duang.duang(CEntrustSrv.class);

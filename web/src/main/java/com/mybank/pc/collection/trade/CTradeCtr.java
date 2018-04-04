@@ -45,6 +45,22 @@ public class CTradeCtr extends CoreController {
 		renderJson(page);
 	}
 
+	@ActionKey("/coll/trade/getMerCust")
+	public void merCust() {
+		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
+		if (merInfo == null || merInfo.getId() == null) {
+			renderJson(new ArrayList<MerchantCust>());
+		} else {
+			String serach = getPara("search");
+
+			Kv kv = Kv.create();
+			kv.set("search", serach).set("merchantID", merInfo.getId());
+
+			SqlPara sqlPara = Db.getSqlPara("collection_trade.findMerchantCustListPage", kv);
+			renderJson(MerchantCust.dao.find(sqlPara));
+		}
+	}
+
 	@ActionKey("/coll/trade/initiate")
 	public void initiate() {
 		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
@@ -73,7 +89,7 @@ public class CTradeCtr extends CoreController {
 		boolean isSuccess = false;
 		try {
 			if ("1".equals(bussType)) {
-				cCTradeSrvSrv.realtime(kv, userId, merInfo);
+				isSuccess=cCTradeSrvSrv.realtime(kv, userId, merInfo);
 			}
 		} catch (Exception e) {
 			isSuccess = false;

@@ -42,6 +42,17 @@
 		ORDER BY
 			mat DESC,cat DESC
 #end
+#sql("findMerchantCustListPage")
+	SELECT * FROM merchant_cust WHERE 1=1
+		#if(search)
+	        AND (instr(custName, #para(search) )>0 OR instr(cardID, #para(search) )>0 OR instr(mobileBank, #para(search) )>0 OR instr(bankcardNo, #para(search) )>0) 
+	    #end
+		#if(merchantID)
+	        AND merID = #para(merchantID)
+	    #end
+		ORDER BY
+			mat DESC,cat DESC
+#end
 #sql("findByTradeNo")
 	SELECT * FROM collection_trade  WHERE 1=1
 	    #if(tradeNo)

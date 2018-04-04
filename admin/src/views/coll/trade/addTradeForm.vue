@@ -5,20 +5,24 @@
                 <Icon type="information-circled"></Icon>
                 <span>{{modalTitle}}</span>
             </p>
-            
+
             <Form ref="formValidate" :label-width="120" :model="trade" :rules="ruleValidate">
                 <FormItem label="业务类型" prop="bussType">
                     <Select v-model="trade.bussType">
                         <Option v-for="item in bussTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                     </Select>
                 </FormItem>
-                <FormItem label="卡号" prop="accNo">
-                    <Input v-model="trade.accNo" placeholder="请输入..."></Input>
+                <FormItem label="客户卡号" prop="accNo">
+                    <Select placeholder="输入 姓名/身份证号/手机号/卡号 进行搜索..." v-model="trade.accNo" filterable remote :remote-method="selectAccNo" :loading="selectAccNoLoading">
+                        <Option v-for="(option, index) in accNoOptions" :value="option.bankcardNo" :key="index">
+                            <span>{{option.custName}}</span>
+                            <span style="float:right;color:#ccc">{{option.bankcardNo}}</span>
+                        </Option>
+                    </Select>
                 </FormItem>
                 <FormItem label="金额" prop="txnAmt">
                     <Input v-model="trade.txnAmt" placeholder="请输入..."></Input>
                 </FormItem>
-                
             </Form>
             <div slot="footer">
                 <Button type="success" :loading="modalLoading" @click="save">发起</Button>
@@ -26,7 +30,6 @@
                 <Button type="error" @click="initiateTradeModal=false">关闭</Button>
             </div>
         </Modal>
-
     </div>
 </template>
 
@@ -49,8 +52,11 @@
                 this.initiateTradeModal = true;
                 this.$store.commit('collTrade_set', {});
                 this.modalLoading = false;
+                this.$axios.post('/coll/trade/getMerCust').then((res) => {
+                    this.accNoOptionsList = res;
+                });
             },
-            close(){
+            close() {
                 this.initiateTradeModal = false;
                 this.$store.commit('collTrade_set', {});
                 this.modalLoading = false;
@@ -76,8 +82,22 @@
             },
             reset() {
                 this.$store.dispatch('collTrade_set', {})
+            },
+            selectAccNo(query) {
+                if (query !== '') {
+                    this.selectAccNoLoading = true;
+                    setTimeout(() => {
+                        this.selectAccNoLoading = false;
+                        this.accNoOptions = this.accNoOptionsList.filter(item =>
+                            (item.custName.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
+                            (item.cardID.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
+                            (item.mobileBank.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
+                            (item.bankcardNo.toLowerCase().indexOf(query.toLowerCase()) > -1));
+                    }, 200);
+                } else {
+                    this.accNoOptions = [];
+                }
             }
-
         },
         data() {
             return {
@@ -85,6 +105,9 @@
                 initiateTradeModal: false,
                 modalTitle: '发起交易',
                 modalLoading: false,
+                accNoOptions: [],
+                selectAccNoLoading: false,
+                accNoOptionsList: [],
                 bussTypeList: [
                     {
                         value: '1',
