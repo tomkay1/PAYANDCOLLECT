@@ -1,5 +1,6 @@
 package com.mybank.pc.merchant.cust;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.Kv;
@@ -18,9 +19,7 @@ import com.mybank.pc.merchant.model.MerchantInfo;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -69,17 +68,18 @@ public class MerchantCustCtr extends CoreController {
 
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
     public void cust(){
-
         render("/WEB-INF/template/www/cust.html");
 
     }
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
     public void addCust(){
+        String resCode ="success";
+        String resMsg = "绑定成功";
 
         try {
             //此处一定优先处理上传文件，后处理其它参数
-            UploadFile cardImgZ =  getFile("cardImgZ","",20*1024*1000);
-            UploadFile selfImg = getFile("selfImg","",20*1024*1000);
+            UploadFile cardImgZ =  getFile("cardImgZ","",10*1024*1000);
+            UploadFile selfImg = getFile("selfImg","",10*1024*1000);
            File cardImgZFile = cardImgZ.getFile();
            File selfImgFile = selfImg.getFile();
             System.out.println("上传文件1大小："+cardImgZFile.length());
@@ -87,36 +87,50 @@ public class MerchantCustCtr extends CoreController {
             String cardImgZID = CMNSrv.saveFile(cardImgZFile, FileUtil.getType(cardImgZFile));
             String selfImgID = CMNSrv.saveFile(selfImgFile, FileUtil.getType(selfImgFile));
             String merNo =getPara("merNo");
-           MerchantInfo mf=  MerchantInfo.dao.findFirst("select * from merchant_info mi where mi.merchantNo=? ",merNo);
-           if (mf !=null){
-               String custName =getPara("custName");
-               String cardID =getPara("cardID");
-               String mobileBank =getPara("mobileBank");
-               String bankcardNo =getPara("bankcardNo");
+            String custName =getPara("custName");
+            String cardID =getPara("cardID");
+            String mobileBank =getPara("mobileBank");
+            String bankcardNo =getPara("bankcardNo");
+           MerchantInfo mf=  MerchantInfo.dao.findFirst("select * from merchant_info mi where mi.merchantNo=? and mi.dat is null ",merNo);
 
-               MerchantCust mc = new MerchantCust();
-               mc.setMerID(mf.getId());
-               mc.setMerNo(merNo);
-               mc.setCustName(custName);
-               mc.setCardID(cardID);
-               mc.setMobileBank(mobileBank);
-               mc.setBankcardNo(bankcardNo);
-               mc.setCardImgZ(cardImgZID);
-               mc.setSelfImg(selfImgID);
-               mc.setCat(new Date());
-               mc.save();
+
+           if (mf !=null){
+               List<MerchantCust> mcList = MerchantCust.dao.find("select * from merchant_cust mc where mc.dat is null and  mc.merNo=?  and mc.cardID=? and mc.mobileBank=? and mc.bankcardNo=?", merNo,cardID,mobileBank,bankcardNo);
+               if(CollectionUtil.isEmpty(mcList)){
+                   if(false){
+                       //调用四要素验证接口进行绑卡，如果是失败则返回
+                   }
+                   MerchantCust mc = new MerchantCust();
+                   mc.setMerID(mf.getId());
+                   mc.setMerNo(merNo);
+                   mc.setCustName(custName);
+                   mc.setCardID(cardID);
+                   mc.setMobileBank(mobileBank);
+                   mc.setBankcardNo(bankcardNo);
+                   mc.setCardImgZ(cardImgZID);
+                   mc.setSelfImg(selfImgID);
+                   mc.setCat(new Date());
+                   mc.save();
+               }else{
+                   //同意商户下已经绑定过银行卡
+                   resCode="error";
+                   resMsg="绑定失败，该客户银行卡已经绑定！";
+               }
+
            }else{
-                //商户编号输入错误，商户不存在
-               render("/WEB-INF/template/www/cust-error.html");
+               //商户编号输入错误，商户不存在
+               resCode="error";
+               resMsg="绑定失败，商户不存在！";
            }
 
         } catch (Exception e) {
             e.printStackTrace();
-            render("/WEB-INF/template/www/cust-error.html");
-
+            resCode="error";
+            resMsg="系统异常，绑定失败！";
         }
-
-        render("/WEB-INF/template/www/cust-success.html");
+        setAttr("resCode",resCode);
+        setAttr("resMsg",resMsg);
+        render("/WEB-INF/template/www/cust-res.html");
 
     }
 }
