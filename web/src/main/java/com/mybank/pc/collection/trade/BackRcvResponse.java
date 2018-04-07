@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 
+import com.jfinal.aop.Duang;
 import com.jfinal.core.ActionKey;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.LogKit;
@@ -41,6 +42,9 @@ import com.mybank.pc.kits.unionpay.acp.SDKConstants;
 
 public class BackRcvResponse extends CoreController {
 
+	private CTradeSrv cTradeSrv = Duang.duang(CTradeSrv.class);
+	private CBatchTradeSrv cBatchTradeSrv = Duang.duang(CBatchTradeSrv.class);
+
 	@ActionKey("/coll/backRcvResponse/receive")
 	public void receive() {
 		LogKit.info("BackRcvResponse接收后台通知开始");
@@ -52,18 +56,10 @@ public class BackRcvResponse extends CoreController {
 		UnionpayCallbackLog unionpayCallbackLog = log(reqParam, encoding);
 		if ("1".equals(unionpayCallbackLog.getValidate())) {// 验签成功
 
-			// 代收回调
+			// 实时代收回调
 			if ("11".equals(unionpayCallbackLog.getTxnType()) && "02".equals(unionpayCallbackLog.getTxnSubType())) {
-
+				cTradeSrv.updateOrderStatus(reqParam);
 			}
-
-			String txnType = "11"; // 交易类型
-			String txnSubType = "02"; // 交易子类型
-
-			String channelType = "07";// 渠道类型
-			String accessType = "0";// 接入类型，商户接入固定填0，不需修改
-			String bizType = "000501";// 业务类型
-			String accType = "01";// 账号类型
 
 		}
 

@@ -1,5 +1,5 @@
 #sql("findCollectionEntrustPage")
-	SELECT ce.* FROM collection_entrust ce,merchant_cust mc WHERE 1=1 AND ce.certifId = mc.cardID
+	SELECT DISTINCT ce.* FROM collection_entrust ce INNER JOIN merchant_cust mc on ce.certifId = mc.cardID WHERE 1=1
 		 #if(merID)
 	    	AND mc.merID = #para(merID)
 	    #end

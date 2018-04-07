@@ -59,6 +59,54 @@
 	        AND tradeNo = #para(tradeNo)
 	    #end
 #end
+#sql("findUnionpayCollection")
+	SELECT * FROM unionpay_collection  WHERE 1=1
+	    #if(customerNm)
+	        AND customerNm = #para(customerNm)
+	    #end
+	    #if(certifTp)
+	        AND certifTp = #para(certifTp)
+	    #end
+	    #if(certifId)
+	        AND certifId = #para(certifId)
+	    #end
+	    #if(accType)
+	        AND accType = #para(accType)
+	    #end
+	    #if(accNo)
+	        AND accNo = #para(accNo)
+	    #end
+	    #if(phoneNo)
+	        AND phoneNo = #para(phoneNo)
+	    #end
+	    #if(tradeNo)
+	        AND tradeNo = #para(tradeNo)
+	    #end
+	    #if(orderId)
+	        AND orderId = #para(orderId)
+	    #end
+	    #if(txnType)
+	        AND txnType = #para(txnType)
+	    #end
+	    #if(txnSubType)
+	        AND txnSubType = #para(txnSubType)
+	    #end
+	    #if(txnTime)
+	        AND txnTime = #para(txnTime)
+	    #end
+	    #if(merId)
+	        AND merId = #para(merId)
+	    #end
+	    #if(queryId)
+	        AND queryId = #para(queryId)
+	    #end
+	    #if(merchantID)
+	        AND merchantID = #para(merchantID)
+	    #end
+	    #if(finalCode)
+	        AND finalCode = #para(finalCode)
+	    #end
+#end
 #sql("findMerchantFee")
 	SELECT * FROM merchant_fee WHERE 1=1
 		AND amountLower < #para(amount)
@@ -78,7 +126,11 @@
 #sql("findCustByBankcardNo")
 	SELECT * FROM merchant_cust  WHERE 1=1
 	    #if(bankcardNo)
-	        AND BankcardNo = #para(bankcardNo)
+	        AND bankcardNo = #para(bankcardNo)
 	    #end
+#end
+#sql("findToBeSentUnionpayCollection")
+	SELECT * FROM unionpay_collection  WHERE 
+	    txnType = '21' AND txnSubType = '02' AND status = '0'
 #end
 

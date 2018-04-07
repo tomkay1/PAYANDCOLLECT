@@ -10,6 +10,7 @@ import com.jfinal.plugin.activerecord.SqlPara;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.CardBin;
+import com.mybank.pc.exception.ValidateCTRException;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.merchant.model.MerchantFee;
 
@@ -73,14 +74,13 @@ public class FeeKit {
 		BigDecimal fee = new BigDecimal(0);
 		MerchantFee merchantFee = findMerchantFee(amount, merID, tradeType);
 		if (merchantFee == null) {
-			throw new RuntimeException("符合金额[" + amount.toPlainString() + "]的手续费设置不存在!!");
+			throw new ValidateCTRException("符合金额[" + amount.toPlainString() + "]的手续费设置不存在!!");
 		}
 
-		// 1定额 2比例
 		String feeType = merchantFee.getFeeType();
-		if (feeType.equals("1")) {
+		if (feeType.equals("1")) {// 定额
 			fee = merchantFee.getAmount();
-		} else if (feeType.equals("2")) {
+		} else if (feeType.equals("2")) {// 比例
 			fee = amount.multiply(merchantFee.getRatio());
 		}
 		fee = fee.setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -90,6 +90,7 @@ public class FeeKit {
 	/**
 	 * @param amount
 	 * @param merID
+	 *            商户ID
 	 * @param tradeType
 	 *            1加急 2标准
 	 * @return
@@ -136,7 +137,7 @@ public class FeeKit {
 				fee = new BigDecimal(170);
 			}
 		} else {
-			throw new RuntimeException(
+			throw new ValidateCTRException(
 					"不支持的卡Bin[" + cardBin.getBankName() + " " + cardBin.getCardName() + " " + cardBin.getCBin() + "]");
 		}
 

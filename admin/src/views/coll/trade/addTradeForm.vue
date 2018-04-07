@@ -6,22 +6,31 @@
                 <span>{{modalTitle}}</span>
             </p>
 
-            <Form ref="formValidate" :label-width="120" :model="trade" :rules="ruleValidate">
+            <Form ref="formValidate" :label-width="80" :model="trade" :rules="ruleValidate">
                 <FormItem label="业务类型" prop="bussType">
                     <Select v-model="trade.bussType">
                         <Option v-for="item in bussTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                     </Select>
                 </FormItem>
-                <FormItem label="客户卡号" prop="accNo">
-                    <Select placeholder="输入 姓名/身份证号/手机号/卡号 进行搜索..." v-model="trade.accNo" filterable remote :remote-method="selectAccNo" :loading="selectAccNoLoading">
-                        <Option v-for="(option, index) in accNoOptions" :value="option.bankcardNo" :key="index">
-                            <span>{{option.custName}}</span>
-                            <span style="float:right;color:#ccc">{{option.bankcardNo}}</span>
+                <FormItem label="客户" prop="custID">
+                    <Select ref="merCustSelect" placeholder="输入 姓名/身份证号/手机号/卡号 进行搜索..." v-model="trade.custID" clearable filterable remote
+                        :remote-method="selectCustID" :loading="selectCustIdLoading">
+                        <Option v-for="(option, index) in custIDOptions" :value="option.id" :key="index" :label="option.custName">
+                            <div style="margin: 5px auto;">
+                                <div>
+                                    <span style="font-weight:bold; margin-right: 10px;">{{option.custName}}</span>
+                                    <span style="color:#ccc">{{option.cardID}}</span>
+                                </div>
+                                <div>
+                                    <span style="margin-right: 10px;">{{option.bankcardNo}}</span>
+                                    <span v-if="option.cardBin.cardName" style="color:#ccc">{{option.cardBin.cardName}}</span>
+                                </div>
+                            </div>
                         </Option>
                     </Select>
                 </FormItem>
-                <FormItem label="金额" prop="txnAmt">
-                    <Input v-model="trade.txnAmt" placeholder="请输入..."></Input>
+                <FormItem label="金额" prop="txnAmt" required>
+                    <InputNumber :min='0.01' v-model="trade.txnAmt" :step="1" style="width: 100%;"></InputNumber>
                 </FormItem>
             </Form>
             <div slot="footer">
@@ -53,7 +62,7 @@
                 this.$store.commit('collTrade_set', {});
                 this.modalLoading = false;
                 this.$axios.post('/coll/trade/getMerCust').then((res) => {
-                    this.accNoOptionsList = res;
+                    this.custIDOptionsList = res;
                 });
             },
             close() {
@@ -67,7 +76,6 @@
                 }
             },
             save() {
-                let vm = this;
                 this.modalLoading = true;
                 this.$refs['formValidate'].validate((valid) => {
                     if (valid) {
@@ -83,19 +91,19 @@
             reset() {
                 this.$store.dispatch('collTrade_set', {})
             },
-            selectAccNo(query) {
+            selectCustID(query) {
                 if (query !== '') {
-                    this.selectAccNoLoading = true;
+                    this.selectCustIdLoading = true;
                     setTimeout(() => {
-                        this.selectAccNoLoading = false;
-                        this.accNoOptions = this.accNoOptionsList.filter(item =>
+                        this.selectCustIdLoading = false;
+                        this.custIDOptions = this.custIDOptionsList.filter(item =>
                             (item.custName.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
                             (item.cardID.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
                             (item.mobileBank.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
                             (item.bankcardNo.toLowerCase().indexOf(query.toLowerCase()) > -1));
                     }, 200);
                 } else {
-                    this.accNoOptions = [];
+                    this.custIDOptions = [];
                 }
             }
         },
@@ -105,9 +113,9 @@
                 initiateTradeModal: false,
                 modalTitle: '发起交易',
                 modalLoading: false,
-                accNoOptions: [],
-                selectAccNoLoading: false,
-                accNoOptionsList: [],
+                custIDOptions: [],
+                selectCustIdLoading: false,
+                custIDOptionsList: [],
                 bussTypeList: [
                     {
                         value: '1',
@@ -120,14 +128,13 @@
                 ],
                 ruleValidate: {
                     bussType: [
-                        { type: 'string', required: true, message: '业务类型不能为空', trigger: 'blur' },
+                        { type: 'string', required: true, message: '请选择业务类型', trigger: 'blur' },
                     ],
-                    accNo: [
-                        { type: 'string', required: true, message: '卡号不能为空', trigger: 'blur' },
-                        { type: 'string', max: 50, message: '卡号长度不能超过50', trigger: 'blur' }
+                    custID: [
+                        { type: 'number', required: true, message: '请选择客户', trigger: 'blur' },
                     ],
                     txnAmt: [
-                        { type: 'string', required: true, message: '金额不能为空', trigger: 'blur' },
+                        { type: 'number', required: true, message: '请输入有效金额', trigger: 'blur' },
                     ]
                 }
             }
