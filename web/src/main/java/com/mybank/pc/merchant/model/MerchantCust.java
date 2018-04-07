@@ -1,6 +1,8 @@
 package com.mybank.pc.merchant.model;
 
+import com.mybank.pc.admin.model.CardBin;
 import com.mybank.pc.kits.DateKit;
+import com.mybank.pc.kits.FeeKit;
 import com.mybank.pc.merchant.model.base.BaseMerchantCust;
 
 /**
@@ -9,12 +11,17 @@ import com.mybank.pc.merchant.model.base.BaseMerchantCust;
 @SuppressWarnings("serial")
 public class MerchantCust extends BaseMerchantCust<MerchantCust> {
 	public static final MerchantCust dao = new MerchantCust().dao();
-	public String getCatTxt(){
-		return DateKit.dateToStr(getCat(),"yyyy-MM-dd HH:mm:ss");
+
+	public String getCatTxt() {
+		return DateKit.dateToStr(getCat(), "yyyy-MM-dd HH:mm:ss");
 	}
 
-	public MerchantInfo getMerchantInfo(){
+	public MerchantInfo getMerchantInfo() {
 		return MerchantInfo.dao.findById(getMerID());
+	}
+
+	public CardBin getCardBin() {
+		return FeeKit.getCardBin(getBankcardNo());
 	}
 
 }

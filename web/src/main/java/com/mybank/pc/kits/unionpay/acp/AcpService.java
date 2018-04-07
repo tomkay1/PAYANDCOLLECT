@@ -1,8 +1,11 @@
 package com.mybank.pc.kits.unionpay.acp;
 
-import com.jfinal.kit.LogKit;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -10,6 +13,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.jfinal.kit.LogKit;
 
 /**
  * @ClassName AcpService
@@ -317,6 +322,24 @@ public class AcpService {
 					LogKit.error(e.getMessage(), e);
 				}
 			}
+		}
+		return baseFileContent;
+	}
+
+	/**
+	 * 功能：将批量文件内容使用DEFLATE压缩算法压缩，Base64编码生成字符串并返回<br>
+	 * 适用到的交易：批量代付，批量代收，批量退货<br>
+	 * 
+	 * @param fileContent
+	 *            批量文件-文件体<br>
+	 * @return
+	 */
+	public static String enCodeFileContentByString(String fileContent, String encoding) {
+		String baseFileContent = null;
+		try {
+			baseFileContent = new String(SecureUtil.base64Encode(SDKUtil.deflater(fileContent.getBytes())), encoding);
+		} catch (Exception e) {
+			LogKit.error(e.getMessage(), e);
 		}
 		return baseFileContent;
 	}
