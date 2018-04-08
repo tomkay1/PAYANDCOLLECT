@@ -210,6 +210,7 @@ public class CTradeSrv {
 			unionpayCollection.setCat(now);
 			unionpayCollection.setMat(now);
 			unionpayCollection.setOperID(operID);
+			unionpayCollection.setQueryResultCount(0);
 
 			collectionTrade.setTradeNo(tradeNo);
 			collectionTrade.setTradeTime(now);
@@ -459,6 +460,12 @@ public class CTradeSrv {
 			SqlPara sqlPara = Db.getSqlPara("collection_trade.findUnionpayCollection", kv);
 			UnionpayCollection unionpayCollection = UnionpayCollection.dao.findFirst(sqlPara);
 			if (unionpayCollection != null) {
+				if ("00".equals(respCode)) {
+					unionpayCollection.setFinalCode("0");// 成功
+				} else {
+					unionpayCollection.setFinalCode("2");// 失败
+				}
+
 				unionpayCollection.setResultCode(respCode);
 				unionpayCollection.setResultMsg(respMsg);
 				unionpayCollection.setResult(JsonKit.toJson(reqParam));
