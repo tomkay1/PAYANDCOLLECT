@@ -20,7 +20,6 @@ import collUndo from './modules/collection_undo';
 import collReconciliation from './modules/collection_reconciliation';
 import merCust from './modules/merCust';
 import unionpayEntrust from './modules/unionpay_entrust';
-
 Vue.use(Vuex);
 
 const store = new Vuex.Store({

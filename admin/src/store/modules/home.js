@@ -4,7 +4,7 @@ const home = {
         countStatisticsData:{},
         dspOption:{},
         lastWeekUnlock:{},
-        lastWeekAct:{}
+        lastWeekAct:{},
     },
     mutations: {
         setCountStatisticsData:function (state,obj) {
@@ -146,7 +146,7 @@ const home = {
 
             state.lastWeekAct=Object.assign({},option);
 
-        }
+        },
     },
     actions:{
         countStatisticsData_query :function ({ commit,state }) {
@@ -156,6 +156,14 @@ const home = {
                     commit('setCountStatisticsData', res)
                     resolve()
                 });
+            });
+        },
+        home_merFee_list:function({commit,state},param){
+            let vm=this._vm;
+            return new Promise(function (resolve, reject) {
+                vm.$axios.post('/home/fee', param).then((res) => {
+                    resolve(res);
+                })
             });
         },
     }

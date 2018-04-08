@@ -19,6 +19,7 @@ import com.jfinal.render.JsonRender;
 import com.jfinal.template.Engine;
 import com.mybank.pc.CMNCtr;
 import com.mybank.pc.Consts;
+import com.mybank.pc.admin.HomeCtr;
 import com.mybank.pc.admin.LoginCtr;
 import com.mybank.pc.admin.art.ArtCtr;
 import com.mybank.pc.admin.param.ParamCtr;
@@ -93,6 +94,12 @@ public class CoreConfig extends JFinalConfig{
             }
         });
 
+        routes.add(new Routes() {
+            @Override
+            public void config() {
+                add("/home", HomeCtr.class);
+            }
+        });
         routes.add(new Routes() {
             @Override
             public void config() {
