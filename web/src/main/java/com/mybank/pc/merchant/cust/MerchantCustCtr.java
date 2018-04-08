@@ -2,6 +2,7 @@ package com.mybank.pc.merchant.cust;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Db;
@@ -11,6 +12,8 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.upload.UploadFile;
 import com.mybank.pc.CMNSrv;
 import com.mybank.pc.Consts;
+import com.mybank.pc.collection.entrust.CEntrustSrv;
+import com.mybank.pc.collection.model.UnionpayEntrust;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.merchant.info.MerchantInfoSrv;
@@ -19,7 +22,10 @@ import com.mybank.pc.merchant.model.MerchantInfo;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -28,6 +34,7 @@ import java.util.*;
 
 public class MerchantCustCtr extends CoreController {
     private MerchantInfoSrv merchantInfoSrv = enhance(MerchantInfoSrv.class);
+    private CEntrustSrv cEntrustSrv = enhance(CEntrustSrv.class);
 
     public void list() {
         Page<MerchantCust> page;
@@ -99,30 +106,64 @@ public class MerchantCustCtr extends CoreController {
             if (mf != null) {
                 List<MerchantCust> mcList = MerchantCust.dao.find("select * from merchant_cust mc where mc.dat is null and  mc.merNo=?  and mc.cardID=? and mc.mobileBank=? and mc.bankcardNo=?", merNo, cardID, mobileBank, bankcardNo);
                 if (CollectionUtil.isEmpty(mcList)) {
-                    if (false) {
-                        //调用四要素验证接口进行绑卡，如果是失败则返回
+                    Kv kv = Kv.create();
+                    kv.set("customerNm",custName);
+                    kv.set("certifTp","01");
+                    kv.set("certifId",cardID);
+                    kv.set("phoneNo",mobileBank);
+                    kv.set("accNo",bankcardNo);
+                    kv.set("merchantID",mf.getId());
+                    kv.set("cvn2","");
+                    kv.set("expired","");
+                    Kv[] resKv = cEntrustSrv.establishAll(kv);
+
+                    if (resKv[0].getBoolean("isSuccess") ) {
+                        if (resKv[1].getBoolean("isSuccess") ) {
+                            //调用四要素验证接口进行绑卡，如果成功则记录
+                            MerchantCust mc = new MerchantCust();
+                            mc.setMerID(mf.getId());
+                            mc.setMerNo(merNo);
+                            mc.setCustName(custName);
+                            mc.setCardID(cardID);
+                            mc.setMobileBank(mobileBank);
+                            mc.setBankcardNo(bankcardNo);
+                            mc.setCardImgZ(cardImgZID);
+                            mc.setSelfImg(selfImgID);
+                            mc.setCat(new Date());
+                            mc.save();
+                        }else{
+                            resCode = "error";
+                            if(ObjectUtil.isNotNull(resKv[1].get("unionpayEntrust"))){
+                                resMsg = ((UnionpayEntrust)resKv[1].get("unionpayEntrust")).getRespMsg();
+                                if (ObjectUtil.isNull(resMsg)){
+                                    resMsg ="远程调用失败（系统内部异常）！";
+                                }
+                            }else{
+                                resMsg ="远程调用异常！";
+                            }
+                        }
+                    }else{
+                        resCode = "error";
+                        if(ObjectUtil.isNotNull(resKv[0].get("unionpayEntrust"))){
+                            resMsg = ((UnionpayEntrust)resKv[0].get("unionpayEntrust")).getRespMsg();
+                            if (ObjectUtil.isNull(resMsg)){
+                                resMsg ="远程调用失败（系统内部异常）！";
+                            }
+                        }else{
+                            resMsg ="远程调用异常！";
+                        }
                     }
-                    MerchantCust mc = new MerchantCust();
-                    mc.setMerID(mf.getId());
-                    mc.setMerNo(merNo);
-                    mc.setCustName(custName);
-                    mc.setCardID(cardID);
-                    mc.setMobileBank(mobileBank);
-                    mc.setBankcardNo(bankcardNo);
-                    mc.setCardImgZ(cardImgZID);
-                    mc.setSelfImg(selfImgID);
-                    mc.setCat(new Date());
-                    mc.save();
+
                 } else {
                     //同意商户下已经绑定过银行卡
                     resCode = "error";
-                    resMsg = "绑定失败，该客户银行卡已经绑定！";
+                    resMsg = "该客户银行卡已经绑定！";
                 }
 
             } else {
                 //商户编号输入错误，商户不存在
                 resCode = "error";
-                resMsg = "绑定失败，商户不存在！";
+                resMsg = "商户不存在！";
             }
 
         } catch (Exception e) {
