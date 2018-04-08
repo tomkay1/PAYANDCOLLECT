@@ -12,15 +12,15 @@
                             <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
                             </Col>
                             <Col span="16" align="right">
-                                <Select v-model="finalCode" style="width: 120px; text-align: center;" placeholder="最终处理结果">
-                                    <Option v-for="item in finalCodeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                                </Select>
-                                <DatePicker type="date" placeholder="开始日期" style="width: 200px" v-model="bTime" format="yyyy-MM-dd" :clearable="false"></DatePicker>
-                                <DatePicker type="date" placeholder="结束日期" style="width: 200px" v-model="eTime" format="yyyy-MM-dd" :clearable="false"></DatePicker>
-                                <Input v-model="searchKey" placeholder="请输入..." style="width: 200px" />
-                                <span @click="search" style="margin: 0 10px;">
-                                    <Button type="primary" icon="search">搜索</Button>
-                                </span>
+                            <Select v-model="finalCode" style="width: 120px; text-align: center;" placeholder="最终处理结果">
+                                <Option v-for="item in finalCodeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                            </Select>
+                            <DatePicker type="date" placeholder="开始日期" style="width: 200px" v-model="bTime" format="yyyy-MM-dd" :clearable="false"></DatePicker>
+                            <DatePicker type="date" placeholder="结束日期" style="width: 200px" v-model="eTime" format="yyyy-MM-dd" :clearable="false"></DatePicker>
+                            <Input v-model="searchKey" placeholder="请输入..." style="width: 200px" />
+                            <span @click="search" style="margin: 0 10px;">
+                                <Button type="primary" icon="search">搜索</Button>
+                            </span>
                             </Col>
                         </Row>
 
@@ -38,7 +38,7 @@
             </Card>
             </Col>
         </Row>
-        <addForm ref="aem" :pageSize="pageSize"></addForm>
+        <addForm ref="aem" :pageSize="pageSize" :finalCode="finalCode" :bTime="bTime" :eTime="eTime" :searchKey="searchKey"></addForm>
     </div>
 </template>
 
@@ -88,13 +88,13 @@
         },
         mounted() {
             let param = {
-                    finalCode: this.finalCode,
-                    'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
-                    'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
-                    search: this.searchKey,
-                    ps: this.pageSize
-                }
-            this.$store.dispatch('trade_list',param)
+                finalCode: this.finalCode,
+                'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
+                'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
+                search: this.searchKey,
+                ps: this.pageSize
+            }
+            this.$store.dispatch('trade_list', param)
         },
         data() {
             return {

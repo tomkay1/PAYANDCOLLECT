@@ -6,7 +6,6 @@ const collTrade = {
         pageNumber: 1,
         totalRow: 0,
         collTrade: {
-            txnAmt: 1
         }
     },
     mutations: {

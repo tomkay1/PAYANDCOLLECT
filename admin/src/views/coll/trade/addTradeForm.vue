@@ -13,8 +13,8 @@
                     </Select>
                 </FormItem>
                 <FormItem label="客户" prop="custID">
-                    <Select ref="merCustSelect" placeholder="输入 姓名/身份证号/手机号/卡号 进行搜索..." v-model="trade.custID" clearable filterable remote
-                        :remote-method="selectCustID" :loading="selectCustIdLoading">
+                    <Select ref="merCustSelect" placeholder="输入 姓名/身份证号/手机号/卡号 进行搜索..." v-model="trade.custID" clearable filterable remote :remote-method="selectCustID"
+                        :loading="selectCustIdLoading">
                         <Option v-for="(option, index) in custIDOptions" :value="option.id" :key="index" :label="option.custName">
                             <div style="margin: 5px auto;">
                                 <div>
@@ -30,7 +30,8 @@
                     </Select>
                 </FormItem>
                 <FormItem label="金额" prop="txnAmt" required>
-                    <InputNumber :min='0.01' v-model="trade.txnAmt" :step="1" style="width: 100%;"></InputNumber>
+                    <Input v-model="trade.txnAmt" placeholder="请输入..."></Input>
+                    <!-- <InputNumber :min='0.01' v-model="trade.txnAmt" :step="1" style="width: 100%;"></InputNumber> -->
                 </FormItem>
             </Form>
             <div slot="footer">
@@ -45,11 +46,12 @@
 
 <script>
     import { mapState } from 'vuex'
+    import dateKit from '../../../libs/date'
 
     export default {
         name: 'initiateTradeModal',
         props: [
-            'pageSize'
+            'pageSize','finalCode','bTime','eTime','searchKey'
         ],
         computed: {
             ...mapState({
@@ -80,7 +82,14 @@
                 this.$refs['formValidate'].validate((valid) => {
                     if (valid) {
                         this.$store.dispatch('trade_save').then((res) => {
-                            this.$store.dispatch('trade_list', { ps: this.pageSize })
+                            let param = {
+                                finalCode: this.finalCode,
+                                'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
+                                'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
+                                search: this.searchKey,
+                                ps: this.pageSize
+                            }
+                            this.$store.dispatch('trade_list', param)
                             this.close()
                         })
                     } else {
@@ -134,7 +143,9 @@
                         { type: 'number', required: true, message: '请选择客户', trigger: 'blur' },
                     ],
                     txnAmt: [
-                        { type: 'number', required: true, message: '请输入有效金额', trigger: 'blur' },
+                        {
+                            type: 'string', required: true, message: '请输入有效金额', trigger: 'blur'
+                        },
                     ]
                 }
             }

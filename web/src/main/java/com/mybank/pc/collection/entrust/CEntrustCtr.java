@@ -64,6 +64,7 @@ public class CEntrustCtr extends CoreController {
 	@ActionKey("/coll/entrust/establish")
 	public void establish() {
 		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
+		String operID = CookieKit.get(this, Consts.USER_ACCESS_TOKEN);
 
 		String merCode = getPara("merCode");
 
@@ -79,28 +80,30 @@ public class CEntrustCtr extends CoreController {
 			Kv kv = Kv.create();
 			kv.set("accNo", accNo).set("certifTp", certifTp).set("certifId", certifId).set("customerNm", customerNm)
 					.set("phoneNo", phoneNo).set("cvn2", cvn2 == null ? "" : cvn2)
-					.set("expired", expired == null ? "" : expired);
+					.set("expired", expired == null ? "" : expired).set("operID", operID);
 			if (merInfo != null) {
 				kv.set("merchantID", merInfo.getId());
 			}
 
-			String userId = CookieKit.get(this, Consts.USER_ACCESS_TOKEN);
-
 			boolean isSuccess = false;
+			Kv respKv = null;
 			if (merCode.equals("all")) {
 				try {
-					isSuccess = cEntrustSrv.establish(kv.set("merCode", "0"), userId);
+					respKv = cEntrustSrv.establish(kv.set("merCode", "0"));
+					isSuccess = respKv.getBoolean("isSuccess");
 				} catch (Exception e) {
 					isSuccess = false;
 				}
 				try {
-					isSuccess = cEntrustSrv.establish(kv.set("merCode", "1"), userId) && isSuccess;
+					respKv = cEntrustSrv.establish(kv.set("merCode", "1"));
+					isSuccess = respKv.getBoolean("isSuccess") && isSuccess;
 				} catch (Exception e) {
 					isSuccess = false;
 				}
 			} else {
 				try {
-					isSuccess = cEntrustSrv.establish(kv.set("merCode", merCode), userId);
+					respKv = cEntrustSrv.establish(kv.set("merCode", merCode));
+					isSuccess = respKv.getBoolean("isSuccess");
 				} catch (Exception e) {
 					isSuccess = false;
 				}

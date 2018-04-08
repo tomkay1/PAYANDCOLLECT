@@ -25,10 +25,33 @@ import com.mybank.pc.kits.unionpay.acp.SDKConfig;
 
 public class CEntrustSrv {
 
+	public Kv[] establishAll(Kv kv) {
+		Kv[] result = new Kv[2];
+		try {
+			result[0] = this.establish(kv.set("merCode", "0"));
+		} catch (EntrustRuntimeException e) {
+			result[0] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
+		} catch (Exception e) {
+			result[0] = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
+		}
+
+		try {
+			result[1] = this.establish(kv.set("merCode", "1"));
+		} catch (EntrustRuntimeException e) {
+			result[1] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
+		} catch (Exception e) {
+			result[1] = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
+		}
+		return result;
+	}
+
 	@Before({ EntrustExceptionInterceptor.class, Tx.class })
 	@TxnKey("establish")
-	public boolean establish(Kv kv, String userId) {
+	public Kv establish(Kv kv) {
+		Kv respKv = Kv.create();
 		UnionpayEntrust unionpayEntrust = new UnionpayEntrust();
+		respKv.set("unionpayEntrust", unionpayEntrust);
+		boolean isSuccess = false;
 		try {
 			String merCode = kv.getStr("merCode");
 
@@ -41,6 +64,7 @@ public class CEntrustSrv {
 			String expired = kv.getStr("expired");
 
 			int merchantID = kv.getInt("merchantID");
+			String operID = kv.getStr("operID");
 
 			Date now = new Date();
 			String orderId = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(now) + accNo;
@@ -64,7 +88,7 @@ public class CEntrustSrv {
 			unionpayEntrust.setMerchantID(String.valueOf(merchantID));
 			unionpayEntrust.setCat(now);
 			unionpayEntrust.setMat(now);
-			unionpayEntrust.setOperID(userId);
+			unionpayEntrust.setOperID(operID);
 
 			SDK sdk = getSDK(merCode);
 			SDKConfig sdkConfig = sdk.getSdkConfig();
@@ -127,7 +151,8 @@ public class CEntrustSrv {
 																	// acpsdk.backTransUrl
 			Map<String, String> rspData = acpService.post(reqData, requestBackUrl, encoding); // 发送请求报文并接受同步应答（默认连接超时时间30秒，读取返回结果超时时间30秒）;这里调用signData之后，调用submitUrl之前不能对submitFromData中的键值对做任何修改，如果修改会导致验签不通过
 			unionpayEntrust.setResp(JsonKit.toJson(rspData));
-			return handlingEstablishResult(rspData, acpService, encoding, unionpayEntrust);
+			isSuccess = handlingEstablishResult(rspData, acpService, encoding, unionpayEntrust);
+			return respKv.set("isSuccess", isSuccess);
 		} catch (EntrustRuntimeException e) {
 			throw e;
 		} catch (Exception e) {

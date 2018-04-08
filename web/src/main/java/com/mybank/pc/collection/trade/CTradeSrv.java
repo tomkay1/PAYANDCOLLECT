@@ -111,7 +111,11 @@ public class CTradeSrv {
 			BigDecimal originaltxnAmt = null;
 			try {
 				originaltxnAmt = new BigDecimal(txnAmt = txnAmt.trim());
-				txnAmt = String.valueOf(originaltxnAmt.multiply(new BigDecimal(100)).longValue());
+				long numTxnAmt = originaltxnAmt.multiply(new BigDecimal(100)).longValue();
+				if (numTxnAmt < 1) {
+					throw new RuntimeException();
+				}
+				txnAmt = String.valueOf(numTxnAmt);
 			} catch (Exception e) {
 				throw new ValidateCTRException("非法的交易金额[" + txnAmt + "]");
 			}
