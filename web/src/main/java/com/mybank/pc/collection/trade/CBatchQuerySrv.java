@@ -27,7 +27,7 @@ import com.mybank.pc.kits.unionpay.acp.file.collection.model.BatchCollectionRequ
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.RequestContent;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.RequestHead;
 
-public class CBatchTradeSrv {
+public class CBatchQuerySrv {
 
 	public void sendOrder() {
 		SqlPara sqlPara = Db.getSqlPara("collection_trade.findToBeSentUnionpayCollection");
