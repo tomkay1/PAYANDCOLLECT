@@ -42,10 +42,10 @@ public class HomeCtr extends CoreController {
             lastCust = merchantCustSrv.totalLastCust(null);
         }
         Map map = new HashMap();
-        map.put("lastAmount",10000000);
-        map.put("lastCount",20000);
+        map.put("lastAmount",99999999);
+        map.put("lastCount",99999);
         map.put("lastCust",lastCust);
-        map.put("lastFee",3000);
+        map.put("lastFee",9999);
         renderJson(map);
     }
 
