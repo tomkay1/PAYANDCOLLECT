@@ -114,7 +114,7 @@ public class FeeKit {
 		BigDecimal fee = new BigDecimal(0);
 
 		// 实时
-		if (SDK.REALTIME_SDK.getMerId().equals(merId)) {
+		if (SDK.getSDK(SDK.MER_CODE_REALTIME).getMerId().equals(merId)) {
 			String cardType = cardBin.getCardType();
 			// 借记卡
 			if (cardType.equals("0")) {
@@ -126,7 +126,7 @@ public class FeeKit {
 			} else if (cardType.equals("1")) {// 贷记卡
 				fee = txnAmt.multiply(new BigDecimal("0.0055"));
 			}
-		} else if (SDK.BATCH_SDK.getMerId().equals(merId)) {
+		} else if (SDK.getSDK(SDK.MER_CODE_BATCH).getMerId().equals(merId)) {
 			if (txnAmt.compareTo(new BigDecimal(100000)) < 0) {
 				// <1000 0.1%
 				fee = txnAmt.divide(new BigDecimal(1000));

@@ -136,6 +136,20 @@
 #sql("findMaxBatchNo")
 	SELECT MAX(CAST(batchNo AS signed)) AS maxBatchNo FROM unionpay_batch_collection  WHERE 1=1
 		#if(txnTime)
-			AND LEFT (txnTime, 8) = LEFT (#para(txnTime), 8);
+			AND LEFT (txnTime, 8) = LEFT (#para(txnTime), 8)
 	   #end
 #end
+#sql("findNeedQueryBatchCollection")
+	SELECT ubc.* FROM unionpay_batch_collection ubc WHERE
+		respCode = '00' AND finalCode = '1'
+		AND (
+			ubc.queryResultCount IS NULL
+			OR ubc.queryResultCount < 5
+		)
+		AND round(
+			(
+				UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(cat)
+			) / 60
+		) > 60
+#end
+

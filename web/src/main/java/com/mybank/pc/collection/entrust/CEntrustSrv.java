@@ -28,7 +28,7 @@ public class CEntrustSrv {
 	public Kv[] establishAll(Kv kv) {
 		Kv[] result = new Kv[2];
 		try {
-			result[0] = this.establish(kv.set("merCode", "0"));
+			result[0] = this.establish(kv.set("merCode", SDK.MER_CODE_REALTIME));
 		} catch (EntrustRuntimeException e) {
 			result[0] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
 		} catch (Exception e) {
@@ -36,7 +36,7 @@ public class CEntrustSrv {
 		}
 
 		try {
-			result[1] = this.establish(kv.set("merCode", "1"));
+			result[1] = this.establish(kv.set("merCode", SDK.MER_CODE_BATCH));
 		} catch (EntrustRuntimeException e) {
 			result[1] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
 		} catch (Exception e) {
@@ -90,7 +90,7 @@ public class CEntrustSrv {
 			unionpayEntrust.setMat(now);
 			unionpayEntrust.setOperID(operID);
 
-			SDK sdk = getSDK(merCode);
+			SDK sdk = SDK.getSDK(merCode);
 			SDKConfig sdkConfig = sdk.getSdkConfig();
 			AcpService acpService = sdk.getAcpService();
 			String encoding = "UTF-8";
@@ -250,7 +250,7 @@ public class CEntrustSrv {
 			String accNo = kv.getStr("accNo");
 			int merchantID = kv.getInt("merchantID");
 
-			SDK sdk = getSDK(merCode);
+			SDK sdk = SDK.getSDK(merCode);
 			SDKConfig sdkConfig = sdk.getSdkConfig();
 			AcpService acpService = sdk.getAcpService();
 			String encoding = "UTF-8";
@@ -440,16 +440,6 @@ public class CEntrustSrv {
 			}
 		}
 
-	}
-
-	private SDK getSDK(String merCode) {
-		SDK sdk = null;
-		if (merCode.equals("0")) {
-			sdk = SDK.REALTIME_SDK;
-		} else if (merCode.equals("1")) {
-			sdk = SDK.BATCH_SDK;
-		}
-		return sdk;
 	}
 
 }
