@@ -5,6 +5,7 @@ const  role={
         totalPage:0,
         pageNumber:1,
         totalRow:0,
+        pageSize:15,
         role:{},
         resJsonArray:[]
     },
@@ -13,6 +14,7 @@ const  role={
             state.roleList=page.list
             state.totalPage=page.totalPage
             state.pageNumber=page.pageNumber
+            state.pageSize=page.pageSize
             state.totalRow=page.totalRow
         },
         role_set(state,obj){

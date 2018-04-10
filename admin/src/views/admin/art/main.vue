@@ -19,11 +19,11 @@
                     </Col>
                 </Row>
                 <Row class="margin-top-10">
-                    <Table :context="self" :data="artList" :columns="tableColums" stripe border></Table>
+                    <Table :context="self" :data="artList" :columns="tableColums"  stripe border></Table>
                 </Row>
                 <div style="margin: 10px;overflow: hidden">
                     <div style="float: right;">
-                        <Page :total="total" :current="pageNumber" @on-change="search" show-total show-elevator></Page>
+                        <Page :total="total" :current="pageNumber" @on-change="search" :page-size="pageSize" show-total show-elevator></Page>
                     </div>
                 </div>
             </Card>
@@ -300,6 +300,7 @@
                 'totalPage': state => state.art.totalPage,
                 'total': state => state.art.totalRow,
                 'pageNumber': state => state.art.pageNumber,
+                'pageSize': state => state.art.pageSize,
                 'art': state => state.art.art,
             })
         },

@@ -1,5 +1,6 @@
 package com.mybank.pc.collection.clear;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
@@ -68,11 +69,11 @@ public class CClearCtr extends CoreController {
         Page<CollectionClear> page;
         Kv kv = Kv.create();
 
-        if(!isParaBlank(merNo)){
+        if(StrUtil.isNotBlank(merNo)){
             kv.put("cc.merNO=",merNo);
         }
-        if(!isParaBlank(chargeOff)){
-            kv.put("cc.changeOff=",chargeOff);
+        if(StrUtil.isNotBlank(chargeOff)){
+            kv.put("cc.chargeOff=",chargeOff);
         }
         kv.put("clearTime>=",bTime);
         kv.put("clearTime<=",eTime);
@@ -102,18 +103,18 @@ public class CClearCtr extends CoreController {
         }
         Kv kv = Kv.create();
 
-        if(!isParaBlank(merNo)){
+        if(StrUtil.isNotBlank(merNo)){
             kv.put("cc.merNO=",merNo);
         }
-        if(!isParaBlank(changeOff)){
-            kv.put("cc.changeOff=",changeOff);
+        if(StrUtil.isNotBlank(changeOff)){
+            kv.put("cc.chargeOff=",changeOff);
         }
         kv.put("clearTime>=",bTime);
         kv.put("clearTime<=",eTime);
         String sqlKey=merchantInfo==null?"collection_clear.sum":"collection_clear.sum4Mer";
         SqlPara sqlPara = Db.getSqlPara(sqlKey, Kv.by("cond", kv));
         CollectionClear collectionClear =CollectionClear.dao.findFirst( sqlPara);
-        renderJson(collectionClear);
+        renderJson(JSON.toJSONString(collectionClear,new BigDecimalValueFilter()));
     }
 
     /**
@@ -134,6 +135,10 @@ public class CClearCtr extends CoreController {
         SqlPara sqlPara = Db.getSqlPara("collection_clear.findTotalPage", Kv.by("cond", kv));
         page =CollectionCleartotle.dao.paginate(getPN(), getPS(), sqlPara);
 
+        sqlPara = Db.getSqlPara("collection_clear.sumTotal", Kv.by("cond", kv));
+//        CollectionCleartotle collectionCleartotle=CollectionCleartotle.dao.findFirst(sqlPara);
+//        page.getList().add(collectionCleartotle);
+
         renderJson(JSON.toJSONString(page,new BigDecimalValueFilter()));
     }
 
@@ -153,7 +158,7 @@ public class CClearCtr extends CoreController {
         kv.put("cleartotleTime<=",eTime);
         SqlPara sqlPara = Db.getSqlPara("collection_clear.sumTotal", Kv.by("cond", kv));
         CollectionCleartotle collectionCleartotle=CollectionCleartotle.dao.findFirst(sqlPara);
-        renderJson(collectionCleartotle);
+        renderJson(JSON.toJSONString(collectionCleartotle,new BigDecimalValueFilter()));
     }
 
 
@@ -234,8 +239,10 @@ public class CClearCtr extends CoreController {
         UploadFile uf=getFile("file");
         File file=uf.getFile();
         ExcelReader excelReader=ExcelUtil.getReader(file);
-        List<Map<String,Object>> readAll = excelReader.readAll();
-        Map map=null;
+        List<List<Object>> readData=excelReader.read();
+        int rowCount=readData.size();
+        readData = excelReader.read(2,rowCount-2);
+        List list=null;
         Object obj=null;
         String chargeOffTradeNo=null;
         String clearNo=null;
@@ -244,31 +251,13 @@ public class CClearCtr extends CoreController {
         CollectionClear collectionClear=null;
 
         LogKit.info("批量出账处理开始");
-        for (int i=2;i<readAll.size()-4;i++){
-            map=readAll.get(i);
-            obj = map.get("汇款凭证单号");
-            if (obj==null){
-                LogKit.error("导入的数据模板中缺少汇款凭证单号列");
-                renderFailJSON("导入的数据文件模板不正确，缺少汇款凭证单号列");
-                return;
-            }
-            chargeOffTradeNo = obj == null ? "" : obj.toString();
-            obj=map.get("清分流水号");
-            if (obj==null){
-                LogKit.error("导入的数据模板中缺少清分流水号列");
-                renderFailJSON("导入的数据文件模板不正确，缺少清分流水号列");
-                return;
-            }
-            clearNo=obj == null ? "" : obj.toString();
-            obj=map.get("出账汇款时间");
-            if (obj==null){
-                LogKit.error("导入的数据模板中缺少出账汇款时间列");
-                renderFailJSON("导入的数据文件模板不正确,缺少出账汇款时间列");
-                return;
-            }
-            chargetAt=DateKit.strToDate((String) obj,DateKit.STR_DATEFORMATE);
+        for (int i=0;i<readData.size();i++){
+            list=readData.get(i);
+            LogKit.info("批量导入的出账数据==>>"+ list.toString());
 
-
+            chargeOffTradeNo = (String)list.get(13) ;
+            clearNo=(String)list.get(0);
+            chargetAt=DateKit.strToDate((String) list.get(12),DateKit.STR_DATEFORMATE);
             collectionClear=CollectionClear.dao.findFristByPropEQ("clearNo",clearNo);
             if(collectionClear!=null){
                 if(collectionClear.getChargeOff().equals(Consts.YORN_STR.no.getVal())) {
@@ -301,9 +290,10 @@ public class CClearCtr extends CoreController {
     public void exportTotalExcel() {
         String bTime=getPara("bTime");
         String eTime=getPara("eTime");
+        String excelTitle=bTime+"至"+eTime+"清分数据汇总";
         bTime=DateKit.getTimeStampBegin(DateKit.strToDate(bTime,DateKit.yyyy_MM_dd));
         eTime=DateKit.getTimeStampEnd(DateKit.strToDate(eTime,DateKit.yyyy_MM_dd));
-        String excelTitle=bTime+"-"+eTime+"清分数据汇总";
+//        String excelTitle=bTime+"-"+eTime+"清分数据汇总";
         User user=currUser();
         Kv kv = Kv.create();
         kv.put("cleartotleTime>=",bTime);
@@ -318,7 +308,7 @@ public class CClearCtr extends CoreController {
         ExcelWriter writer = ExcelUtil.getWriter();
         List<Map> excelList=new ArrayList<>();
         collectionClearTotleToExcelData(list,excelList);
-        writer.merge(excelList.size()-1,excelTitle);
+        writer.merge(7,excelTitle);
         Map<String, String> alias = new HashMap<>();
         alias.put("tradeCount", "交易笔数");
         alias.put("amountSum", "交易金额");
@@ -332,19 +322,24 @@ public class CClearCtr extends CoreController {
         writer.write(excelList);
         sqlPara = Db.getSqlPara("collection_clear.sumTotal", Kv.by("cond", kv));
         CollectionCleartotle collectionCleartotle=CollectionCleartotle.dao.findFirst(sqlPara);
-        int r=list.size()+4;
-        writer.writeCellValue(r,0,"合计:");
-        writer.writeCellValue(r,1,collectionCleartotle.getTradeCount().toString());
-        writer.writeCellValue(r,2,collectionCleartotle.getAmountSum().toString());
-        writer.writeCellValue(r,3,collectionCleartotle.getAmountFeeSum().toString());
-        writer.writeCellValue(r,4,collectionCleartotle.getAccountFee().toString());
-        writer.writeCellValue(r,5,collectionCleartotle.getTradeFee().toString());
-        writer.writeCellValue(r,6,collectionCleartotle.getBankFee().toString());
-        writer.writeCellValue(r,7,collectionCleartotle.getAmountOff().toString());
-        writer.writeCellValue(r,8,collectionCleartotle.getProfit().toString());
+        int r=list.size()+3;
+        writer.writeCellValue(0,r-1,"合计:");
+        writer.writeCellValue(0,r,collectionCleartotle.getTradeCount().toString());
+        writer.writeCellValue(1,r,collectionCleartotle.getAmountSum().toString());
+        writer.writeCellValue(2,r,collectionCleartotle.getAmountFeeSum().toString());
+        writer.writeCellValue(3,r,collectionCleartotle.getAccountFee().toString());
+        writer.writeCellValue(4,r,collectionCleartotle.getTradeFee().toString());
+        writer.writeCellValue(5,r,collectionCleartotle.getBankFee().toString());
+        writer.writeCellValue(6,r,collectionCleartotle.getAmountOff().toString());
+        writer.writeCellValue(7,r,collectionCleartotle.getProfit().toString());
 
-        String fileName = "qfhz/"+DateUtil.now()+"/"+currUser()!=null?currUser().getLoginname():""+DateUtil.current(true) + ".xls";
-        File file = FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() + fileName);
+
+
+        String fileFolder="qfhz/"+DateKit.dateToStr(new Date(),DateKit.yyyy_MM_dd)+"/";
+        File file=FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() +fileFolder);
+        if(!file.exists())file.mkdirs();
+        String fileName = fileFolder+(currUser()!=null?currUser().getLoginname():"")+DateUtil.current(true) + ".xls";
+         file = FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() + fileName);
         try {
             OutputStream out = new FileOutputStream(file);
             writer.flush(out);
@@ -352,6 +347,7 @@ public class CClearCtr extends CoreController {
             out.flush();
             out.close();
         }catch (IOException e){
+            LogKit.error("文件导出失败=>"+e.getMessage());
             renderFailJSON("文件导出失败");
             return;
         }
@@ -375,11 +371,11 @@ public class CClearCtr extends CoreController {
         eTime=DateKit.getTimeStampEnd(DateKit.strToDate(eTime,DateKit.yyyy_MM_dd));
         User user=currUser();
         Kv kv = Kv.create();
-        if(!isParaBlank(merNo)){
+        if(StrUtil.isNotBlank(merNo)){
             kv.put("cc.merNO=",merNo);
         }
-        if(!isParaBlank(changeOff)){
-            kv.put("cc.changeOff=",changeOff);
+        if(StrUtil.isNotBlank(changeOff)){
+            kv.put("cc.chargeOff=",changeOff);
         }
         kv.put("clearTime>=",bTime);
         kv.put("clearTime<=",eTime);
@@ -393,7 +389,7 @@ public class CClearCtr extends CoreController {
         ExcelWriter writer = ExcelUtil.getWriter();
         List<Map> excelList=new ArrayList<>();
         collectionClearToExcelData(list,excelList);
-        writer.merge(excelList.size()-1,excelTitle);
+        writer.merge(13,excelTitle);
         Map<String, String> alias = new HashMap<>();
         alias.put("clearNo", "清分流水号");
         alias.put("merNo", "商户编号");
@@ -413,19 +409,22 @@ public class CClearCtr extends CoreController {
         writer.write(excelList);
         sqlPara = Db.getSqlPara("collection_clear.sum", Kv.by("cond", kv));
         CollectionClear collectionClear =CollectionClear.dao.findFirst( sqlPara);
-        int r=list.size()+4;
-        writer.writeCellValue(r,0,"合计:");
-        writer.writeCellValue(r,3,collectionClear.getTradeCount().toString());
-        writer.writeCellValue(r,4,collectionClear.getAmountSum().toString());
-        writer.writeCellValue(r,5,collectionClear.getAmountFeeSum().toString());
-        writer.writeCellValue(r,6,collectionClear.getAccountFee().toString());
-        writer.writeCellValue(r,7,collectionClear.getTradeFee().toString());
-        writer.writeCellValue(r,8,collectionClear.getBankFee().toString());
-        writer.writeCellValue(r,9,collectionClear.getAmountOff().toString());
-        writer.writeCellValue(r,10,collectionClear.getProfit().toString());
+        int r=list.size()+2;
+        writer.writeCellValue(0,r,"合计:");
+        writer.writeCellValue(3,r,collectionClear.getTradeCount().toString());
+        writer.writeCellValue(4,r,collectionClear.getAmountSum().toString());
+        writer.writeCellValue(5,r,collectionClear.getAmountFeeSum().toString());
+        writer.writeCellValue(6,r,collectionClear.getAccountFee().toString());
+        writer.writeCellValue(7,r,collectionClear.getTradeFee().toString());
+        writer.writeCellValue(8,r,collectionClear.getBankFee().toString());
+        writer.writeCellValue(9,r,collectionClear.getAmountOff().toString());
+        writer.writeCellValue(10,r,collectionClear.getProfit().toString());
 
-        String fileName = "qf/"+DateUtil.now()+"/"+currUser()!=null?currUser().getLoginname():""+DateUtil.current(true) + ".xls";
-        File file = FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() + fileName);
+        String fileFolder="qfmx/"+DateKit.dateToStr(new Date(),DateKit.yyyy_MM_dd)+"/";
+        File file=FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() +fileFolder);
+        if(!file.exists())file.mkdirs();
+        String fileName = fileFolder+(currUser()!=null?currUser().getLoginname():"")+DateUtil.current(true) + ".xls";
+        file = FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() + fileName);
         try {
             OutputStream out = new FileOutputStream(file);
             writer.flush(out);
@@ -433,6 +432,7 @@ public class CClearCtr extends CoreController {
             out.flush();
             out.close();
         }catch (IOException e){
+            LogKit.error("文件导出失败=>"+e.getMessage());
             renderFailJSON("文件导出失败");
             return;
         }
@@ -460,11 +460,11 @@ public class CClearCtr extends CoreController {
             merNo=merchantInfo.getMerchantNo();
         }
         Kv kv = Kv.create();
-        if(!isParaBlank(merNo)){
+        if(StrUtil.isNotBlank(merNo)){
             kv.put("cc.merNO=",merNo);
         }
-        if(!isParaBlank(changeOff)){
-            kv.put("cc.changeOff=",changeOff);
+        if(StrUtil.isNotBlank(changeOff)){
+            kv.put("cc.chargeOff=",changeOff);
         }
         kv.put("clearTime>=",bTime);
         kv.put("clearTime<=",eTime);
@@ -478,7 +478,7 @@ public class CClearCtr extends CoreController {
         ExcelWriter writer = ExcelUtil.getWriter();
         List<Map> excelList=new ArrayList<>();
         collectionClearToExcelData(list,excelList);
-        writer.merge(excelList.size()-1,excelTitle);
+        writer.merge(11,excelTitle);
         Map<String, String> alias = new HashMap<>();
         alias.put("clearNo", "清分流水号");
         alias.put("merNo", "商户编号");
@@ -497,17 +497,20 @@ public class CClearCtr extends CoreController {
 
         sqlPara = Db.getSqlPara("collection_clear.sum", Kv.by("cond", kv));
         CollectionClear collectionClear =CollectionClear.dao.findFirst( sqlPara);
-        int r=list.size()+4;
-        writer.writeCellValue(r,0,"合计:");
-        writer.writeCellValue(r,3,collectionClear.getTradeCount().toString());
-        writer.writeCellValue(r,4,collectionClear.getAmountSum().toString());
-        writer.writeCellValue(r,5,collectionClear.getAmountFeeSum().toString());
-        writer.writeCellValue(r,6,collectionClear.getAccountFee().toString());
-        writer.writeCellValue(r,7,collectionClear.getTradeFee().toString());
-        writer.writeCellValue(r,9,collectionClear.getAmountOff().toString());
+        int r=list.size()+2;
+        writer.writeCellValue(0,r,"合计:");
+        writer.writeCellValue(3,r,collectionClear.getTradeCount().toString());
+        writer.writeCellValue(4,r,collectionClear.getAmountSum().toString());
+        writer.writeCellValue(5,r,collectionClear.getAmountFeeSum().toString());
+        writer.writeCellValue(6,r,collectionClear.getAccountFee().toString());
+        writer.writeCellValue(7,r,collectionClear.getTradeFee().toString());
+        writer.writeCellValue(9,r,collectionClear.getAmountOff().toString());
 
-        String fileName = "shqf/"+DateUtil.now()+"/"+currUser()!=null?currUser().getLoginname():""+DateUtil.current(true) + ".xls";
-        File file = FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() + fileName);
+        String fileFolder="qfmx/"+DateKit.dateToStr(new Date(),DateKit.yyyy_MM_dd)+"/";
+        File file=FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() +fileFolder);
+        if(!file.exists())file.mkdirs();
+        String fileName = fileFolder+(currUser()!=null?currUser().getLoginname():"")+DateUtil.current(true) + ".xls";
+        file = FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() + fileName);
         try {
             OutputStream out = new FileOutputStream(file);
             writer.flush(out);
@@ -515,6 +518,7 @@ public class CClearCtr extends CoreController {
             out.flush();
             out.close();
         }catch (IOException e){
+            LogKit.error("文件导出失败=>"+e.getMessage());
             renderFailJSON("文件导出失败");
             return;
         }
@@ -545,10 +549,10 @@ public class CClearCtr extends CoreController {
             map.put("tradeFee",collectionClear.getTradeFee()!=null?collectionClear.getTradeFee().toString():"0");
             map.put("bankFee",collectionClear.getBankFee()!=null?collectionClear.getBankFee().toString():"0");
             map.put("amountOff",collectionClear.getAmountOff()!=null?collectionClear.getAmountOff().toString():"0");
-            map.put("chargeOffTradeNo",collectionClear.getChargeOffTradeNo());
+            map.put("profit",collectionClear.getProfit());//利润
             map.put("clearTime",DateKit.dateToStr(collectionClear.getClearTime(),DateKit.format4Login));
             map.put("chargeAt",DateKit.dateToStr(collectionClear.getChargeAt(),DateKit.format4Login));
-            map.put("profit",collectionClear.getProfit());//利润
+            map.put("chargeOffTradeNo",collectionClear.getChargeOffTradeNo());
 
             ret.add(map);
         }

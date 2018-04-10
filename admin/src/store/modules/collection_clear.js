@@ -1,4 +1,5 @@
 import kit from '../../libs/kit';
+import dateKit from '../../libs/date';
 const collectionClear = {
     state: {
         cctList: [],
@@ -6,6 +7,8 @@ const collectionClear = {
         totalPage: 0,
         pageNumber: 1,
         totalRow: 0,
+        pageSize:15,
+        pageSize_cc:15,
         totalPage_cc: 0,
         pageNumber_cc: 1,
         totalRow_cc: 0,
@@ -18,8 +21,11 @@ const collectionClear = {
             state.totalPage = page.totalPage
             state.totalRow = page.totalRow
             state.pageNumber = page.pageNumber
+            state.pageSize = page.pageSize
         },
         set_cct_list_sum(state, obj){
+            obj.cleartotleTimeTxt='合计:'
+            // obj.cellClassName={'cleartotleTimeTxt':'demo-table-error-row'}
             if(state.cctList.length>0)
                 state.cctList.push(obj)
         },
@@ -28,8 +34,10 @@ const collectionClear = {
             state.totalPage_cc = page.totalPage
             state.totalRow_cc = page.totalRow
             state.pageNumber_cc = page.pageNumber
+            state.pageSize_cc = page.pageSize
         },
         set_cc_list_sum(state, obj){
+            obj.merNO='合计:'
             if(state.ccList.length>0)
                 state.ccList.push(obj)
         },
@@ -60,7 +68,8 @@ const collectionClear = {
             let self=this;
             this._vm.$axios.post('/cc/list', param).then((res) => {
                 commit('set_cc_list', res)
-                self.dispatch('cct_sum',param)
+                if(param.debit==undefined)
+                    self.dispatch('cc_sum',param)
             });
         },
         cc_sum: function ({commit, state}, param) {
@@ -79,7 +88,8 @@ const collectionClear = {
         },
         debit: function ({commit, state}, param) {
             var vm=this._vm;
-            param=this.state.collectionClear;
+            param=state.collectionClear;
+            param.chargeAt=dateKit.formatDate(param.chargeAt,'yyyy-MM-dd hh:mm:ss');
             return new Promise(function (resolve, reject) {
                 vm.$axios.post('/cc/debit', param).then((res) => {
                     resolve(res);

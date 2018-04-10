@@ -1,5 +1,6 @@
 package com.mybank.pc.merchant.info;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.ehcache.CacheKit;
@@ -24,7 +25,7 @@ public class MerchantInfoSrv {
     }
     public void removeCacheMerchantInfo(Integer merID){
       List<MerchantUser> list=  MerchantUser.dao.find("select * from merchant_user mu where mu.merchantID=? ",merID);
-      if(!ArrayUtil.isEmpty(list)){
+      if(!CollectionUtil.isEmpty(list)){
           for(MerchantUser mu :list){
               CacheKit.remove("merInfo","getMerchantInfoByUserID_"+mu.getUserID());
           }
