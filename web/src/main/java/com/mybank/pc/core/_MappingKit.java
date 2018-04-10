@@ -19,6 +19,7 @@ import com.mybank.pc.collection.model.CollectionCleartotle;
 import com.mybank.pc.collection.model.CollectionEntrust;
 import com.mybank.pc.collection.model.CollectionTrade;
 import com.mybank.pc.collection.model.UnionpayBatchCollection;
+import com.mybank.pc.collection.model.UnionpayBatchCollectionBatchno;
 import com.mybank.pc.collection.model.UnionpayBatchCollectionQuery;
 import com.mybank.pc.collection.model.UnionpayCallbackLog;
 import com.mybank.pc.collection.model.UnionpayCollection;
@@ -65,6 +66,7 @@ public class _MappingKit {
 		arp.addMapping("s_user", "id", User.class);
 		arp.addMapping("s_user_role", "id", UserRole.class);
 		arp.addMapping("unionpay_batch_collection", "id", UnionpayBatchCollection.class);
+		arp.addMapping("unionpay_batch_collection_batchno", "id", UnionpayBatchCollectionBatchno.class);
 		arp.addMapping("unionpay_batch_collection_query", "id", UnionpayBatchCollectionQuery.class);
 		arp.addMapping("unionpay_callback_log", "id", UnionpayCallbackLog.class);
 		arp.addMapping("unionpay_collection", "id", UnionpayCollection.class);
