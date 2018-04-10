@@ -75,7 +75,7 @@ public class Res extends BaseRes<Res> {
 	}
 
 	public List<Res> getChildren() {
-		List<Res> list = dao.findByCache(Consts.CACHE_NAMES.userReses.name(), "getResChildren" + getId(),
+		List<Res> list = dao.findByCache(Consts.CACHE_NAMES.userReses.name(), "getResChildren_" + get("roleId")+"_"+getId(),
 				"select * from s_res r left join s_role_res rr on r.id=rr.resId where pId=? and rr.roleId=? order by seq", getId(),get("roleId"));
 		return list;
 	}
@@ -91,7 +91,7 @@ public class Res extends BaseRes<Res> {
 				p = p + "," + r.getId().toString();
 		}
 
-		List<Res> list = Res.dao.findByCache(Consts.CACHE_NAMES.userReses.name(), userId,
+		List<Res> list = Res.dao.findByCache(Consts.CACHE_NAMES.userReses.name(), "findResesByUserId_"+userId,
 				"select r.*,rr.roleId as roleId from s_res r left join s_role_res rr on r.id=rr.resId  where rr.roleId in (?) and r.pid=0 order by r.seq",
 				p);
 		return list;
