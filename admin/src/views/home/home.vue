@@ -33,8 +33,8 @@
         mounted() {
             let serviceArray = eval("(" + Cookies.get('serviceArray') + ")");
             let menuArray = eval("(" + Cookies.get('menuArray') + ")");
-            console.info(serviceArray)
-            console.info(menuArray)
+            // console.info(serviceArray)
+            // console.info(menuArray)
             for (let i = 0; i < serviceArray.length; i++) {
                 if(serviceArray[i] === '/home/fee') {
                     this.isFeeCard = true;
