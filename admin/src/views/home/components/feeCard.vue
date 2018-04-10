@@ -65,13 +65,11 @@ export default {
 
     mounted() {
         //页面加载时或数据方法
-        this.$store.dispatch('home_merFee_list').then((res) => {
-            this.merFeeListJ = res.feeListJ;
-            this.merFeeListB = res.feeListB;
-            this.merInfo = res.merInfo;
-
-            //vm.search()
-        })
+            this.$axios.post('/home/fee').then((res) => {
+                     this.merFeeListJ = res.feeListJ;
+                    this.merFeeListB = res.feeListB;
+                    this.merInfo = res.merInfo;
+            })
 
     },
     data () {

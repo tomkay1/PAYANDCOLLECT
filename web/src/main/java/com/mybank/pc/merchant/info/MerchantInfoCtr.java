@@ -183,7 +183,11 @@ public class MerchantInfoCtr extends CoreController {
         }
         renderSuccessJSON("恢复操作执行成功。", "");
     }
-
+    public void loginMerInfo(){
+        //获取当前登录用户信息
+        MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
+        renderJson(merInfo);
+    }
     public void listFee() {
 
         String merID = getPara("id");
