@@ -222,7 +222,7 @@
             this.init();
             let serviceArray = eval("(" + Cookies.get('serviceArray') + ")");
             for (let i = 0; i < serviceArray.length; i++) {
-                if (serviceArray[i] === '/home' || serviceArray[i] === '/home/merCenter') {
+                if ( serviceArray[i] === '/home/merCenter') {
                     this.isMerCenter = true;
                 }
             }

@@ -36,10 +36,10 @@
             console.info(serviceArray)
             console.info(menuArray)
             for (let i = 0; i < serviceArray.length; i++) {
-                if (serviceArray[i] === '/home' || serviceArray[i] === '/home/fee') {
+                if(serviceArray[i] === '/home/fee') {
                     this.isFeeCard = true;
                 }
-                if (serviceArray[i] === '/home' || serviceArray[i] === '/home/total') {
+                if (serviceArray[i] === '/home/total') {
                     this.isTotal = true;
                 }
             }
