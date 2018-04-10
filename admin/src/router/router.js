@@ -81,14 +81,14 @@ export const appRouter = [
     {
         path: '/cclear',
         icon: 'calculator',
-        isCheck: 'no',
+        isCheck: 'yes',
         name: 'collectionClear',
         title: '清分管理',
         component: Main,
         children: [
-            { path: 'cla', title: '清分查询', isCheck: 'no', name: 'collectionClear_cla', component: resolve => { require(['@/views/collection-clear/clearList_admin.vue'], resolve); } },
-            { path: 'clm', title: '商户清分查询', isCheck: 'no', name: 'collectionClear_clm', component: resolve => { require(['@/views/collection-clear/clearList_mer.vue'], resolve); } },
-            { path: 'debit', title: '出账处理', isCheck: 'no', name: 'collectionClear_debit', component: resolve => { require(['@/views/collection-clear/debit.vue'], resolve); } },
+            { path: 'cla', title: '清分查询', isCheck: 'yes', name: 'collectionClear_cla', component: resolve => { require(['@/views/collection-clear/clearList_admin.vue'], resolve); } },
+            { path: 'clm', title: '商户清分查询', isCheck: 'yes', name: 'collectionClear_clm', component: resolve => { require(['@/views/collection-clear/clearList_mer.vue'], resolve); } },
+            { path: 'debit', title: '出账处理', isCheck: 'yes', name: 'collectionClear_debit', component: resolve => { require(['@/views/collection-clear/debit.vue'], resolve); } },
         ]
     },
     {

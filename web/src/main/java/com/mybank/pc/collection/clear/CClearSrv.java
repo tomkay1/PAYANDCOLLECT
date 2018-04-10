@@ -4,6 +4,7 @@ import com.jfinal.aop.Before;
 import com.jfinal.kit.LogKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.activerecord.SqlPara;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import com.mybank.pc.Consts;
 import com.mybank.pc.collection.model.CollectionClear;
@@ -104,9 +105,9 @@ public class CClearSrv  {
             if (merchantInfo.getFeeAmount().compareTo(tradeModel.getTradeFee()) <= 0) {
                 amountFee = merchantInfo.getFeeAmount();
                 merchantInfo.setFeeAmount(Consts.ZERO);//商户预存账户余额
-                collectionClear.setTradeFee(tradeModel.getTradeFee().subtract(amountFee));//从交易中扣除手续费金额
+                collectionClear.setTradeFee(tradeModel.getTradeFee().subtract(amountFee));//从交易中扣除手续费金额 交易手续费-预存抵扣
                 merchantInfo.update();//更新商户预存手续费当前金额
-                collectionClear.setAmountOff(tradeModel.getTradeAmount().subtract(tradeModel.getTradeFee()).add(amountFee));
+                collectionClear.setAmountOff(tradeModel.getTradeAmount().subtract(tradeModel.getTradeFee()).add(amountFee));//设置出账金额  交易金额-交易手续费+预存抵扣
             } else {
                 merchantInfo.setFeeAmount(merchantInfo.getFeeAmount().subtract(tradeModel.getTradeFee()));
                 merchantInfo.update();
@@ -114,9 +115,11 @@ public class CClearSrv  {
                 collectionClear.setTradeFee(Consts.ZERO);
                 collectionClear.setAmountOff(tradeModel.getTradeAmount());
             }
-            allAccountFee = allAccountFee.add(collectionClear.getAccountFee());
-            allTradeFee = allTradeFee.add(collectionClear.getTradeFee());
-            allAmountOff = allAmount.add(collectionClear.getAmountOff());
+            allAccountFee = allAccountFee.add(collectionClear.getAccountFee()!=null?collectionClear.getAccountFee():Consts.ZERO);
+            allTradeFee = allTradeFee.add(collectionClear.getTradeFee()!=null?collectionClear.getTradeFee():Consts.ZERO);
+            allAmountOff = allAmount.add(collectionClear.getAmountOff()!=null?collectionClear.getAmountOff():Consts.ZERO);
+            if(collectionClear.getAccountFee()==null)collectionClear.setAccountFee(Consts.ZERO);
+            if(collectionClear.getTradeFee()==null)collectionClear.setTradeFee(Consts.ZERO);
             collectionClears.add(collectionClear);
         }
         LogKit.info("清分数据计算完成，准备增加当日的清分汇总数据====>>>>");
@@ -144,6 +147,14 @@ public class CClearSrv  {
         LogKit.info("每日清分处理结束，一共处理了:" + collectionClears.size() + "个商户的清分数据");
     }
 
+    public long countUnclear(){
+        SqlPara sqlPara=Db.getSqlPara("collection_clear.collectAllTrade");
+        Record record=Db.findFirst(sqlPara);
+        return record.getLong("tradeCount");
+    }
+
+
+
     /**
      * 每日清分汇总数据处理
      * @Deprecated
@@ -170,6 +181,7 @@ public class CClearSrv  {
             collectionTrade.update();
         }
     }
+
 
 
     public class TradeModel {

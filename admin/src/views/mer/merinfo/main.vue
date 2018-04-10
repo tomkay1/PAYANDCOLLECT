@@ -626,7 +626,7 @@
                         {
                             type: 'string',
                             message: '手续费金额或比例输入无效',
-                            pattern: /^(?=\d+.?\d+$)[\d.]{0,20}$/,
+                            pattern: /^([+]?\d{1,10})(\.\d{1,10})?$/,
                             trigger: 'blur'
                         }
                     ],

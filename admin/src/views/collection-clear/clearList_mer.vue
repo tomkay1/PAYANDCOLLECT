@@ -25,7 +25,7 @@
                 </Row>
                 <div style="margin: 10px;overflow: hidden">
                     <div style="float: right;">
-                        <Page :total="total_cc" :current="pageNumber_cc" @on-change="search_cc" show-total
+                        <Page :total="total_cc" :current="pageNumber_cc" :page-size="pageSize_cc" @on-change="search_cc" show-total
                               show-elevator></Page>
                     </div>
                 </div>
@@ -46,6 +46,7 @@
                 'totalPage_cc': state => state.cc.totalPage_cc,
                 'total_cc': state => state.cc.totalRow_cc,
                 'pageNumber_cc': state => state.cc.pageNumber_cc,
+                'pageSize_cc': state => state.cc.pageSize_cc,
             })
         },
         data() {

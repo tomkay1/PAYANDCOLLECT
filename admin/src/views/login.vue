@@ -111,12 +111,13 @@ export default {
 
                                     }
                                 }
-                                }if(tmp.type=='1'&&tmp.enabled=='y'){
+                                }
+                                else if(tmp.type=='1'&&tmp.enabled=='y'){
                                     serviceArray.push(tmp.url);
                                     if(tmp.children.length>0){
-                                        for(let j=0;j<tmp.children.length;j++){
-                                            if(tmp.children[j].type=='0'&&tmp.children[j].enabled=='y'){
-                                                serviceArray.push(tmp.children[j].url);
+                                        for(let k=0;k<tmp.children.length;k++){
+                                            if(tmp.children[k].type=='1'&&tmp.children[k].enabled=='y'){
+                                                serviceArray.push(tmp.children[k].url);
                                             }
 
                                         }

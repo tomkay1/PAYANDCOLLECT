@@ -108,7 +108,9 @@ public class CMNCtr extends CoreController {
     public void act02() {
         String ePath = getPara("ePath");
         File file = FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() + ePath);
-        renderFile(file, DateUtil.current(true) + "");
+        int index = ePath.lastIndexOf("/");
+        String str = ePath.substring(index, ePath.length());
+        renderFile(file, str);
     }
 
 
@@ -118,17 +120,18 @@ public class CMNCtr extends CoreController {
     public void act03() {
         UploadFile uf = getFile("file");
         File file = uf.getFile();
-        String fileID =CMNSrv.saveFile(file,FileUtil.getType(file));
+        String fileID = CMNSrv.saveFile(file, FileUtil.getType(file));
         if (fileID == null) {
             renderFailJSON("图片上传失败");
-        }else{
-            renderSuccessJSON("图片上传成功",   fileID);
+        } else {
+            renderSuccessJSON("图片上传成功", fileID);
         }
 
 
     }
+
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
-    public void act04(){
+    public void act04() {
         String picid = getPara("picid");
         //读取本地图片输入流
         InputStream fis = null;
@@ -136,13 +139,13 @@ public class CMNCtr extends CoreController {
 
         try {
 
-            CMNSrv.MongoFileVO mvo=CMNSrv.loadFile(picid);
+            CMNSrv.MongoFileVO mvo = CMNSrv.loadFile(picid);
 
 
             fis = mvo.getInputStream();
             getResponse().setContentType("image/jpeg");
             out = getResponse().getOutputStream();
-            IoUtil.copy(fis,out);
+            IoUtil.copy(fis, out);
             out.flush();
 
         } catch (Exception e) {

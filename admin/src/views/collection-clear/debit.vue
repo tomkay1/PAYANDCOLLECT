@@ -35,7 +35,7 @@
                 </Row>
                 <div style="margin: 10px;overflow: hidden">
                     <div style="float: right;">
-                        <Page :total="total_cc" :current="pageNumber_cc" @on-change="search_cc" show-total
+                        <Page :total="total_cc" :current="pageNumber_cc" :page-size="pageSize_cc" @on-change="search_cc" show-total
                               show-elevator></Page>
                     </div>
                 </div>
@@ -82,7 +82,22 @@
     import dateKit from '../../libs/date'
     import Input from "iview/src/components/input/input";
     import consts from '../../libs/consts'
-
+    const openDebitDialog=(vm,h,param)=>{
+        return h('Button', {
+            props: {
+                type: 'primary',
+                size: 'small'
+            },
+            style: {
+                marginRight: '5px'
+            },
+            on: {
+                click: () => {
+                    vm.debit(param.row)
+                }
+            }
+        }, '出账处理');
+    }
     export default {
 
         computed: {
@@ -91,26 +106,12 @@
                 'totalPage_cc': state => state.cc.totalPage_cc,
                 'total_cc': state => state.cc.totalRow_cc,
                 'pageNumber_cc': state => state.cc.pageNumber_cc,
+                'pageSize_cc': state => state.cc.pageSize_cc,
                 'collectionClear': state => state.cc.collectionClear,
             })
         },
         data() {
-            const openDebitDialog=(vm,h,param)=>{
-                return h('Button', {
-                    props: {
-                        type: 'primary',
-                        size: 'small'
-                    },
-                    style: {
-                        marginRight: '5px'
-                    },
-                    on: {
-                        click: () => {
-                            vm.debit(param.row)
-                        }
-                    }
-                }, '出账处理');
-            }
+
             return {
                 now: new Date(),
                 self: this,
@@ -126,12 +127,12 @@
                 ruleValidate: {
                     amountOff: [
                         {required: true, message: '出账金额必填', trigger: 'blur'},
-                        {
-                            type: 'string',
-                            message: '请填写正确的出账金额格式，支持到小数点后2位',
-                            pattern: /^(^[1-9](\d+)?(\.\d{1,2})?$)|(^(0){1}$)|(^\d\.\d{1,2}?$)$/,
-                            trigger: 'blur'
-                        }
+                        // {
+                        //     type: 'string',
+                        //     message: '请填写正确的出账金额格式，支持到小数点后2位',
+                        //     pattern: /^(^[1-9](\d+)?(\.\d{1,2})?$)|(^(0){1}$)|(^\d\.\d{1,2}?$)$/,
+                        //     trigger: 'blur'
+                        // }
                     ],
                     chargeAt: [
                         {type:'date',required: true, message: '出账时间', trigger: 'change'},
@@ -172,7 +173,7 @@
 
                     {
                         title: '清分日期',
-                        key: 'clearDateTxt',
+                        key: 'clearTimeTxt',
                     },
                     {
                         title: '交易笔数',
@@ -182,10 +183,7 @@
                         title: '交易金额',
                         key: 'amountSum',
                     },
-                    {
-                        title: '出账金额',
-                        key: 'amountOff',
-                    },
+
                     {
                         title: '交易手续费金额',
                         key: 'amountFeeSum',
@@ -208,7 +206,7 @@
                     },
                     {
                         title: '出账金额',
-                        key: 'chargeOff',
+                        key: 'amountOff',
                     },
                     {
                         title: '出账时间',
@@ -216,7 +214,7 @@
                     },
                     {
                         title: '出账单据流水号',
-                        key: 'chargeAOffTradeNo',
+                        key: 'chargeOffTradeNo',
                     },
 
                     {
@@ -226,10 +224,11 @@
                         width: 200,
                         align: 'center',
                         render: (h, param) =>{
-                                        return h('div', [
-                                            this.openDebitDialog(this,h,param),
-                                        ]);
-
+                                        // if(param.index<this.ccList.length-1){
+                                            return h('div', [
+                                                openDebitDialog(this,h,param),
+                                            ]);
+                                        // }
                         }
                     }
 
@@ -239,21 +238,25 @@
         methods: {
             vChange(b){
                 if (!b) {
+                    this.$store.commit('set_collectionClear',{});
                     this.$refs['formValidate'].resetFields()
                     this.modalLoading = false;
                 }
+
             },
             search_cc() {
                 let param = {
                     'bTime': dateKit.formatDate(this.bTime_cc, 'yyyy-MM-dd'),
                     'eTime': dateKit.formatDate(this.eTime_cc, 'yyyy-MM-dd'),
                     merNO: this.merNO,
-                    chargetOff: this.chargeOff
+                    chargeOff: this.chargeOff,
+                    debit:'yes'
                 }
                 this.$store.dispatch("cc_list", param);
             },
 
             debit(obj){
+                obj.chargeAt=new Date();
                 this.$store.commit('set_collectionClear',obj);
                 this.debitModal=true;
 
@@ -266,14 +269,24 @@
                 this.modalLoading = true;
                 this.$refs['formValidate'].validate((valid) => {
                     if (valid) {
-                        this.$store.dispatch('debit','').then((res) => {
-                            if (res && res == 'success') {
-                                vm.debitModal = false;
-                                vm.search_cc()
-                            } else {
-                                this.modalLoading = false;
+
+                        this.$Modal.confirm({
+                            title: '提示',
+                            content: '请再次确认要执行出账处理操作吗？',
+                            onOk: () => {
+                                this.$store.dispatch('debit','').then((res) => {
+                                    if (res && res.resCode == 'success') {
+                                        vm.debitModal = false;
+                                        vm.search_cc()
+                                    } else {
+                                        this.modalLoading = false;
+                                    }
+                                })
+                            },
+                            onCancel: () => {
+
                             }
-                        })
+                        });
                     } else {
                         this.modalLoading = false;
                     }
@@ -313,6 +326,8 @@
         },
         components: {Input},
         mounted() {
+            this.$store.commit('set_cct_list',[])
+            this.$store.commit('set_cc_list',[])
         }
 
     }

@@ -3,6 +3,7 @@ package com.mybank.pc.admin.model;
 import cn.hutool.log.StaticLog;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.jfinal.kit.LogKit;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.base.BaseRes;
 
@@ -33,17 +34,19 @@ public class Res extends BaseRes<Res> {
 			jo.put("checked", (roleResIds != null && roleResIds.contains(res.getId())) ? true : false);
 			jo.put("description", res.getDescription());
 			jo.put("logged", res.getLogged());
-			dao.getChildren(jo, roleResIds);
+			if(dao.getChildren(jo, roleResIds)){
+				jo.put("checked",false);
+			}
 			ja.add(jo);
 		}
-		StaticLog.info(ja.toJSONString());
+		LogKit.info(ja.toJSONString());
 		return ja.toJSONString();
 	}
 
-	public void getChildren(JSONObject jsonObject, List<Long> roleResIds) {
+	public boolean getChildren(JSONObject jsonObject, List<Long> roleResIds) {
 		int id = jsonObject.getIntValue("id");
 		List<Res> list = dao.find("select * from s_res where pId=? order by seq", id);
-
+		boolean  is =false;
 		if (!list.isEmpty()) {
 			JSONArray ja = new JSONArray();
 			JSONObject jo;
@@ -55,7 +58,11 @@ public class Res extends BaseRes<Res> {
 				jo.put("expand", true);
 				jo.put("url", res.getUrl());
 				jo.put("seq", res.getSeq());
-				jo.put("checked", (roleResIds != null && roleResIds.contains(res.getId())) ? true : false);
+				boolean n =(roleResIds != null && roleResIds.contains(res.getId())) ? true : false;
+				if (!n){
+					is =true;
+				}
+				jo.put("checked", n);
 				jo.put("description", res.getDescription());
 				jo.put("logged", res.getLogged());
 				ja.add(jo);
@@ -63,12 +70,13 @@ public class Res extends BaseRes<Res> {
 			}
 			jsonObject.put("children", ja);
 		}
+		return is;
 
 	}
 
 	public List<Res> getChildren() {
-		List<Res> list = dao.findByCache(Consts.CACHE_NAMES.userReses.name(), "getResChildren" + getId(),
-				"select * from s_res where pId=? order by seq", getId());
+		List<Res> list = dao.findByCache(Consts.CACHE_NAMES.userReses.name(), "getResChildren_" + get("roleId")+"_"+getId(),
+				"select * from s_res r left join s_role_res rr on r.id=rr.resId where pId=? and rr.roleId=? order by seq", getId(),get("roleId"));
 		return list;
 	}
 
@@ -83,8 +91,8 @@ public class Res extends BaseRes<Res> {
 				p = p + "," + r.getId().toString();
 		}
 
-		List<Res> list = Res.dao.findByCache(Consts.CACHE_NAMES.userReses.name(), userId,
-				"select r.* from s_res r left join s_role_res rr on r.id=rr.resId  where rr.roleId in (?) and r.pid=0 order by r.seq",
+		List<Res> list = Res.dao.findByCache(Consts.CACHE_NAMES.userReses.name(), "findResesByUserId_"+userId,
+				"select r.*,rr.roleId as roleId from s_res r left join s_role_res rr on r.id=rr.resId  where rr.roleId in (?) and r.pid=0 order by r.seq",
 				p);
 		return list;
 	}

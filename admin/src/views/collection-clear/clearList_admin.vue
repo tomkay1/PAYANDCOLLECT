@@ -19,13 +19,13 @@
                     </Col>
                 </Row>
                 <Row class="margin-top-10">
-                    <Table :context="self" :data="cctList" :columns="tableColums" stripe border>
+                    <Table :context="self" :row-class-name="rowClassName" :data="cctList" :columns="tableColums"  border>
                         <!--<div slot="footer">Use a card with a shadow effect</div>-->
                     </Table>
                 </Row>
                 <div style="margin: 10px;overflow: hidden">
                     <div style="float: right;">
-                        <Page :total="total" :current="pageNumber" @on-change="search" show-total
+                        <Page :total="total" :current="pageNumber" @on-change="search" :page-size="pageSize" show-total
                               show-elevator></Page>
                     </div>
                 </div>
@@ -54,11 +54,11 @@
                     </Col>
                 </Row>
                 <Row class="margin-top-10">
-                    <Table :context="self" :data="ccList" :columns="tableColums_cc" stripe border></Table>
+                    <Table :context="self" :data="ccList" :columns="tableColums_cc" :row-class-name="rowClassName_cc"  border></Table>
                 </Row>
                 <div style="margin: 10px;overflow: hidden">
                     <div style="float: right;">
-                        <Page :total="total_cc" :current="pageNumber_cc" @on-change="search_cc" show-total
+                        <Page :total="total_cc" :current="pageNumber_cc" :page-size="pageSize_cc" @on-change="search_cc" show-total
                               show-elevator></Page>
                     </div>
                 </div>
@@ -89,6 +89,7 @@
     import {mapState} from 'vuex'
     import dateKit from '../../libs/date'
     import Input from "iview/src/components/input/input";
+    import consts from '../../libs/consts'
 
     export default {
         computed: {
@@ -97,9 +98,11 @@
                 'ccList': state => state.cc.ccList,
                 'totalPage': state => state.cc.totalPage,
                 'total': state => state.cc.totalRow,
+                'pageSize': state => state.cc.pageSize,
                 'pageNumber': state => state.cc.pageNumber,
                 'totalPage_cc': state => state.cc.totalPage_cc,
                 'total_cc': state => state.cc.totalRow_cc,
+                'pageSize_cc': state => state.cc.pageSize_cc,
                 'pageNumber_cc': state => state.cc.pageNumber_cc,
             })
         },
@@ -167,7 +170,7 @@
 
                     {
                         title: '清分日期',
-                        key: 'clearDateTxt',
+                        key: 'clearTimeTxt',
                     },
                     {
                         title: '交易笔数',
@@ -176,10 +179,6 @@
                     {
                         title: '交易金额',
                         key: 'amountSum',
-                    },
-                    {
-                        title: '出账金额',
-                        key: 'amountOff',
                     },
                     {
                         title: '交易手续费金额',
@@ -203,7 +202,7 @@
                     },
                     {
                         title: '出账金额',
-                        key: 'chargeOff',
+                        key: 'amountOff',
                     },
                     {
                         title: '出账时间',
@@ -211,7 +210,7 @@
                     },
                     {
                         title: '出账单据流水号',
-                        key: 'chargeAOffTradeNo',
+                        key: 'chargeOffTradeNo',
                     },
 
 
@@ -264,7 +263,7 @@
                     'bTime': dateKit.formatDate(this.bTime_cc, 'yyyy-MM-dd'),
                     'eTime': dateKit.formatDate(this.eTime_cc, 'yyyy-MM-dd'),
                     merNO: this.merNO,
-                    chargetOff: this.chargeOff
+                    chargeOff: this.chargeOff
                 }
                 this.$store.dispatch("cc_list", param);
             },
@@ -275,7 +274,7 @@
                 }
                 this.$store.dispatch("cct_list_export",param).then((res)=>{
                     if(res&&res.resCode&&res.resCode=='success'){
-                        let url=res.resData;
+                        let url=consts.devLocation+'/cmn/act02?ePath='+res.resData;
                         window.open(url,'_blank')
                     }else if(res&&res.resCode&&res.resCode=='fail'){
                         // this.$Message.success("导出失败>>"+res.resMsg);
@@ -288,21 +287,37 @@
                     'bTime': dateKit.formatDate(this.bTime_cc, 'yyyy-MM-dd'),
                     'eTime': dateKit.formatDate(this.eTime_cc, 'yyyy-MM-dd'),
                     merNO: this.merNO,
-                    chargetOff: this.chargeOff
+                    chargeOff: this.chargeOff
                 }
                 this.$store.dispatch("cc_list_export", param).then((res)=>{
                     if(res&&res.resCode&&res.resCode=='success'){
-                        let url=res.resData;
+                        let url=consts.devLocation+'/cmn/act02?ePath='+res.resData;
                         window.open(url,'_blank')
                     }else if(res&&res.resCode&&res.resCode=='fail'){
                         // this.$Message.success("导出失败>>"+res.resMsg);
                     }
 
                 });
-            }
+            },
+            rowClassName (row, index) {
+                if (index === this.cctList.length-1) {
+                    return 'demo-table-error-row';
+                }
+                return '';
+            },
+            rowClassName_cc (row, index) {
+                if (index === this.ccList.length-1) {
+                    return 'demo-table-error-row';
+                }
+                return '';
+            },
+
         },
         components: {Input},
         mounted() {
+
+            this.$store.commit('set_cct_list',[])
+            this.$store.commit('set_cc_list',[])
         }
 
     }
@@ -310,4 +325,8 @@
 
 <style lang="less">
     @import '../../styles/common.less';
+    .ivu-table .demo-table-error-row td{
+        background-color: #ff6600;
+        color: #fff;
+    }
 </style>

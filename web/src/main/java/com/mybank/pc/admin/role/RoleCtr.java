@@ -110,11 +110,23 @@ public class RoleCtr extends CoreController {
 			String[] resIds_array = StrUtil.split(resIds, ",");
 			String resId = null;
 			RoleRes rr = null;
+			Res res=null;
 			for (String s : resIds_array) {
 				rr = new RoleRes();
+				res=Res.dao.findById(new Integer(s));
 				rr.setResId(new Integer(s));
 				rr.setRoleId(roleId);
 				rr.save();
+				//处理 父亲节点部分子节点被选中的情况
+				if(res.getPid()!=0){
+					List<RoleRes> list=RoleRes.dao.find("select * from s_role_res where roleId=? and resId=?",roleId,res.getPid());
+					if(list.isEmpty()){
+						rr=new RoleRes();
+						rr.setRoleId(roleId);
+						rr.setResId(res.getPid());
+						rr.save();
+					}
+				}
 			}
 		}
 		CacheKit.removeAll(Consts.CACHE_NAMES.userReses.name());

@@ -24,7 +24,7 @@
                 </Row>
                 <div style="margin: 10px;overflow: hidden">
                     <div style="float: right;">
-                        <Page :total="total" :current="pageNumber" @on-change="search"  show-total show-elevator></Page>
+                        <Page :total="total" :current="pageNumber" @on-change="search" :page-size="pageSize"  show-total show-elevator></Page>
                     </div>
                 </div>
             </Card>
@@ -195,6 +195,7 @@
                 'userList': state => state.user.userList,
                 'totalPage': state => state.user.totalPage,
                 'pageNumber': state => state.user.pageNumber,
+                'pageSize': state => state.user.pageSize,
                 'total': state => state.user.totalRow,
                 'roleList': state => state.role.roleList,
                 'user': state => state.user.user,

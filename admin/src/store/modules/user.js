@@ -7,6 +7,7 @@ const user = {
         totalPage:0,
         pageNumber:1,
         totalRow:0,
+        pageSize:15,
         user:{}
     },
     mutations: {
@@ -32,6 +33,7 @@ const user = {
             state.userList=page.list
             state.totalPage=page.totalPage
             state.pageNumber=page.pageNumber
+            state.pageSize=page.pageSize;
             state.totalRow=page.totalRow
         },
         user_reset(state,param){
