@@ -56,6 +56,7 @@ export const otherRouter = {
     children: [
         { path: 'home', title: '控制中心', isCheck: 'no', name: 'home_index', component: resolve => { require(['@/views/home/home.vue'], resolve); } },
         { path: 'ownspace', title: '个人中心', isCheck: 'no', name: 'ownspace_index', component: resolve => { require(['@/views/own-space/own-space.vue'], resolve); } },
+        { path: 'merCenter', title: '商户中心', isCheck: 'no', name: 'merCenter', component: resolve => { require(['@/views/own-space/merCenter.vue'], resolve); } },
     ]
 };
 
@@ -107,10 +108,10 @@ export const appRouter = [
         icon: 'monitor',
         isCheck: 'yes',
         name: 'mer1',
-        title: '商户操作管理',
+        title: '商户客户管理',
         component: Main,
         children: [
-            { path: 'custquery', title: '商户客户查询', isCheck: 'yes', name: 'custquery', component: resolve => { require(['@/views/mer/custquery/main.vue'], resolve); } },
+            { path: 'custquery', title: '商户客户管理', isCheck: 'yes', name: 'custquery', component: resolve => { require(['@/views/mer/custquery/main.vue'], resolve); } },
         ]
     },
     {

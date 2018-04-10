@@ -11,17 +11,17 @@ import CountUp from 'countup';
 function transformValue (val) {
     let endVal = 0;
     let unit = '';
-    if (val < 1000) {
+    if (val < 10000) {
         endVal = val;
-    } else if (val >= 1000 && val < 1000000) {
-        endVal = parseInt(val / 1000);
-        unit = 'K+';
-    } else if (val >= 1000000 && val < 10000000000) {
-        endVal = parseInt(val / 1000000);
-        unit = 'M+';
-    } else {
-        endVal = parseInt(val / 1000000000);
-        unit = 'B+';
+    } else if (val >= 10000 && val < 100000000) {
+        endVal = parseInt(val / 10000);
+        unit = '万+';
+    } else  if(val >= 100000000 ){
+        endVal = parseInt(val / 100000000);
+        unit = '亿+';
+    }else{
+        endVal = 0;
+        unit = '';
     }
     return {
         val: endVal,

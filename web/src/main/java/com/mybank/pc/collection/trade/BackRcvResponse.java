@@ -74,7 +74,7 @@ public class BackRcvResponse extends CoreController {
 		unionpayCallbackLog.setInfo(JsonKit.toJson(reqParam));
 
 		// 重要！验证签名前不要修改reqParam中的键值对的内容，否则会验签不过
-		if (!SDK.REALTIME_SDK.getAcpService().validate(reqParam, encoding)) {
+		if (!SDK.getSDK(SDK.MER_CODE_REALTIME).getAcpService().validate(reqParam, encoding)) {
 			LogKit.error("验证签名结果[失败].");
 			// 验签失败，需解决验签问题
 			unionpayCallbackLog.setValidate("0");

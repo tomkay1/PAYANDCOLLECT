@@ -31,8 +31,11 @@ public abstract class BaseCollectionRuntimeException extends RuntimeException {
 	}
 
 	public Map<String, Object> getExceptionInfo() {
+		return getExceptionInfo(this.getCause());
+	}
+
+	public static Map<String, Object> getExceptionInfo(Throwable cause) {
 		Map<String, Object> exceptionResult = new HashMap<String, Object>();
-		Throwable cause = this.getCause();
 		if (cause != null) {
 			List<String> stackTraceArray = new ArrayList<String>();
 			for (StackTraceElement stackTraceElement : cause.getStackTrace()) {

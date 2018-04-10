@@ -43,6 +43,7 @@
                                     <Icon type="arrow-down-b"></Icon>
                                 </a>
                                 <DropdownMenu slot="list">
+                                    <DropdownItem name="merCenter" v-if="isMerCenter">商户中心</DropdownItem>
                                     <DropdownItem name="ownSpace">密码修改</DropdownItem>
                                     <DropdownItem name="loginout" divided>退出登录</DropdownItem>
                                 </DropdownMenu>
@@ -101,7 +102,8 @@
                 shrink: false,
                 userName: '',
                 isFullScreen: false,
-                openedSubmenuArr: this.$store.state.app.openedSubmenuArr
+                openedSubmenuArr: this.$store.state.app.openedSubmenuArr,
+                isMerCenter:false,
             };
         },
         computed: {
@@ -169,6 +171,13 @@
                     });
 
                 }
+                else if (name === 'merCenter') {
+                    util.openNewPage(this, 'merCenter');
+                    this.$router.push({
+                        name: 'merCenter'
+                    });
+
+                }
             },
             checkTag (name) {
                 let openpageHasTag = this.pageTagsList.some(item => {
@@ -211,6 +220,12 @@
         },
         mounted () {
             this.init();
+            let serviceArray = eval("(" + Cookies.get('serviceArray') + ")");
+            for (let i = 0; i < serviceArray.length; i++) {
+                if (serviceArray[i] === '/home' || serviceArray[i] === '/home/merCenter') {
+                    this.isMerCenter = true;
+                }
+            }
         },
         created () {
             // 显示打开的页面的列表

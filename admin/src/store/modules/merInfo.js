@@ -114,6 +114,14 @@ const merInfo = {
                 })
             });
         },
+        login_merInfo:function({commit,state}){
+            let vm=this._vm;
+            return new Promise(function (resolve, reject) {
+                vm.$axios.post('/mer00/loginMerInfo').then((res) => {
+                    resolve(res);
+                })
+            });
+        },
 
     }
 };
