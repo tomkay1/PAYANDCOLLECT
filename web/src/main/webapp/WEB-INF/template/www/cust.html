@@ -39,25 +39,32 @@
             <input type="text" class="form-control" placeholder="银行卡号" name="bankcardNo">
         </div>
         <div class="form-group">
-            <label>请上传身份证正面照片</label>
-            <input type="file" name="cardImgZ">
+            <div class="file-container"  style="display:inline-block;position:relative;overflow: hidden;vertical-align:middle">
+                <button   class="btn btn-primary " type="button" style="height: 44px; width: 240px ;margin-left: 30px;"><span class="glyphicon glyphicon-camera" aria-hidden="true"></span> 选择身份证正面照片<span id="cardImgZTxt"></span></button>
+                <input type="file" name="cardImgZ"  onchange="$('#cardImgZTxt').html('（已上传）')" style="position:absolute;top:0;left:0;font-size:34px; opacity:0">
+            </div>
+
         </div>
         <div class="form-group">
-            <label>请上传本人现场照片</label>
-            <input type="file" name="selfImg">
+                <div class="file-container"  style="display:inline-block;position:relative;overflow: hidden;vertical-align:middle">
+                    <button class="btn btn-primary " type="button" style="height: 44px; width: 240px;margin-left: 30px"><span class="glyphicon glyphicon-camera" aria-hidden="true"></span> 选择本人现场照片<span id="selfImgTxt"></span></button>
+                    <input type="file" name="selfImg"  onchange="$('#selfImgTxt').html('（已上传）')" style="position:absolute;top:0;left:0;font-size:34px; opacity:0">
+                </div>
+
         </div>
         <div class="form-group" align="center">
             <label></label>
-            <input type="checkbox" name="is"> <a href="/mer01/custAgree?merNo=#(merchantInfo.merchantNo)" >同意《迈伴客用户使用协议》</a>
+            <input type="checkbox" name="is"> <a href="/mer01/custAgree?merNo=#(merchantInfo.merchantNo)" >已阅读并同意《迈伴客用户使用协议》</a>
 
         </div>
         <div class="form-group">
             <label></label>
-            <input type="text" class="form-control" style="width: 200px; float: left" placeholder="验证码" name="code">
-            <button type="button" class="btn btn-primary " style="height: 44px">发送验证码</button>
+            <input type="text" class="form-control" style="width: 140px; float: left" placeholder="验证码" name="code">
+            <button id="sendCode" type="button" class="btn btn-primary " style="height: 44px;width: 155px">发送验证码</button>
+
         </div>
 
-
+        <div id="sendCodeTxt" style="margin-bottom: 10px"></div>
         <button id="formBtn" name="formBtn" class="btn btn-lg btn-primary btn-block" type="submit">绑定</button>
     </form>
 </div> <!-- /container -->
@@ -122,23 +129,17 @@
 
                 },
                 cardImgZ: {
-                    /*键名username和input name值对应*/
-                    message: 'The username is not valid',
                     validators: {
                         notEmpty: {
-                            /*非空提示*/
-                            message: '用户名不能为空'
+                            message: '身份证正面照片不能为空'
                         },
 
                     }
                 },
                 selfImg: {
-                    /*键名username和input name值对应*/
-                    message: 'The username is not valid',
                     validators: {
                         notEmpty: {
-                            /*非空提示*/
-                            message: '用户名不能为空'
+                            message: '手持身份证照片不能为空'
                         },
 
                     }
@@ -171,7 +172,50 @@
         if (!$('#custForm').data('bootstrapValidator').isValid()) {
             return false;
         }
+
+
+
     });
+
+
+    var InterValObj;
+    //timer变量，控制时间
+    var count = 5;//间隔函数，1秒执行
+    var curCount;//当前剩余秒数
+
+
+    //按钮单击时执行
+    $("#sendCode").click(function(){
+
+        curCount = count; // 设置button效果，开始计时
+        $("#sendCode").attr("disabled","true" );//设置按钮为禁用状态
+        console.info(  $("#sendCode").val())
+        $("#sendCode").html( + curCount + "秒后重新发送");//更改按钮文字
+        InterValObj = window.setInterval(SetRemainTime, 1000); // 启动计时器timer处理函数，1秒执行一次 // 向后台发送处理数据
+        $.post("/mer01/sendCode", function(data) {
+            if(data == 111){
+                $("#sendCodeTxt").html("<font color='#339933'>短信验证码已发到您的手机,请查收</font>");
+            }else if(data == 0){
+                $("#sendCodeTxt").html("<font color='red'>×短信验证码发送失败，请重新发送</font>");
+            }
+        }).fail(function() {
+            $("#sendCodeTxt").html("<font color='red'>×短信验证码发送失败，请重新发送</font>");
+            });
+    });
+
+    //timer处理函数
+    function SetRemainTime() {
+        if (curCount == 0) {
+            window.clearInterval(InterValObj);// 停止计时器
+            $("#sendCode").removeAttr("disabled");//移除禁用状态改为可用
+            $("#sendCode").html( "重新发送验证码");//更改按钮文字
+        }else {
+            curCount--;
+            $("#sendCode").html( + curCount + "秒后重新发送");//更改按钮文字
+        }
+    }
+
+
 </script>
 
 

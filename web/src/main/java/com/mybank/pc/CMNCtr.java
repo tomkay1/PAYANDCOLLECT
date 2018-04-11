@@ -179,4 +179,6 @@ public class CMNCtr extends CoreController {
         qrCodeRender.setContext(getRequest(),getResponse());
         qrCodeRender.render();
     }
+
+
 }

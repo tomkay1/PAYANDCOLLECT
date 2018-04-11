@@ -123,7 +123,7 @@ public class MerchantCustCtr extends CoreController {
             File cardImgZFile = cardImgZ.getFile();
             File selfImgFile = selfImg.getFile();
             System.out.println("上传文件1大小：" + cardImgZFile.length());
-            System.out.println("上传文件1大小：" + selfImgFile.length());
+            System.out.println("上传文件2大小：" + selfImgFile.length());
             String cardImgZID = CMNSrv.saveFile(cardImgZFile, FileUtil.getType(cardImgZFile));
             String selfImgID = CMNSrv.saveFile(selfImgFile, FileUtil.getType(selfImgFile));
             String merNo = getPara("merNo");
@@ -208,5 +208,11 @@ public class MerchantCustCtr extends CoreController {
         setAttr("resMsg", resMsg);
         render("/WEB-INF/template/www/cust-res.html");
 
+    }
+
+    //客户绑定银行卡发送短信验证码
+    @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
+    public void sendCode(){
+        renderJson("111");
     }
 }
