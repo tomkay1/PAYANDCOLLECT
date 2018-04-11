@@ -76,7 +76,20 @@ public class MerchantCustCtr extends CoreController {
 
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
     public void cust() {
-        render("/WEB-INF/template/www/cust.html");
+        String merNo = getPara("merNo");
+      MerchantInfo merchantInfo =  MerchantInfo.dao.findFirst("select * from merchant_info mi where merchantNo=?",merNo);
+        String url =  "/WEB-INF/template/www/cust.html";
+      if (ObjectUtil.isNull(merchantInfo)){
+            String resCode = "error";
+            String resMsg = "商户不存在,请与商户客户核对！";
+            setAttr("resCode", resCode);
+            setAttr("resMsg", resMsg);
+          url="/WEB-INF/template/www/cust-res.html";
+        }else{
+          setAttr("merchantInfo" ,merchantInfo);
+      }
+
+        render(url);
 
     }
 
