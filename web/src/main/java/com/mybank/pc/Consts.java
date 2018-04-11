@@ -140,7 +140,7 @@ public interface Consts {
     }
 
     enum CACHE_NAMES {
-        paramCache, ssq, userRoles, user, userReses, taxonomy, art, carouselsetting, login,cardBin
+        paramCache, ssq, userRoles, user, userReses, taxonomy, art, carouselsetting, login,cardBin,smsCode
     }
 
 }
