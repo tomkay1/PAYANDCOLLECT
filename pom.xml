@@ -37,6 +37,7 @@
         <cron4j.version>2.2.5</cron4j.version>
         <mongodbPlugin>1.0.8.2</mongodbPlugin>
         <mongodbDriver>3.4.0</mongodbDriver>
+        <zxing.version>3.2.1</zxing.version>
 
     </properties>
 
@@ -168,6 +169,11 @@
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongo-java-driver</artifactId>
                 <version>${mongodbDriver}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.zxing</groupId>
+                <artifactId>core</artifactId>
+                <version>${zxing.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
