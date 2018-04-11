@@ -18,43 +18,53 @@
     <form id="custForm" role="form" class="form-signin" method="post" action="/mer01/addCust" enctype="multipart/form-data">
         <h3 class="form-signin-heading">客户银行卡绑定</h3>
         <div class="form-group">
-            <label >商户名称</label>
-            <input type="hidden"   name="merNo" value="#(merchantInfo.merchantNo)">
+            <label>商户名称</label>
+            <input type="hidden" name="merNo" value="#(merchantInfo.merchantNo)">
             <div style="font-size:14px;margin-bottom: 10px; margin-left: 12px">#(merchantInfo.merchantName)</div>
         </div>
         <div class="form-group">
-            <label >客户姓名</label>
-            <input type="text" class="form-control"  placeholder="客户姓名" name="custName">
+            <label>客户姓名</label>
+            <input type="text" class="form-control" placeholder="客户姓名" name="custName">
         </div>
         <div class="form-group">
-            <label >身份证号</label>
-            <input type="text" class="form-control"  placeholder="身份证号" name="cardID">
+            <label>身份证号</label>
+            <input type="text" class="form-control" placeholder="身份证号" name="cardID">
         </div>
         <div class="form-group">
-            <label >银行预留手机号</label>
-            <input type="text" class="form-control"  placeholder="银行预留手机号" name="mobileBank">
+            <label>银行预留手机号</label>
+            <input type="text" class="form-control" placeholder="银行预留手机号" name="mobileBank">
         </div>
         <div class="form-group">
-            <label >银行卡号</label>
-            <input type="text" class="form-control"  placeholder="银行卡号" name="bankcardNo">
+            <label>银行卡号</label>
+            <input type="text" class="form-control" placeholder="银行卡号" name="bankcardNo">
         </div>
         <div class="form-group">
-            <label >请上传身份证正面照片</label>
+            <label>请上传身份证正面照片</label>
             <input type="file" name="cardImgZ">
         </div>
         <div class="form-group">
-            <label >请上传本人现场照片</label>
-            <input type="file"  name="selfImg">
+            <label>请上传本人现场照片</label>
+            <input type="file" name="selfImg">
         </div>
+        <div class="form-group" align="center">
+            <label></label>
+            <input type="checkbox" name="is"> <a href="/mer01/custAgree?merNo=#(merchantInfo.merchantNo)" >同意《迈伴客用户使用协议》</a>
+
+        </div>
+        <div class="form-group">
+            <label></label>
+            <input type="text" class="form-control" style="width: 200px; float: left" placeholder="验证码" name="code">
+            <button type="button" class="btn btn-primary " style="height: 44px">发送验证码</button>
+        </div>
+
 
         <button id="formBtn" name="formBtn" class="btn btn-lg btn-primary btn-block" type="submit">绑定</button>
     </form>
 </div> <!-- /container -->
 
 
-
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
         /**
          * 下面是进行插件初始化
          * 你只需传入相应的键值对
@@ -63,9 +73,9 @@
             message: '',
             feedbackIcons: {
                 /*输入框不同状态，显示图片的样式*/
-                valid: 'glyphicon glyphicon-ok',
-                invalid: 'glyphicon glyphicon-remove',
-                validating: 'glyphicon glyphicon-refresh'
+                // valid: 'glyphicon glyphicon-ok',
+                // invalid: 'glyphicon glyphicon-remove',
+                // validating: 'glyphicon glyphicon-refresh'
             },
             fields: {
 
@@ -104,15 +114,13 @@
                     }
                 },
                 bankcardNo: {
-                validators: {
-                notEmpty: {
-                    message: '银行卡号不能为空'
+                    validators: {
+                        notEmpty: {
+                            message: '银行卡号不能为空'
+                        },
+                    }
+
                 },
-
-
-            }
-
-        },
                 cardImgZ: {
                     /*键名username和input name值对应*/
                     message: 'The username is not valid',
@@ -135,7 +143,22 @@
 
                     }
                 },
+                is: {
+                    validators: {
+                        notEmpty: {
+                            message: '需要同意用户使用协议'
+                        },
+                    }
 
+                },
+                code: {
+                    validators: {
+                        notEmpty: {
+                            message: '短信验证码不能为空'
+                        },
+                    }
+
+                },
             },
 
 
@@ -145,7 +168,7 @@
 
         //提交的时候代码组合
         $('#custForm').data('bootstrapValidator').validate();
-        if(!$('#custForm').data('bootstrapValidator').isValid()){
+        if (!$('#custForm').data('bootstrapValidator').isValid()) {
             return false;
         }
     });

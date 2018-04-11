@@ -92,6 +92,24 @@ public class MerchantCustCtr extends CoreController {
         render(url);
 
     }
+    @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
+    public void custAgree() {
+        String merNo = getPara("merNo");
+        MerchantInfo merchantInfo =  MerchantInfo.dao.findFirst("select * from merchant_info mi where merchantNo=?",merNo);
+        String url =  "/WEB-INF/template/www/cust-agree.html";
+        if (ObjectUtil.isNull(merchantInfo)){
+            String resCode = "error";
+            String resMsg = "商户不存在,请与商户客户核对！";
+            setAttr("resCode", resCode);
+            setAttr("resMsg", resMsg);
+            url="/WEB-INF/template/www/cust-res.html";
+        }else{
+            setAttr("merchantInfo" ,merchantInfo);
+        }
+
+        render(url);
+
+    }
 
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
     public void addCust() {
@@ -113,6 +131,8 @@ public class MerchantCustCtr extends CoreController {
             String cardID = getPara("cardID");
             String mobileBank = getPara("mobileBank");
             String bankcardNo = getPara("bankcardNo");
+            String is = getPara("is");
+            String code = getPara("code");
             MerchantInfo mf = MerchantInfo.dao.findFirst("select * from merchant_info mi where mi.merchantNo=? and mi.dat is null ", merNo);
 
 
