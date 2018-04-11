@@ -1,12 +1,12 @@
 package com.mybank.pc;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jfinal.kit.LogKit;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.ehcache.CacheKit;
+import com.jfinal.render.QrCodeRender;
 import com.jfinal.upload.UploadFile;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.core.CoreException;
@@ -170,5 +170,13 @@ public class CMNCtr extends CoreController {
         }
 
 
+    }
+    @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
+    public void act05(){
+        String merNo = getPara("merNo");
+        String path =  CacheKit.get(Consts.CACHE_NAMES.paramCache.name(),"siteDomain")+"/mer01/cust?merNo="+merNo;
+        QrCodeRender qrCodeRender  = new  QrCodeRender(path,300,300);
+        qrCodeRender.setContext(getRequest(),getResponse());
+        qrCodeRender.render();
     }
 }

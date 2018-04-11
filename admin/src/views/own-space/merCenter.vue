@@ -10,7 +10,8 @@
                 商户中心
             </p>
             <div>
-
+                <Row>
+               <i-col span="14">
                 <Form :label-width="200" label-position="right" >
                     <FormItem label="商户编号"  >
                         {{merInfo.merchantNo}}
@@ -63,6 +64,12 @@
 
 
                 </Form>
+               </i-col>
+                    <i-col span="10" align="center">
+                        <div style="margin-top: 30px"><img :src="urlEWImg"  width="150"></div>
+                <div style="margin-top: 10px">客户请扫描此二维码进行银行卡绑定</div>
+                </i-col>
+                </Row>
                 <div slot="footer">
 
                 </div>
@@ -84,6 +91,7 @@ export default {
             urlCard: '',
             urlCardZ: '',
             urlCardF: '',
+            urlEWImg: '',
         };
     },
     methods: {
@@ -95,6 +103,7 @@ export default {
             this.urlCard = consts.devLocation + "/cmn/act04?picid=" + this.merInfo.cardImg;
             this.urlCardF = consts.devLocation + "/cmn/act04?picid=" + this.merInfo.cardF;
             this.urlCardZ = consts.devLocation + "/cmn/act04?picid=" + this.merInfo.cardZ;
+            this.urlEWImg = consts.devLocation + "/cmn/act05?merNo=" + this.merInfo.merchantNo;
         });
     }
 };
