@@ -38,6 +38,7 @@
         <mongodbPlugin>1.0.8.2</mongodbPlugin>
         <mongodbDriver>3.4.0</mongodbDriver>
         <zxing.version>3.2.1</zxing.version>
+        <zxing4javase.version>3.3.2</zxing4javase.version>
 
     </properties>
 
@@ -174,6 +175,11 @@
                 <groupId>com.google.zxing</groupId>
                 <artifactId>core</artifactId>
                 <version>${zxing.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.zxing</groupId>
+                <artifactId>javase</artifactId>
+                <version>${zxing4javase.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
