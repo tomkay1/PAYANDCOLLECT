@@ -135,7 +135,8 @@ public class CTradeSrv {
 				throw new ValidateCTRException("不支持的卡类型!!");
 			}
 
-			if ("1".equals(bussType)) {// 加急
+			boolean isRealtimeBuss = "1".equals(bussType) ? true : false;
+			if (isRealtimeBuss) {// 加急
 				sdk = SDK.getSDK(SDK.MER_CODE_REALTIME);
 				merchantFeeTradeType = "1";
 				txnType = "11";
@@ -156,16 +157,19 @@ public class CTradeSrv {
 
 			String formattedTradeType = StringUtils.leftPad(tradeType, 2, '0');
 			String formattedBussType = StringUtils.leftPad(bussType, 2, '0');
-			String formattedCustID = StringUtils.leftPad(custID, 10, '0');
+			String formattedCustID = StringUtils.leftPad(custID, isRealtimeBuss ? 10 : 8, '0');
 
-			// 订单/流水号
 			Date now = new Date();
 			String txnTime = new SimpleDateFormat("yyyyMMddHHmmss").format(now);
+
+			// 订单号 实时最大长度40，批量最大长度32
 			String orderId = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(now) + txnType + txnSubType
 					+ formattedBussType + formattedCustID;
-			if (orderId.length() > 40) {
-				orderId = orderId.substring(0, 40);
+			int maxLength = "1".equals(bussType) ? 40 : 32;
+			if (orderId.length() > maxLength) {
+				orderId = orderId.substring(0, maxLength);
 			}
+			// 流水号
 			String tradeNo = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(now) + formattedTradeType
 					+ formattedBussType + formattedCustID;
 

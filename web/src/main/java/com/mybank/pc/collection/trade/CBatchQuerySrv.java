@@ -124,9 +124,10 @@ public class CBatchQuerySrv {
 
 			String respCode = responseContent.getRespCode();
 			String respMsg = responseContent.getRespMsg();
-			String settleDate = responseContent.getSettleDate();
+			String queryId = responseContent.getQueryId();
 			String traceNo = responseContent.getSysTraNo();
 			String traceTime = responseContent.getSysTm();
+			String settleDate = responseContent.getSettleDate();
 
 			Date now = new Date();
 
@@ -147,6 +148,7 @@ public class CBatchQuerySrv {
 				unionpayCollection.setSettleDate(settleDate);
 				unionpayCollection.setTraceNo(traceNo);
 				unionpayCollection.setTraceTime(traceTime);
+				unionpayCollection.setQueryId(queryId);
 				unionpayCollection.setMat(now);
 				unionpayCollection.update();
 

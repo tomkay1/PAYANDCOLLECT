@@ -2,10 +2,10 @@
 
 <template>
     <Row :gutter="10">
-        <Col span="24" :style="{marginBottom: '10px'}">
+        <Col span="24" style="marginBottom: '10px">
             <Card>
                 <Row >
-                    <Col :xs="24" :sm="12" :md="12"  align="center">
+                    <Col :xs="24" :sm="12" :md="12"  align="center" class="feeCol">
                     <div style="font-size: 13px; font-weight: bold; color: #ffffff; background-color: #2d8cf0; padding: 5px; ;margin: 0px 1px; ">加急手续费</div>
                     <table>
                         <div v-for="item in merFeeListJ" class="feeList">
@@ -26,7 +26,7 @@
                     </table>
 
                     </Col>
-                    <Col :xs="24" :sm="12" :md="12"  align="center">
+                    <Col :xs="24" :sm="12" :md="12"  align="center" class="feeCol">
                     <div style="font-size: 13px; font-weight: bold;color: #ffffff; background-color: #2d8cf0; padding: 5px;margin: 0px 1px;">标准手续费</div>
                     <table>
                         <div v-for="item in merFeeListB" class="feeList">
@@ -85,5 +85,9 @@ export default {
     .feeList {
         font-size: 12px;
         line-height: 30px;
+
+    }
+    .feeCol{
+          min-height: 160px;
     }
 </style>

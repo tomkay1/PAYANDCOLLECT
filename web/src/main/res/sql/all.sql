@@ -10,3 +10,6 @@
 #namespace("collection_trade")
   #include("collection_trade.sql")
 #end
+#namespace("collection_batch")
+  #include("collection_batch.sql")
+#end
