@@ -7,14 +7,7 @@
          
     <diskStore path="java.io.tmpdir/mb-pc"/>
 
-    <!-- 默认缓存配置 -->
-    <defaultCache
-            maxElementsInMemory="10000"
-            eternal="false"
-            timeToIdleSeconds="120"
-            timeToLiveSeconds="120"
-            overflowToDisk="true"
-    />
+
     <cache name="paramCache"
            maxEntriesLocalHeap="5000"
            eternal="true"
@@ -59,21 +52,21 @@
            memoryStoreEvictionPolicy="FIFO"
     />
     <cache name="currUserReses"
-           maxEntriesLocalHeap="5000"
+           maxEntriesLocalHeap="50000"
            eternal="true"
            overflowToDisk="true"
            diskPersistent="true"
            memoryStoreEvictionPolicy="FIFO"
     />
     <cache name="currUserRoles"
-           maxEntriesLocalHeap="5000"
+           maxEntriesLocalHeap="50000"
            eternal="true"
            overflowToDisk="true"
            diskPersistent="true"
            memoryStoreEvictionPolicy="FIFO"
     />
     <cache name="currUser"
-           maxEntriesLocalHeap="5000"
+           maxEntriesLocalHeap="50000"
            eternal="true"
            overflowToDisk="true"
            diskPersistent="true"
@@ -81,25 +74,33 @@
     />
 
     <cache name="login"
-           maxEntriesLocalHeap="5000"
+           maxEntriesLocalHeap="50000"
            eternal="true"
            overflowToDisk="true"
            diskPersistent="true"
            memoryStoreEvictionPolicy="FIFO"
     />
     <cache name="cardBin"
-           maxEntriesLocalHeap="5000"
+           maxEntriesLocalHeap="10000"
            eternal="true"
            overflowToDisk="true"
            diskPersistent="true"
            memoryStoreEvictionPolicy="FIFO"
     />
     <cache name="merInfo"
-           maxEntriesLocalHeap="5000"
+           maxEntriesLocalHeap="50000"
            eternal="true"
            overflowToDisk="true"
            diskPersistent="true"
            memoryStoreEvictionPolicy="FIFO"
     />
+    <cache name="smsCode"
+           maxElementsInMemory="50000"
+           eternal="false"
+           timeToLiveSeconds="600"
+           overflowToDisk="true"
+           memoryStoreEvictionPolicy="FIFO"
+    />
+
 
 </ehcache>
