@@ -6,7 +6,7 @@
                 <span>{{modalTitle}}</span>
             </p>
             <Form ref="formValidate" :label-width="120" :model="entrust" :rules="ruleValidate">
-                <FormItem label="商户类型" prop="merCode">
+                <FormItem label="商户" prop="merCode">
                     <Select v-model="entrust.merCode">
                         <Option v-for="item in merCodeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                     </Select>
@@ -107,11 +107,19 @@
                     },
                     {
                         value: '0',
-                        label: '实时商户'
+                        label: '春城实时商户'
                     },
                     {
                         value: '1',
-                        label: '批量商户'
+                        label: '春城批量商户'
+                    },
+                    {
+                        value: '2',
+                        label: '银盛实时4商户'
+                    },
+                    {
+                        value: '3',
+                        label: '银盛实时2商户'
                     },
                 ],
                 ruleValidate: {

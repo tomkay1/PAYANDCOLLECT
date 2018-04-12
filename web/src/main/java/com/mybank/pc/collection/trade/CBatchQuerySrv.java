@@ -6,18 +6,15 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.jfinal.aop.Before;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.SqlPara;
-import com.jfinal.plugin.activerecord.tx.Tx;
 import com.mybank.pc.collection.model.CollectionTrade;
 import com.mybank.pc.collection.model.UnionpayBatchCollection;
 import com.mybank.pc.collection.model.UnionpayBatchCollectionQuery;
 import com.mybank.pc.collection.model.UnionpayCollection;
 import com.mybank.pc.exception.BaseCollectionRuntimeException;
-import com.mybank.pc.exception.TxnKey;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDKConstants;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.BatchCollectionResponse;
@@ -27,35 +24,32 @@ import com.mybank.pc.kits.unionpay.acp.file.collection.model.ResponseHead;
 public class CBatchQuerySrv {
 
 	public void batchQuery(UnionpayBatchCollection unionpayBatchCollection) {
-		UnionpayBatchCollectionQuery unionpayBatchCollectionQuery = unionpayBatchCollection.buildQueryResult();
-		saveBatchQueryRecord(unionpayBatchCollectionQuery);
-		sendBatchQueryOrder(unionpayBatchCollection);
-	}
+		UnionpayBatchCollectionQuery unionpayBatchCollectionQuery = null;
 
-	@Before({ Tx.class })
-	@TxnKey("saveBatchQueryOrder")
-	public void saveBatchQueryRecord(UnionpayBatchCollectionQuery unionpayBatchCollectionQuery) {
+		boolean isSaved = false;
 		try {
-			unionpayBatchCollectionQuery.save();
-		} catch (Exception e) {
-			unionpayBatchCollectionQuery
-					.setExceInfo(JsonKit.toJson(BaseCollectionRuntimeException.getExceptionInfo(e)));
-			throw e;
-		}
-	}
-
-	@Before({ Tx.class })
-	@TxnKey("batch-sendQueryOrder")
-	public void sendBatchQueryOrder(UnionpayBatchCollection unionpayBatchCollection) {
-		try {
+			unionpayBatchCollectionQuery = unionpayBatchCollection.buildQueryResult();
+			isSaved = unionpayBatchCollectionQuery.save();
 			unionpayBatchCollection.queryResult();
 			handlingBatchQueryResult(unionpayBatchCollection);
 		} catch (Exception e) {
 			e.printStackTrace();
+
+			if (unionpayBatchCollectionQuery != null) {
+				unionpayBatchCollectionQuery
+						.setExceInfo(JsonKit.toJson(BaseCollectionRuntimeException.getExceptionInfo(e)));
+				if (!isSaved) {
+					unionpayBatchCollectionQuery.save();
+				} else {
+					unionpayBatchCollectionQuery.update();
+				}
+			}
+
 		}
+
 	}
 
-	private boolean handlingBatchQueryResult(UnionpayBatchCollection unionpayBatchCollection) {
+	private boolean handlingBatchQueryResult(UnionpayBatchCollection unionpayBatchCollection) throws Exception {
 		boolean isSuccess = false;
 		try {
 			UnionpayBatchCollectionQuery unionpayBatchCollectionQuery = unionpayBatchCollection.getQuery();
@@ -104,6 +98,7 @@ public class CBatchQuerySrv {
 
 			Integer queryCount = unionpayBatchCollection.getQueryResultCount();
 			unionpayBatchCollection.setQueryResultCount(queryCount == null ? 1 : queryCount + 1);
+			unionpayBatchCollection.setNextAllowQueryDate();
 
 			Date now = new Date();
 			unionpayBatchCollectionQuery.setMat(now);
@@ -113,7 +108,7 @@ public class CBatchQuerySrv {
 			unionpayBatchCollection.update();
 		} catch (Exception e) {
 			isSuccess = false;
-			// throw e;
+			throw e;
 		}
 		return isSuccess;
 	}

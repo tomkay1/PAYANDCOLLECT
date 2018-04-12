@@ -9,8 +9,8 @@
 		AND txnDate = LEFT (#para(txnTime), 8) 
 	    AND batchNo = #para(batchNo)
 #end
-#sql("updateToBeSentUnionpayCollectionBatchId")
-	UPDATE unionpay_collection  SET batchId = #para(batchId) , status = '1' , mat = #para(mat) WHERE 
+#sql("updateToBeSentUnionpayCollectionBatchNo")
+	UPDATE unionpay_collection  SET batchNo = #para(batchNo) , txnTime = #para(txnTime) , status = '1' , mat = #para(mat) WHERE 
 	    txnType = '21' AND txnSubType = '02' AND status = '0' 
 	    #if(merId)
 	    	AND merId = #para(merId)
@@ -18,11 +18,14 @@
 	    ORDER BY cat 
 	    LIMIT 500
 #end
-#sql("findToBeSentUnionpayCollectionByBatchId")
+#sql("findToBeSentUnionpayCollectionByBatchNo")
 	SELECT * FROM unionpay_collection  WHERE 
 	    txnType = '21' AND txnSubType = '02' AND status = '1'
-	    #if(batchId)
-	    	AND batchId = #para(batchId)
+	    #if(txnTime)
+	    	AND txnTime = #para(txnTime)
+	    #end
+	    #if(batchNo)
+	    	AND batchNo = #para(batchNo)
 	    #end
 	    #if(merId)
 	    	AND merId = #para(merId)
@@ -41,9 +44,9 @@
 		)
 		AND round(
 			(
-				UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(cat)
+				UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(nextQueryTime)
 			) / 60
-		) > 60
+		) > 0
 #end
 
 

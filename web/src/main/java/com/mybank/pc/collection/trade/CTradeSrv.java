@@ -134,14 +134,17 @@ public class CTradeSrv {
 			if (cardBin == null || !"0".equals(cardBin.getCardType())) {
 				throw new ValidateCTRException("不支持的卡类型!!");
 			}
-
 			boolean isRealtimeBuss = "1".equals(bussType) ? true : false;
 			if (isRealtimeBuss) {// 加急
-				sdk = SDK.getSDK(SDK.MER_CODE_REALTIME);
+				if (Integer.valueOf(txnAmt) > 500000) {
+					sdk = SDK.getSDK(SDK.MER_CODE_REALTIME_YS_4);
+				} else {
+					sdk = SDK.getSDK(SDK.MER_CODE_REALTIME_YS_2);
+				}
 				merchantFeeTradeType = "1";
 				txnType = "11";
 			} else if ("2".equals(bussType)) {// 批量
-				sdk = SDK.getSDK(SDK.MER_CODE_BATCH);
+				sdk = SDK.getSDK(SDK.MER_CODE_BATCH_CH);
 				merchantFeeTradeType = "2";
 				txnType = "21"; // 取值：21 批量交易
 			}
@@ -152,7 +155,7 @@ public class CTradeSrv {
 			query.setMerId(merId);
 			CollectionEntrust collectionEntrust = query.findOne();
 			if (collectionEntrust == null || !"0".equals(collectionEntrust.getStatus())) {
-				throw new ValidateCTRException("客户委托信息不存在或未处于已委托状态");
+				//throw new ValidateCTRException("客户委托信息不存在或未处于已委托状态");
 			}
 
 			String formattedTradeType = StringUtils.leftPad(tradeType, 2, '0');

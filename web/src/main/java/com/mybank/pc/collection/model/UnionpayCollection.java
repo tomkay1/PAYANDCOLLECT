@@ -1,10 +1,14 @@
 package com.mybank.pc.collection.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.jfinal.kit.JsonKit;
+import com.jfinal.kit.Kv;
 import com.jfinal.kit.LogKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseUnionpayCollection;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
@@ -136,6 +140,24 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 			throw new RuntimeException("验证签名失败");
 		}
 		return isValidate;
+	}
+
+	public static int updateToBeSentUnionpayCollectionBatchNo(Kv kv) {
+		SqlPara sqlPara = Db.getSqlPara("collection_batch.updateToBeSentUnionpayCollectionBatchNo", kv);
+		return Db.update(sqlPara);
+	}
+
+	public static List<UnionpayCollection> findToBeSentUnionpayCollectionByBatchNo(Kv kv) {
+		SqlPara sqlPara = Db.getSqlPara("collection_batch.findToBeSentUnionpayCollectionByBatchNo", kv);
+		return UnionpayCollection.dao.find(sqlPara);
+	}
+
+	public void resetBatchStatus() {
+		setBatchNo("");
+		setTxnTime("");
+		if ("1".equals(getStatus())) {
+			setStatus("0");
+		}
 	}
 
 	public Map<String, String> getRealtimeReqData() {

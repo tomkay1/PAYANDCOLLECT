@@ -114,7 +114,7 @@ public class FeeKit {
 		BigDecimal fee = new BigDecimal(0);
 
 		// 实时
-		if (SDK.getSDK(SDK.MER_CODE_REALTIME).getMerId().equals(merId)) {
+		if (SDK.getSDK(SDK.MER_CODE_REALTIME_CH).getMerId().equals(merId)) {
 			String cardType = cardBin.getCardType();
 			// 借记卡
 			if (cardType.equals("0")) {
@@ -126,7 +126,7 @@ public class FeeKit {
 			} else if (cardType.equals("1")) {// 贷记卡
 				fee = txnAmt.multiply(new BigDecimal("0.0055"));
 			}
-		} else if (SDK.getSDK(SDK.MER_CODE_BATCH).getMerId().equals(merId)) {
+		} else if (SDK.getSDK(SDK.MER_CODE_BATCH_CH).getMerId().equals(merId)) {
 			if (txnAmt.compareTo(new BigDecimal(100000)) < 0) {
 				// <1000 0.1%
 				fee = txnAmt.divide(new BigDecimal(1000));
@@ -136,6 +136,10 @@ public class FeeKit {
 			} else {
 				fee = new BigDecimal(170);
 			}
+		} else if (SDK.getSDK(SDK.MER_CODE_REALTIME_YS_4).getMerId().equals(merId)) {
+			fee = new BigDecimal(400);
+		} else if (SDK.getSDK(SDK.MER_CODE_REALTIME_YS_2).getMerId().equals(merId)) {
+			fee = new BigDecimal(200);
 		} else {
 			throw new ValidateCTRException(
 					"不支持的卡Bin[" + cardBin.getBankName() + " " + cardBin.getCardName() + " " + cardBin.getCBin() + "]");

@@ -377,12 +377,12 @@ public abstract class BaseUnionpayCollection<M extends BaseUnionpayCollection<M>
 		return getInt("queryResultCount");
 	}
 
-	public void setBatchId(java.lang.String batchId) {
-		set("batchId", batchId);
+	public void setBatchNo(java.lang.String batchNo) {
+		set("batchNo", batchNo);
 	}
 
-	public java.lang.String getBatchId() {
-		return getStr("batchId");
+	public java.lang.String getBatchNo() {
+		return getStr("batchNo");
 	}
 
 	public void setCat(java.util.Date cat) {

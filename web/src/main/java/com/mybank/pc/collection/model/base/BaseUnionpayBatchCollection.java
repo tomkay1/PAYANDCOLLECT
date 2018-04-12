@@ -226,6 +226,14 @@ public abstract class BaseUnionpayBatchCollection<M extends BaseUnionpayBatchCol
 		return get("mat");
 	}
 
+	public void setNextQueryTime(java.util.Date nextQueryTime) {
+		set("nextQueryTime", nextQueryTime);
+	}
+
+	public java.util.Date getNextQueryTime() {
+		return get("nextQueryTime");
+	}
+
 	public void setOperID(java.lang.String operID) {
 		set("operID", operID);
 	}

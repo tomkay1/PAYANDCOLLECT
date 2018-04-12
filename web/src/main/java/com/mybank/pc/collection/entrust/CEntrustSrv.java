@@ -28,7 +28,7 @@ public class CEntrustSrv {
 	public Kv[] establishAll(Kv kv) {
 		Kv[] result = new Kv[2];
 		try {
-			result[0] = this.establish(kv.set("merCode", SDK.MER_CODE_REALTIME));
+			result[0] = this.establish(kv.set("merCode", SDK.MER_CODE_REALTIME_CH));
 		} catch (EntrustRuntimeException e) {
 			result[0] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
 		} catch (Exception e) {
@@ -36,7 +36,7 @@ public class CEntrustSrv {
 		}
 
 		try {
-			result[1] = this.establish(kv.set("merCode", SDK.MER_CODE_BATCH));
+			result[1] = this.establish(kv.set("merCode", SDK.MER_CODE_BATCH_CH));
 		} catch (EntrustRuntimeException e) {
 			result[1] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
 		} catch (Exception e) {
