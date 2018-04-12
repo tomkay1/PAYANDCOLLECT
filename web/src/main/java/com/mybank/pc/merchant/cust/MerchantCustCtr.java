@@ -3,8 +3,15 @@ package com.mybank.pc.merchant.cust;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.XmlUtil;
+import cn.hutool.json.JSONNull;
+import cn.hutool.json.XML;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.HttpKit;
+import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
+import com.jfinal.kit.LogKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.SqlPara;
@@ -19,7 +26,9 @@ import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.merchant.info.MerchantInfoSrv;
 import com.mybank.pc.merchant.model.MerchantCust;
 import com.mybank.pc.merchant.model.MerchantInfo;
+import org.w3c.dom.Document;
 
+import javax.xml.xpath.XPathConstants;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
@@ -213,6 +222,43 @@ public class MerchantCustCtr extends CoreController {
     //客户绑定银行卡发送短信验证码
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
     public void sendCode(){
-        renderJson("111");
+        String flag = "0";
+        String url ="http://dx1.xitx.cn:8888/sms.aspx";
+        String account= "a10165";
+        String password = "154986";
+        String id = "5409";
+        String mobile = "13897939740";
+        String rand =  RandomUtil.randomNumbers(6);
+        String content= "【MyBank】验证码为："+rand+"， 请输入此验证码完成绑卡。";
+        Map<String,String> map = new HashMap<>();
+        map.put("action","send");
+        map.put("userid",id);
+        map.put("account",account);
+        map.put("password",password);
+        map.put("mobile",mobile);
+        map.put("content",content);
+        String resMsg ;
+        String message;
+        try {
+            LogKit.info("发送短信"+mobile+"内容："+content);
+            resMsg = HttpKit.post(url, map,"");
+            LogKit.info("返回信息："+resMsg);
+            Document docResult= XmlUtil.readXML(resMsg);
+            message = XmlUtil.getByXPath("//returnsms/message", docResult, XPathConstants.STRING).toString();
+            if(!"ok".equals(message)){
+                //短信发送失败
+                flag="1";
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            //短信发送失败
+            flag="1";
+        }
+
+
+
+
+
+        renderJson(flag);
     }
 }
