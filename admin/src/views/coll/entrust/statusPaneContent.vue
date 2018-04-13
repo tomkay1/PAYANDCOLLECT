@@ -6,7 +6,7 @@
                 <Row>
                     <Col span="8">
                     <Button type="primary" icon="person-add" @click="add">建立委托</Button>
-                    <Button type="primary" icon="person-add" @click="terminate">解除委托</Button>
+                    <!-- <Button type="primary" icon="person-add" @click="terminate">解除委托</Button> -->
                     <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
                     </Col>
                     <Col span="8" offset="8" align="right">
@@ -77,22 +77,27 @@
                     {
                         title: '姓名',
                         key: 'customerNm',
+                        align: 'center',
                     },
                     {
                         title: '证件类型',
                         key: 'certifTp',
+                        align: 'center',
                     },
                     {
                         title: '证件号码',
                         key: 'certifId',
+                        align: 'center',
                     },
                     {
                         title: '卡号',
                         key: 'accNo',
+                        align: 'center',
                     },
                     {
                         title: '手机号',
                         key: 'phoneNo',
+                        align: 'center',
                     },
                     {
                         title: '状态',
@@ -101,19 +106,23 @@
                             const row = params.row;
                             const status = row.status === '0' ? '已委托' : row.status === '1' ? '未知' : '已解除';
                             return h('span', status);
-                        }
+                        },
+                        align: 'center',
                     },
                     {
                         title: '商户',
                         key: 'merId',
+                        align: 'center',
                     },
                     {
                         title: '创建时间',
                         key: 'cat',
+                        align: 'center',
                     },
                     {
                         title: '修改时间',
                         key: 'mat',
+                        align: 'center',
                     }
                 ]
             }

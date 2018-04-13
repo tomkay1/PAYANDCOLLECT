@@ -17,6 +17,22 @@ public abstract class BaseUnionpayCollection<M extends BaseUnionpayCollection<M>
 		return getInt("id");
 	}
 
+	public void setPlanId(java.lang.String planId) {
+		set("planId", planId);
+	}
+
+	public java.lang.String getPlanId() {
+		return getStr("planId");
+	}
+
+	public void setExecutionId(java.lang.String executionId) {
+		set("executionId", executionId);
+	}
+
+	public java.lang.String getExecutionId() {
+		return getStr("executionId");
+	}
+
 	public void setVersion(java.lang.String version) {
 		set("version", version);
 	}

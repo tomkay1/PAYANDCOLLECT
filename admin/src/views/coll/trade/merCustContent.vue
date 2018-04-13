@@ -2,21 +2,15 @@
     <div>
         <Row>
             <Col span="24">
-
             <Card>
                 <div>
                     <div>
                         <Row>
                             <Col span="8" align="left">
-                            <Button type="primary" icon="person-add" @click="initiate">发起交易</Button>
+                            <!-- <Button type="primary" icon="person-add" @click="initiate">发起交易</Button> -->
                             <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
                             </Col>
                             <Col span="16" align="right">
-                            <Select v-model="finalCode" style="width: 120px; text-align: center;" placeholder="最终处理结果">
-                                <Option v-for="item in finalCodeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                            </Select>
-                            <DatePicker type="date" placeholder="开始日期" style="width: 200px" v-model="bTime" format="yyyy-MM-dd" :clearable="false"></DatePicker>
-                            <DatePicker type="date" placeholder="结束日期" style="width: 200px" v-model="eTime" format="yyyy-MM-dd" :clearable="false"></DatePicker>
                             <Input v-model="searchKey" placeholder="请输入..." style="width: 200px" />
                             <span @click="search" style="margin: 0 10px;">
                                 <Button type="primary" icon="search">搜索</Button>
@@ -27,7 +21,7 @@
                     </div>
 
                     <Row class="margin-top-10">
-                        <Table border :data="tradeList" :columns="tableColums" stripe></Table>
+                        <Table border :data="merCustList" :columns="tableColums" stripe></Table>
                     </Row>
                     <div style="margin: 10px;overflow: hidden">
                         <div style="float: right;">
@@ -38,158 +32,112 @@
             </Card>
             </Col>
         </Row>
-        <addForm ref="aem" :pageSize="pageSize" :finalCode="finalCode" :bTime="bTime" :eTime="eTime" :searchKey="searchKey"></addForm>
+        <!-- <addForm ref="aem" :pageSize="pageSize" :finalCode="finalCode" :bTime="bTime" :eTime="eTime" :searchKey="searchKey"></addForm> -->
     </div>
 </template>
 
 <script>
     import { mapState } from 'vuex'
     import dateKit from '../../../libs/date'
-    import addTradeModal from './addTradeForm.vue'
 
     export default {
         computed: {
             ...mapState({
-                'tradeList': state => state.collTrade.tradeList,
-                'totalPage': state => state.collTrade.totalPage,
-                'pageNumber': state => state.collTrade.pageNumber,
-                'total': state => state.collTrade.totalRow,
-                'collTrade': state => state.collTrade.collTrade,
+                'merCustList': state => state.collMerCust.merCustList,
+                'totalPage': state => state.collMerCust.totalPage,
+                'pageNumber': state => state.collMerCust.pageNumber,
+                'total': state => state.collMerCust.totalRow,
+                'merCust': state => state.collMerCust.merCust,
             })
         },
         methods: {
             search(pn) {
                 let param = {
-                    finalCode: this.finalCode,
-                    'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
-                    'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
                     search: this.searchKey,
                     pn: pn,
                     ps: this.pageSize
                 }
-                this.$store.dispatch('trade_list', param)
+                this.$store.dispatch('mercust_list', param)
             },
             refresh() {
                 let param = {
-                    finalCode: this.finalCode,
-                    'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
-                    'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
                     search: this.searchKey,
                     ps: this.pageSize
                 }
-                this.$store.dispatch('trade_list', param)
+                this.$store.dispatch('mercust_list', param)
             },
             initiate() {
                 this.$refs.aem.open();
             },
         },
         components: {
-            addForm: addTradeModal
+
         },
         mounted() {
             let param = {
-                finalCode: this.finalCode,
-                'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
-                'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
                 search: this.searchKey,
                 ps: this.pageSize
             }
-            this.$store.dispatch('trade_list', param)
+            this.$store.dispatch('mercust_list', param)
         },
         data() {
             return {
-                finalCode: '',
-                bTime: new Date(),
-                eTime: new Date(),
                 searchKey: '',
-                pageSize: 10,
-                finalCodeList: [
-                    {
-                        value: '',
-                        label: '全部'
-                    },
-                    {
-                        value: '0',
-                        label: '成功'
-                    },
-                    {
-                        value: '1',
-                        label: '处理中'
-                    },
-                    {
-                        value: '2',
-                        label: '失败'
-                    },
-                ],
+                pageSize: 30,
                 tableColums: [
                     {
-                        title: '交易流水号',
-                        key: 'tradeNo',
-                        width: '245px',
+                        title: '客户名称',
+                        key: 'custName',
+                        align: 'center',
                     },
                     {
-                        title: '交易时间',
-                        key: 'tradeTime',
-                        width: '150px',
-                    },
-                    {
-                        title: '业务类型',
-                        key: 'bussType',
-                        render: (h, params) => {
-                            const row = params.row;
-                            const type = row.bussType === '1' ? '加急' : '批量';
-                            return h('span', type);
+                        title: '所属商户',
+                        align: 'center',
+                        render: (h, param) => {
+                            return param.row.merchantInfo.merchantName
                         }
                     },
                     {
-                        title: '金额',
-                        key: 'amount',
+                        title: '商户编号',
+                        align: 'center',
+                        render: (h, param) => {
+                            return param.row.merchantInfo.merchantNo
+                        }
                     },
                     {
                         title: '身份证号',
                         key: 'cardID',
-                        width: '160px',
+                        align: 'center',
                     },
                     {
-                        title: '客户姓名',
-                        key: 'custName',
+                        title: '银行预留手机号',
+                        key: 'mobileBank',
+                        align: 'center',
                     },
                     {
-                        title: '最终处理结果',
-                        key: 'finalCode',
-                        render: (h, params) => {
-                            const row = params.row;
-                            var finalStatus = '';
-                            if (row.finalCode === '0') {
-                                finalStatus = '成功'
-                            } else if (row.finalCode === '1') {
-                                finalStatus = '处理中'
-                            } else if (row.finalCode === '2') {
-                                finalStatus = '失败'
-                            }
-                            return h('span', finalStatus);
-                        },
-                        width: '120px',
-                    },
-                    {
-                        title: '清分状态',
-                        key: 'clearStatus',
-                        render: (h, params) => {
-                            const row = params.row;
-                            var clearStatus = '';
-                            if (row.clearStatus === '0') {
-                                clearStatus = '已清分'
-                            } else if (row.clearStatus === '1') {
-                                clearStatus = '未清分'
-                            }
-                            return h('span', clearStatus);
-                        }
+                        title: '银行卡卡号',
+                        key: 'bankcardNo',
+                        align: 'center',
                     },
                     {
                         title: '创建时间',
-                        key: 'cat',
-                        width: '150px',
+                        key: 'catTxt',
+                        align: 'center',
                     },
+                    // {
+                    //     title: '操作',
+                    //     key: 'action',
+                    //     width: 130,
+                    //     align: 'center',
+                    //     render: (h, param) => {
+                    //         if (!param.row.dAt) {
+                    //             return h('div', [
+                    //                 infoBtn(this, h, param),
+                    //                 delBtn(this, h, param),
+                    //             ]);
+                    //         }
+                    //     }
+                    // }
                 ]
             }
         }

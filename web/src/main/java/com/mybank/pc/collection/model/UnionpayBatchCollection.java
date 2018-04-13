@@ -218,7 +218,7 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 		return batchCollectionRequest;
 	}
 
-	static int[] blankingTime = new int[] { 60, 30, 40, 50, 60, 90 };
+	static int[] blankingTime = new int[] { 120, 30, 100, 50, 60, 90 };
 
 	public void setNextAllowQueryDate() {
 		Date nextQueryTime = null;

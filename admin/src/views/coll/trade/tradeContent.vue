@@ -2,16 +2,15 @@
     <div>
         <Row>
             <Col span="24">
-
             <Card>
                 <div>
                     <div>
                         <Row>
-                            <Col span="8" align="left">
+                            <Col span="6" align="left">
                             <Button type="primary" icon="person-add" @click="initiate">发起交易</Button>
                             <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
                             </Col>
-                            <Col span="16" align="right">
+                            <Col span="18" align="right">
                             <Select v-model="finalCode" style="width: 120px; text-align: center;" placeholder="最终处理结果">
                                 <Option v-for="item in finalCodeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                             </Select>
@@ -106,7 +105,7 @@
                 finalCodeList: [
                     {
                         value: '',
-                        label: '全部'
+                        label: '全部',
                     },
                     {
                         value: '0',
@@ -125,11 +124,13 @@
                     {
                         title: '交易流水号',
                         key: 'tradeNo',
+                        align: 'center',
                         width: '245px',
                     },
                     {
                         title: '交易时间',
                         key: 'tradeTime',
+                        align: 'center',
                     },
                     {
                         title: '业务类型',
@@ -138,19 +139,23 @@
                             const row = params.row;
                             const type = row.bussType === '1' ? '加急' : '批量';
                             return h('span', type);
-                        }
+                        },
+                        align: 'center',
                     },
                     {
                         title: '金额',
                         key: 'amount',
+                        align: 'center',
                     },
                     {
                         title: '身份证号',
                         key: 'cardID',
+                        align: 'center',
                     },
                     {
                         title: '客户姓名',
                         key: 'custName',
+                        align: 'center',
                     },
                     {
                         title: '最终处理结果',
@@ -167,6 +172,7 @@
                             }
                             return h('span', finalStatus);
                         },
+                        align: 'center',
                     },
                     {
                         title: '清分状态',
@@ -180,11 +186,13 @@
                                 clearStatus = '未清分'
                             }
                             return h('span', clearStatus);
-                        }
+                        },
+                        align: 'center',
                     },
                     {
                         title: '创建时间',
                         key: 'cat',
+                        align: 'center',
                     },
                 ]
             }

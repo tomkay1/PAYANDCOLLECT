@@ -16,7 +16,7 @@
 	    	AND merId = #para(merId)
 	    #end
 	    ORDER BY cat 
-	    LIMIT 500
+	    LIMIT 2000
 #end
 #sql("findToBeSentUnionpayCollectionByBatchNo")
 	SELECT * FROM unionpay_collection  WHERE 
@@ -36,13 +36,13 @@
 		respCode = '00' AND finalCode = '1'
 		AND (
 			ubc.queryResultCount IS NULL
-			OR ubc.queryResultCount < 5
+			OR ubc.queryResultCount <= 5
 		)
 		AND round(
 			(
 				UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(IFNULL(nextQueryTime,cat))
 			) / 60
-		) > IF(ISNULL(nextQueryTime), 60, 0)
+		) > IF(ISNULL(nextQueryTime), 120, 0)
 #end
 
 

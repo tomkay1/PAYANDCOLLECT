@@ -46,7 +46,7 @@ public class CBatchTradeSrv {
 				sendResult = unionpayBatchCollection.sendBatchOrder();
 				handlingBatchTradeResult(unionpayBatchCollection, toBeSentOrder);
 			} else {
-				UnionpayBatchCollectionBatchno.decrementBatchNo(txnTime);
+				UnionpayBatchCollectionBatchno.decrementBatchNo(txnTime, nextBatchNo);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -54,7 +54,7 @@ public class CBatchTradeSrv {
 			try {
 				if ((!isSaved) && StringUtils.isNotBlank(txnTime) && StringUtils.isNotBlank(nextBatchNo)
 						&& nextBatchNo.length() == 4) {
-					UnionpayBatchCollectionBatchno.decrementBatchNo(txnTime);
+					UnionpayBatchCollectionBatchno.decrementBatchNo(txnTime, nextBatchNo);
 				}
 			} catch (Exception e1) {
 				e1.printStackTrace();
@@ -66,9 +66,13 @@ public class CBatchTradeSrv {
 				}
 				if (CollectionUtils.isNotEmpty(toBeSentOrder)) {
 					for (UnionpayCollection unionpayCollection : toBeSentOrder) {
-						unionpayCollection.resetBatchStatus();
-						unionpayCollection.setMat(now);
-						unionpayCollection.update();
+						try {
+							unionpayCollection.resetBatchStatus();
+							unionpayCollection.setMat(now);
+							unionpayCollection.update();
+						} catch (Exception uce) {
+							uce.printStackTrace();
+						}
 					}
 				}
 			} catch (Exception e2) {
