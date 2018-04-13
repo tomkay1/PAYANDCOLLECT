@@ -5,38 +5,38 @@
         <Col :xs="24" :sm="12" :md="12" :style="{marginBottom: '10px'}">
         <infor-card
                 id-name="user_created_count"
-                :end-val="lastCust"
+                :end-val="custCount"
                 iconType="android-person-add"
                 color="#2d8cf0"
-                intro-text="昨日新增客户数"
+                intro-text="今日新增客户数"
         />
         </Col>
         <Col :xs="24" :sm="12" :md="12" :style="{marginBottom: '10px'}">
         <infor-card
                 id-name="visit_count"
-                :end-val="lastAmount"
+                :end-val="amount"
                 iconType="social-yen"
                 color="#64d572"
 
-                intro-text="昨日交易金额"
+                intro-text="今日交易金额"
         />
         </Col>
         <Col :xs="24" :sm="12" :md="12" :style="{marginBottom: '10px'}">
         <infor-card
                 id-name="collection_count"
-                :end-val="lastCount"
+                :end-val="tradeCount"
                 iconType="arrow-graph-up-right"
                 color="#ffd572"
-                intro-text="昨日交易笔数"
+                intro-text="今日交易笔数"
         />
         </Col>
         <Col :xs="24" :sm="12" :md="12" :style="{marginBottom: '10px'}">
         <infor-card
                 id-name="transfer_count"
-                :end-val="lastFee"
+                :end-val="feeAmount"
                 iconType="card"
                 color="#f25e43"
-                intro-text="昨日手续费总额"
+                intro-text="今日手续费总额"
         />
         </Col>
     </Row>
@@ -56,19 +56,19 @@ export default {
         //页面加载时或数据方法
         this.$axios.post('/home/total').then((res) => {
 
-            this.lastAmount=res.lastAmount;
-            this.lastCust=res.lastCust;
-            this.lastCount=res.lastCount;
-            this.lastFee=res.lastFee;
+            this.amount=res.amount;
+            this.custCount=res.custCount;
+            this.tradeCount=res.tradeCount;
+            this.feeAmount=res.feeAmount;
         })
 
     },
     data () {
         return {
-            lastAmount:0,
-            lastCust:0,
-            lastCount:0,
-            lastFee:0,
+            amount:0,
+            custCount:0,
+            tradeCount:0,
+            feeAmount:0,
 
         }
     },

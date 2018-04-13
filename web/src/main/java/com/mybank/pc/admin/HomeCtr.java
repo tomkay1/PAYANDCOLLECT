@@ -34,18 +34,18 @@ public class HomeCtr extends CoreController {
     }
     //首页各项数字的累计
     public void total(){
-        int lastCust ;
+        int custCount ;
         MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
         if(ObjectUtil.isNotNull(merInfo)) {
-            lastCust = merchantCustSrv.totalLastCust(merInfo.getId());
+            custCount = merchantCustSrv.totalLastCust(merInfo.getId());
         }else{
-            lastCust = merchantCustSrv.totalLastCust(null);
+            custCount = merchantCustSrv.totalLastCust(null);
         }
         Map map = new HashMap();
-        map.put("lastAmount",99999999);
-        map.put("lastCount",99999);
-        map.put("lastCust",lastCust);
-        map.put("lastFee",9999);
+        map.put("amount",99999999);
+        map.put("tradeCount",99999);
+        map.put("custCount",custCount);
+        map.put("feeAmount",9999);
         renderJson(map);
     }
 
