@@ -233,7 +233,7 @@ public class MerchantCustCtr extends CoreController {
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
     public void sendCode() {
         String flag = "0";
-        String url = "http://dx1.xitx.cn:8888/sms.aspx";
+        String url = ResKit.getMsg("url");
 
         String account = ResKit.getMsg("account");
         String password = ResKit.getMsg("password");
