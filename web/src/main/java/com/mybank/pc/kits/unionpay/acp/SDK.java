@@ -1,5 +1,7 @@
 package com.mybank.pc.kits.unionpay.acp;
 
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 
 public class SDK {
@@ -13,10 +15,10 @@ public class SDK {
 	/** 银盛实时商户 826410173920015 手续费 2元 */
 	public static String MER_CODE_REALTIME_YS_2 = "3";
 
-	private static SDK REALTIME_CH_SDK;
-	private static SDK REALTIME_YS_4_SDK;
-	private static SDK REALTIME_YS_2_SDK;
-	private static SDK BATCH_CH_SDK;
+	public static SDK REALTIME_CH_SDK;
+	public static SDK REALTIME_YS_4_SDK;
+	public static SDK REALTIME_YS_2_SDK;
+	public static SDK BATCH_CH_SDK;
 
 	static {
 		REALTIME_CH_SDK = new SDK("acp_sdk_945230148160197.properties", "945230148160197", MER_CODE_REALTIME_CH);
@@ -73,6 +75,13 @@ public class SDK {
 			return REALTIME_YS_2_SDK;
 		}
 		return null;
+	}
+
+	public static boolean validate(Map<String, String> reqParam, String encoding) {
+		return REALTIME_CH_SDK.getAcpService().validate(reqParam, encoding)
+				|| REALTIME_YS_2_SDK.getAcpService().validate(reqParam, encoding)
+				|| REALTIME_YS_4_SDK.getAcpService().validate(reqParam, encoding)
+				|| BATCH_CH_SDK.getAcpService().validate(reqParam, encoding);
 	}
 
 	public SDKConfig getSdkConfig() {

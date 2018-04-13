@@ -127,6 +127,7 @@ public class CBatchTradeSrv {
 				}
 				isSuccess = true;
 				unionpayBatchCollection.setFinalCode("1");// 处理中
+				unionpayBatchCollection.setNextAllowQueryDate();
 			} else {
 				// 其他应答码为失败请排查原因
 				unionpayBatchCollection.setFinalCode("2");// 失败

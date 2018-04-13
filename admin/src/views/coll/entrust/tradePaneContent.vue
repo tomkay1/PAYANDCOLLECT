@@ -52,8 +52,7 @@
                     search: this.searchKey,
                     pn: pn,
                     ps: this.pageSize,
-                    txnType: this.txnType === '0' ? '72' : '74',
-                    txnSubType: this.txnType === '0' ? '11' : '04'
+                    txnType: this.txnType,
                 }
                 this.$store.dispatch('get_entrust_trade_list', param)
             }
@@ -64,8 +63,7 @@
                 'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
                 search: this.searchKey,
                 ps: this.pageSize,
-                txnType: this.txnType === '0' ? '72' : '74',
-                txnSubType: this.txnType === '0' ? '11' : '04'
+                txnType: this.txnType,
             }
             this.$store.dispatch('get_entrust_trade_list', param)
         },
@@ -74,9 +72,13 @@
                 bTime: new Date(),
                 eTime: new Date(),
                 searchKey: '',
-                pageSize: 10,
+                pageSize: 30,
                 txnType: '0',
                 txnTypeList: [
+                    {
+                        value: '',
+                        label: '全部'
+                    },
                     {
                         value: '0',
                         label: '建立委托关系'
@@ -116,13 +118,8 @@
                         key: 'respMsg',
                     },
                     {
-                        title: '商户类型',
-                        key: 'type',
-                        render: (h, params) => {
-                            const row = params.row;
-                            const type = row.merId === '945230148160197' ? '实时' : '批量';
-                            return h('span', type);
-                        }
+                        title: '商户',
+                        key: 'merId',
                     },
                     {
                         title: '创建时间',

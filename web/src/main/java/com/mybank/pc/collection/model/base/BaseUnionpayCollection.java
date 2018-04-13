@@ -17,6 +17,14 @@ public abstract class BaseUnionpayCollection<M extends BaseUnionpayCollection<M>
 		return getInt("id");
 	}
 
+	public void setVersion(java.lang.String version) {
+		set("version", version);
+	}
+
+	public java.lang.String getVersion() {
+		return getStr("version");
+	}
+
 	public void setCustomerNm(java.lang.String customerNm) {
 		set("customerNm", customerNm);
 	}

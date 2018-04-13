@@ -15,18 +15,47 @@
  */
 package com.mybank.pc.kits.unionpay.acp;
 
-import com.jfinal.kit.LogKit;
-
-import java.io.*;
-import java.math.BigInteger;
-import java.security.*;
-import java.security.cert.*;
-import java.security.spec.RSAPublicKeySpec;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 import static com.mybank.pc.kits.unionpay.acp.SDKConstants.UNIONPAY_CNNAME;
 import static com.mybank.pc.kits.unionpay.acp.SDKUtil.isEmpty;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.KeyFactory;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertPathBuilder;
+import java.security.cert.CertStore;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CollectionCertStoreParameters;
+import java.security.cert.PKIXBuilderParameters;
+import java.security.cert.PKIXCertPathBuilderResult;
+import java.security.cert.TrustAnchor;
+import java.security.cert.X509CertSelector;
+import java.security.cert.X509Certificate;
+import java.security.spec.RSAPublicKeySpec;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.jfinal.kit.LogKit;
+import com.jfinal.kit.PathKit;
 
 /**
  * @ClassName: CertUtil
@@ -168,6 +197,14 @@ public class CertUtil {
 		}
 	}
 
+	private String getValidateCertDir() {
+		if ("5.0.0".equals(sdkConfig.getVersion())) {
+			return PathKit.getRootClassPath() + File.separator + "certs" + File.separator;
+		} else {
+			return null;
+		}
+	}
+
 	/**
 	 * 用配置文件acp_sdk.properties配置路径 加载验证签名证书
 	 */
@@ -177,7 +214,8 @@ public class CertUtil {
 			return;
 		}
 		certMap.clear();
-		String dir = sdkConfig.getValidateCertDir();
+		// String dir = sdkConfig.getValidateCertDir();
+		String dir = getValidateCertDir();
 		LogKit.info("加载验证签名证书目录==>" + dir + " 注：如果请求报文中version=5.1.0那么此验签证书目录使用不到，可以不需要设置（version=5.0.0必须设置）。");
 		if (isEmpty(dir)) {
 			LogKit.error("WARN: acpsdk.validateCert.dir is empty");

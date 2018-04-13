@@ -72,7 +72,7 @@
         data() {
             return {
                 searchKey: '',
-                pageSize: 10,
+                pageSize: 30,
                 tableColums: [
                     {
                         title: '姓名',
@@ -104,13 +104,8 @@
                         }
                     },
                     {
-                        title: '商户类型',
-                        key: 'type',
-                        render: (h, params) => {
-                            const row = params.row;
-                            const type = row.merId === '945230148160197' ? '实时' : '批量';
-                            return h('span', type);
-                        }
+                        title: '商户',
+                        key: 'merId',
                     },
                     {
                         title: '创建时间',

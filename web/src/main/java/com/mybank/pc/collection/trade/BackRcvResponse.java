@@ -57,7 +57,8 @@ public class BackRcvResponse extends CoreController {
 		if ("1".equals(unionpayCallbackLog.getValidate())) {// 验签成功
 
 			// 实时代收回调
-			if ("11".equals(unionpayCallbackLog.getTxnType()) && "02".equals(unionpayCallbackLog.getTxnSubType())) {
+			if ("11".equals(unionpayCallbackLog.getTxnType()) && ("02".equals(unionpayCallbackLog.getTxnSubType())
+					|| "00".equals(unionpayCallbackLog.getTxnSubType()))) {
 				cTradeSrv.updateOrderStatus(reqParam);
 			}
 
@@ -74,7 +75,7 @@ public class BackRcvResponse extends CoreController {
 		unionpayCallbackLog.setInfo(JsonKit.toJson(reqParam));
 
 		// 重要！验证签名前不要修改reqParam中的键值对的内容，否则会验签不过
-		if (!SDK.getSDK(SDK.MER_CODE_REALTIME_CH).getAcpService().validate(reqParam, encoding)) {
+		if (!SDK.validate(reqParam, encoding)) {
 			LogKit.error("验证签名结果[失败].");
 			// 验签失败，需解决验签问题
 			unionpayCallbackLog.setValidate("0");

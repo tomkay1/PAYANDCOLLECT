@@ -31,10 +31,6 @@
 	    	AND merId = #para(merId)
 	    #end
 #end
-
-
-
-
 #sql("findNeedQueryBatchCollection")
 	SELECT ubc.* FROM unionpay_batch_collection ubc WHERE
 		respCode = '00' AND finalCode = '1'
@@ -44,9 +40,9 @@
 		)
 		AND round(
 			(
-				UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(nextQueryTime)
+				UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(IFNULL(nextQueryTime,cat))
 			) / 60
-		) > 0
+		) > IF(ISNULL(nextQueryTime), 60, 0)
 #end
 
 

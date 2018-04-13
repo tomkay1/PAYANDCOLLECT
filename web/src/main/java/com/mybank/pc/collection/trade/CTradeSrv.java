@@ -71,12 +71,12 @@ public class CTradeSrv {
 	public Kv validateAndBuildInitiateRequest(Kv kv) {
 		// 银联调用相关参数
 		String txnType = null; // 交易类型
-		String txnSubType = "02"; // 交易子类型
-		String currencyCode = "156"; // 交易币种（境内商户一般是156 人民币）
-		String channelType = "07";// 渠道类型
-		String accessType = "0";// 接入类型，商户接入固定填0，不需修改
-		String bizType = "000501";// 业务类型
-		String accType = "01";// 账号类型
+		// String txnSubType = "02"; // 交易子类型
+		// String currencyCode = "156"; // 交易币种（境内商户一般是156 人民币）
+		// String channelType = "07";// 渠道类型
+		// String accessType = "0";// 接入类型，商户接入固定填0，不需修改
+		// String bizType = "000501";// 业务类型
+		// String accType = "01";// 账号类型
 
 		// 平台调用相关参数
 		SDK sdk = null;
@@ -135,6 +135,7 @@ public class CTradeSrv {
 				throw new ValidateCTRException("不支持的卡类型!!");
 			}
 			boolean isRealtimeBuss = "1".equals(bussType) ? true : false;
+			String merId = null;
 			if (isRealtimeBuss) {// 加急
 				if (Integer.valueOf(txnAmt) > 500000) {
 					sdk = SDK.getSDK(SDK.MER_CODE_REALTIME_YS_4);
@@ -143,19 +144,24 @@ public class CTradeSrv {
 				}
 				merchantFeeTradeType = "1";
 				txnType = "11";
+
+				unionpayCollection.setMerId(merId = sdk.getMerId());
+				unionpayCollection.toCollection();
 			} else if ("2".equals(bussType)) {// 批量
 				sdk = SDK.getSDK(SDK.MER_CODE_BATCH_CH);
 				merchantFeeTradeType = "2";
 				txnType = "21"; // 取值：21 批量交易
+
+				unionpayCollection.setMerId(merId = sdk.getMerId());
+				unionpayCollection.toEntrustCollection();
 			}
-			String merId = sdk.getMerId();
 
 			CollectionEntrust query = new CollectionEntrust();
 			query.setAccNo(accNo);
 			query.setMerId(merId);
 			CollectionEntrust collectionEntrust = query.findOne();
 			if (collectionEntrust == null || !"0".equals(collectionEntrust.getStatus())) {
-				//throw new ValidateCTRException("客户委托信息不存在或未处于已委托状态");
+				throw new ValidateCTRException("客户委托信息不存在或未处于已委托状态");
 			}
 
 			String formattedTradeType = StringUtils.leftPad(tradeType, 2, '0');
@@ -166,8 +172,8 @@ public class CTradeSrv {
 			String txnTime = new SimpleDateFormat("yyyyMMddHHmmss").format(now);
 
 			// 订单号 实时最大长度40，批量最大长度32
-			String orderId = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(now) + txnType + txnSubType
-					+ formattedBussType + formattedCustID;
+			String orderId = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(now) + txnType
+					+ unionpayCollection.getTxnSubType() + formattedBussType + formattedCustID;
 			int maxLength = "1".equals(bussType) ? 40 : 32;
 			if (orderId.length() > maxLength) {
 				orderId = orderId.substring(0, maxLength);
@@ -189,7 +195,6 @@ public class CTradeSrv {
 			unionpayCollection.setCustomerNm(collectionEntrust.getCustomerNm());
 			unionpayCollection.setCertifTp(collectionEntrust.getCertifTp());
 			unionpayCollection.setCertifId(collectionEntrust.getCertifId());
-			unionpayCollection.setAccType(accType);
 			unionpayCollection.setAccNo(accNo);
 			unionpayCollection.setPhoneNo(collectionEntrust.getPhoneNo());
 			unionpayCollection.setCvn2(collectionEntrust.getCvn2());
@@ -197,14 +202,8 @@ public class CTradeSrv {
 			unionpayCollection.setTradeNo(tradeNo);
 			unionpayCollection.setOrderId(orderId);
 			unionpayCollection.setTxnType(txnType);
-			unionpayCollection.setTxnSubType(txnSubType);
-			unionpayCollection.setBizType(bizType);
 			unionpayCollection.setTxnTime(txnTime);
 			unionpayCollection.setTxnAmt(txnAmt);
-			unionpayCollection.setCurrencyCode(currencyCode);
-			unionpayCollection.setMerId(merId);
-			unionpayCollection.setChannelType(channelType);
-			unionpayCollection.setAccessType(accessType);
 			unionpayCollection.setMerchantID(merchantID);
 			unionpayCollection.setFinalCode(finalCode);
 			unionpayCollection.setStatus("2".equals(bussType) ? "0" : null);
