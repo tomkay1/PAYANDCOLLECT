@@ -1,10 +1,15 @@
 package com.mybank.pc.collection.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.jfinal.kit.JsonKit;
+import com.jfinal.kit.Kv;
 import com.jfinal.kit.LogKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseUnionpayCollection;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
@@ -22,16 +27,43 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 	private Map<String, String> realtimeReqData = null;
 	private Map<String, String> realtimeRspData = null;
 
+	public void toEntrustCollection() {
+		SDK sdk = SDK.getByMerId(getMerId());
+		SDKConfig sdkConfig = sdk.getSdkConfig();
+
+		setVersion(sdkConfig.getVersion());
+		setTxnSubType("02");
+		setAccType("01");// 账号类型
+		setAccessType("0");// 接入类型，商户接入固定填0，不需修改
+		setBizType("000501");// 业务类型
+		setChannelType("07");// 渠道类型
+		setCurrencyCode("156");// 交易币种（境内商户一般是156 人民币）
+	}
+
+	public void toCollection() {
+		SDK sdk = SDK.getByMerId(getMerId());
+		SDKConfig sdkConfig = sdk.getSdkConfig();
+
+		setVersion(sdkConfig.getVersion());
+		setTxnSubType("00");
+		setAccType("01");// 账号类型
+		setAccessType("0");// 接入类型，商户接入固定填0，不需修改
+		setBizType("000501");// 业务类型
+		setChannelType("07");// 渠道类型
+		setCurrencyCode("156");// 交易币种（境内商户一般是156 人民币）
+	}
+
 	public Map<String, String> assemblyRealtimeRequest() {
 		Map<String, String> contentData = new HashMap<String, String>();
 
 		SDK sdk = SDK.getByMerId(getMerId());
 		SDKConfig sdkConfig = sdk.getSdkConfig();
 		AcpService acpService = sdk.getAcpService();
+		String version = sdkConfig.getVersion();
 
 		/*** 银联全渠道系统，产品参数，除了encoding自行选择外其他不需修改 ***/
 		// 版本号
-		contentData.put("version", sdkConfig.getVersion());
+		contentData.put("version", version);
 		// 字符集编码 可以使用UTF-8,GBK两种方式
 		contentData.put("encoding", SDKConstants.UTF_8_ENCODING);
 		// 签名方法 目前只支持01-RSA方式证书加密
@@ -71,6 +103,22 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 		String accNoEnc = acpService.encryptData(getAccNo(), SDKConstants.UTF_8_ENCODING);
 		contentData.put("accNo", accNoEnc);
 		//////////
+
+		if (sdk == SDK.REALTIME_YS_2_SDK || sdk == SDK.REALTIME_YS_4_SDK) {
+			Map<String, String> customerInfoMap = new HashMap<String, String>();
+			// 【代收的customerInfo送什么验证要素是配置到银联后台到商户号上的，这些验证要素可以在商户的《全渠道入网申请表》中找到，也可以请咨询您的业务人员或者银联业务运营接口人】
+			// 以下上送要素是参考《测试商户号777290058110097代收、实名认证交易必送验证要素配置说明.txt》贷记卡（实名认证交易-后台）部分
+			customerInfoMap.put("certifTp", getCertifTp()); // 证件类型
+			customerInfoMap.put("certifId", getCertifId()); // 证件号码
+			customerInfoMap.put("customerNm", getCustomerNm()); // 姓名
+			customerInfoMap.put("phoneNo", getPhoneNo()); // 手机号
+			// customerInfoMap.put("cvn2", "123"); //卡背面的cvn2三位数字
+			// customerInfoMap.put("expired", "1711"); //有效期 年在前月在后
+			String customerInfoStr = acpService.getCustomerInfoWithEncrypt(customerInfoMap, getAccNo(),
+					SDKConstants.UTF_8_ENCODING);
+			//////////
+			contentData.put("customerInfo", customerInfoStr);
+		}
 
 		// 后台通知地址（需设置为【外网】能访问 http
 		// https均可），支付成功后银联会自动将异步通知报文post到商户上送的该地址，失败的交易银联不会发送后台通知
@@ -136,6 +184,29 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 			throw new RuntimeException("验证签名失败");
 		}
 		return isValidate;
+	}
+
+	public static int updateToBeSentUnionpayCollectionBatchNo(Kv kv) {
+		SqlPara sqlPara = Db.getSqlPara("collection_batch.updateToBeSentUnionpayCollectionBatchNo", kv);
+		return Db.update(sqlPara);
+	}
+
+	public static List<UnionpayCollection> findToBeSentUnionpayCollectionByBatchNo(Kv kv) {
+		SqlPara sqlPara = Db.getSqlPara("collection_batch.findToBeSentUnionpayCollectionByBatchNo", kv);
+		return UnionpayCollection.dao.find(sqlPara);
+	}
+
+	public static Record tradeHomePageTotal(Kv kv) {
+		SqlPara sqlPara = Db.getSqlPara("collection_trade.tradeHomePageTotal", kv);
+		return Db.findFirst(sqlPara);
+	}
+
+	public void resetBatchStatus() {
+		setBatchNo("");
+		setTxnTime("");
+		if ("1".equals(getStatus())) {
+			setStatus("0");
+		}
 	}
 
 	public Map<String, String> getRealtimeReqData() {

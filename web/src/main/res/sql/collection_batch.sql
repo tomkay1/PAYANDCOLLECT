@@ -9,41 +9,44 @@
 		AND txnDate = LEFT (#para(txnTime), 8) 
 	    AND batchNo = #para(batchNo)
 #end
-#sql("updateToBeSentUnionpayCollectionBatchId")
-	UPDATE unionpay_collection  SET batchId = #para(batchId) , status = '1' , mat = #para(mat) WHERE 
+#sql("updateToBeSentUnionpayCollectionBatchNo")
+	UPDATE unionpay_collection  SET batchNo = #para(batchNo) , txnTime = #para(txnTime) , status = '1' , mat = #para(mat) WHERE 
 	    txnType = '21' AND txnSubType = '02' AND status = '0' 
 	    #if(merId)
 	    	AND merId = #para(merId)
 	    #end
 	    ORDER BY cat 
-	    LIMIT 500
+	    LIMIT 2000
 #end
-#sql("findToBeSentUnionpayCollectionByBatchId")
+#sql("findToBeSentUnionpayCollectionByBatchNo")
 	SELECT * FROM unionpay_collection  WHERE 
 	    txnType = '21' AND txnSubType = '02' AND status = '1'
-	    #if(batchId)
-	    	AND batchId = #para(batchId)
+	    #if(txnTime)
+	    	AND txnTime = #para(txnTime)
+	    #end
+	    #if(batchNo)
+	    	AND batchNo = #para(batchNo)
 	    #end
 	    #if(merId)
 	    	AND merId = #para(merId)
 	    #end
 #end
-
-
-
-
-#sql("findNeedQueryBatchCollection")
-	SELECT ubc.* FROM unionpay_batch_collection ubc WHERE
-		respCode = '00' AND finalCode = '1'
+#sql("updateNeedQueryBatchCollectionPrepare")
+	UPDATE unionpay_batch_collection  ubc SET sysQueryId = #para(sysQueryId) , status = '1' , mat = #para(mat) WHERE 
+	    respCode = '00' AND finalCode = '1'
 		AND (
 			ubc.queryResultCount IS NULL
-			OR ubc.queryResultCount < 5
+			OR ubc.queryResultCount <= 7
 		)
 		AND round(
 			(
-				UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(cat)
+				UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(IFNULL(nextQueryTime,cat))
 			) / 60
-		) > 60
+		) > IF(ISNULL(nextQueryTime), 120, 0)
+#end
+#sql("findNeedQueryBatchCollectionBySysQueryId")
+	SELECT ubc.* FROM unionpay_batch_collection ubc WHERE
+		sysQueryId = #para(sysQueryId)
 #end
 
 

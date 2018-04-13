@@ -17,6 +17,30 @@ public abstract class BaseUnionpayCollection<M extends BaseUnionpayCollection<M>
 		return getInt("id");
 	}
 
+	public void setPlanId(java.lang.String planId) {
+		set("planId", planId);
+	}
+
+	public java.lang.String getPlanId() {
+		return getStr("planId");
+	}
+
+	public void setExecutionId(java.lang.String executionId) {
+		set("executionId", executionId);
+	}
+
+	public java.lang.String getExecutionId() {
+		return getStr("executionId");
+	}
+
+	public void setVersion(java.lang.String version) {
+		set("version", version);
+	}
+
+	public java.lang.String getVersion() {
+		return getStr("version");
+	}
+
 	public void setCustomerNm(java.lang.String customerNm) {
 		set("customerNm", customerNm);
 	}
@@ -377,12 +401,12 @@ public abstract class BaseUnionpayCollection<M extends BaseUnionpayCollection<M>
 		return getInt("queryResultCount");
 	}
 
-	public void setBatchId(java.lang.String batchId) {
-		set("batchId", batchId);
+	public void setBatchNo(java.lang.String batchNo) {
+		set("batchNo", batchNo);
 	}
 
-	public java.lang.String getBatchId() {
-		return getStr("batchId");
+	public java.lang.String getBatchNo() {
+		return getStr("batchNo");
 	}
 
 	public void setCat(java.util.Date cat) {

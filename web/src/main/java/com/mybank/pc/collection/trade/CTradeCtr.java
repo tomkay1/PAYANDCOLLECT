@@ -44,6 +44,21 @@ public class CTradeCtr extends CoreController {
 		renderJson(page);
 	}
 
+	@ActionKey("/coll/trade/getMerCustPage")
+	public void merCustPage() {
+		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
+		Page<MerchantCust> page;
+
+		String serach = getPara("search");
+
+		Kv kv = Kv.create();
+		kv.set("search", serach).set("merchantID", merInfo == null ? "" : merInfo.getId());
+
+		SqlPara sqlPara = Db.getSqlPara("collection_trade.findMerchantCustListPage", kv);
+		page = MerchantCust.dao.paginate(getPN(), getPS(), sqlPara);
+		renderJson(page);
+	}
+
 	@ActionKey("/coll/trade/getMerCust")
 	public void merCust() {
 		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);

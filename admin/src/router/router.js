@@ -124,7 +124,7 @@ export const appRouter = [
         children: [
             { path: 'entrust', title: '委托管理', isCheck: 'yes', name: 'coll_entrust', component: resolve => { require(['@/views/coll/entrust/main.vue'], resolve); } },
             { path: 'trade', title: '交易管理', isCheck: 'yes', name: 'coll_trade', component: resolve => { require(['@/views/coll/trade/main.vue'], resolve); } },
-            { path: 'reconciliation', title: '对账管理', isCheck: 'yes', name: 'coll_reconciliation', component: resolve => { require(['@/views/coll/reconciliation/main.vue'], resolve); } }
+            // { path: 'reconciliation', title: '对账管理', isCheck: 'yes', name: 'coll_reconciliation', component: resolve => { require(['@/views/coll/reconciliation/main.vue'], resolve); } }
         ]
     }
 ];

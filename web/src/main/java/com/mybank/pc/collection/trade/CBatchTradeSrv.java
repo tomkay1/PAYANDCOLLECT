@@ -5,96 +5,91 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.jfinal.aop.Before;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
 import com.jfinal.kit.Kv;
-import com.jfinal.plugin.activerecord.Db;
-import com.jfinal.plugin.activerecord.SqlPara;
-import com.jfinal.plugin.activerecord.tx.Tx;
 import com.mybank.pc.collection.model.UnionpayBatchCollection;
 import com.mybank.pc.collection.model.UnionpayBatchCollectionBatchno;
 import com.mybank.pc.collection.model.UnionpayCollection;
-import com.mybank.pc.exception.TxnKey;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 
 public class CBatchTradeSrv {
 
-	public void sendOrder() {
+	public void sendBatchOrder() {
+		String txnTime = null;
+		String nextBatchNo = null;
+		UnionpayBatchCollection unionpayBatchCollection = null;
+
+		int count = 0;
+		boolean isSaved = false;
+		List<UnionpayCollection> toBeSentOrder = null;
+		Map<String, String> sendResult = null;
+		Kv kv = Kv.create();
 		Date now = new Date();
-		String txnTime = new SimpleDateFormat("yyyyMMddHHmmss").format(now);
-		String nextBatchNo = UnionpayBatchCollectionBatchno.getNextBatchNoToString(txnTime);
-
-		UnionpayBatchCollection unionpayBatchCollection = buildUnionpayBatchCollection(now, txnTime, nextBatchNo);
-		unionpayBatchCollection.save();
-
-		Kv kv = Kv.create().set("batchId", unionpayBatchCollection.getId()).set("merId",
-				SDK.getSDK(SDK.MER_CODE_BATCH).getMerId());
-		SqlPara sqlPara = Db.getSqlPara("collection_trade.updateToBeSentUnionpayCollectionBatchId", kv);
-		int count = Db.update(sqlPara);
-
-		if (count > 0) {
-			sqlPara = Db.getSqlPara("collection_trade.findToBeSentUnionpayCollectionByBatchId", kv.set("mat", now));
-			List<UnionpayCollection> toBeSentOrder = UnionpayCollection.dao.find(sqlPara);
-
-			unionpayBatchCollection.claimToBeSentOrder(toBeSentOrder);
-			unionpayBatchCollection.assemblyBatchRequest();
-
-			saveBatchOrder(unionpayBatchCollection);
-			sendBatchOrder(unionpayBatchCollection, toBeSentOrder);
-			handlingBatchTradeResult(unionpayBatchCollection, toBeSentOrder);
-		} else {
-
-		}
-
-	}
-
-	public UnionpayBatchCollection buildUnionpayBatchCollection(Date now, String txnTime, String batchNo) {
-		// 银联调用相关参数
-		String txnType = "21"; // 交易类型
-		String txnSubType = "02"; // 交易子类型
-		String channelType = "07";// 渠道类型
-		String accessType = "0";// 接入类型，商户接入固定填0，不需修改
-		String bizType = "000501";// 业务类型
-
-		// 平台调用相关参数
-		SDK sdk = SDK.getSDK(SDK.MER_CODE_BATCH);
-		String finalCode = "3";// 最终处理结果：0成功 1处理中 2失败 3待初始化
-
-		UnionpayBatchCollection unionpayBatchCollection = new UnionpayBatchCollection();
-		unionpayBatchCollection.setTxnType(txnType);
-		unionpayBatchCollection.setTxnSubType(txnSubType);
-		unionpayBatchCollection.setBizType(bizType);
-		unionpayBatchCollection.setChannelType(channelType);
-		unionpayBatchCollection.setAccessType(accessType);
-		unionpayBatchCollection.setMerId(sdk.getMerId());
-		unionpayBatchCollection.setBatchNo(batchNo);
-		unionpayBatchCollection.setTxnTime(txnTime);
-		unionpayBatchCollection.setQueryResultCount(0);
-		unionpayBatchCollection.setFinalCode(finalCode);
-		unionpayBatchCollection.setCat(now);
-		unionpayBatchCollection.setMat(now);
-
-		return unionpayBatchCollection;
-	}
-
-	@Before({ Tx.class })
-	@TxnKey("saveBatchOrder")
-	public void saveBatchOrder(UnionpayBatchCollection unionpayBatchCollection) {
 		try {
-			unionpayBatchCollection.save();
-		} catch (Exception e) {
-			unionpayBatchCollection.setFinalCode("2");
-			throw e;
-		}
-	}
+			txnTime = new SimpleDateFormat("yyyyMMddHHmmss").format(now);
+			nextBatchNo = UnionpayBatchCollectionBatchno.getNextBatchNoToString(txnTime);
 
-	@Before({ Tx.class })
-	@TxnKey("batch-sendOrder")
-	public void sendBatchOrder(UnionpayBatchCollection unionpayBatchCollection,
-			List<UnionpayCollection> toBeSentOrder) {
-		try {
-			unionpayBatchCollection.sendBatchOrder();
+			kv.set("batchNo", nextBatchNo).set("txnTime", txnTime)
+					.set("merId", SDK.getSDK(SDK.MER_CODE_BATCH_CH).getMerId()).set("mat", now);
+			count = UnionpayCollection.updateToBeSentUnionpayCollectionBatchNo(kv);
+			if (count > 0) {
+				toBeSentOrder = UnionpayCollection.findToBeSentUnionpayCollectionByBatchNo(kv);
+
+				unionpayBatchCollection = UnionpayBatchCollection.buildUnionpayBatchCollection(now, txnTime,
+						nextBatchNo);
+				unionpayBatchCollection.claimToBeSentOrder(toBeSentOrder);
+				unionpayBatchCollection.assemblyBatchRequest();
+
+				isSaved = unionpayBatchCollection.save();
+				sendResult = unionpayBatchCollection.sendBatchOrder();
+				handlingBatchTradeResult(unionpayBatchCollection, toBeSentOrder);
+			} else {
+				UnionpayBatchCollectionBatchno.decrementBatchNo(txnTime, nextBatchNo);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
+
+			try {
+				if ((!isSaved) && StringUtils.isNotBlank(txnTime) && StringUtils.isNotBlank(nextBatchNo)
+						&& nextBatchNo.length() == 4) {
+					UnionpayBatchCollectionBatchno.decrementBatchNo(txnTime, nextBatchNo);
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+
+			try {
+				if (count != 0 && CollectionUtils.isEmpty(toBeSentOrder)) {
+					toBeSentOrder = UnionpayCollection.findToBeSentUnionpayCollectionByBatchNo(kv);
+				}
+				if (CollectionUtils.isNotEmpty(toBeSentOrder)) {
+					for (UnionpayCollection unionpayCollection : toBeSentOrder) {
+						try {
+							unionpayCollection.resetBatchStatus();
+							unionpayCollection.setMat(now);
+							unionpayCollection.update();
+						} catch (Exception uce) {
+							uce.printStackTrace();
+						}
+					}
+				}
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+
+			try {
+				if (isSaved) {
+					if (sendResult == null || sendResult.isEmpty()) {
+						unionpayBatchCollection.setMat(now);
+						unionpayBatchCollection.setFinalCode("2");
+					}
+					unionpayBatchCollection.update();
+				}
+			} catch (Exception e3) {
+				e3.printStackTrace();
+			}
 		}
 	}
 
@@ -130,14 +125,16 @@ public class CBatchTradeSrv {
 				for (UnionpayCollection unionpayCollection : toBeSentOrder) {
 					unionpayCollection.setRespCode(respCode);
 					unionpayCollection.setRespMsg(respMsg);
-					unionpayCollection.setStatus("1");// 已发送
+					unionpayCollection.setStatus("2");// 已发送
 					unionpayCollection.setMat(now);
 					unionpayCollection.update();
 				}
 				isSuccess = true;
+				unionpayBatchCollection.setFinalCode("1");// 处理中
+				unionpayBatchCollection.setNextAllowQueryDate();
 			} else {
 				// 其他应答码为失败请排查原因
-				unionpayBatchCollection.setFinalCode("2");
+				unionpayBatchCollection.setFinalCode("2");// 失败
 				isSuccess = false;
 			}
 

@@ -11,6 +11,6 @@ public class CollectionBatchTask implements Runnable {
 	@Override
 	public void run() {
 		LogKit.info("开始调用批量代收...");
-		cBatchTradeSrv.sendOrder();
+		cBatchTradeSrv.sendBatchOrder();
 	}
 }

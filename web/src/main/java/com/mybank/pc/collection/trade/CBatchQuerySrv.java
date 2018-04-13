@@ -3,21 +3,19 @@ package com.mybank.pc.collection.trade;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.jfinal.aop.Before;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.SqlPara;
-import com.jfinal.plugin.activerecord.tx.Tx;
 import com.mybank.pc.collection.model.CollectionTrade;
 import com.mybank.pc.collection.model.UnionpayBatchCollection;
 import com.mybank.pc.collection.model.UnionpayBatchCollectionQuery;
 import com.mybank.pc.collection.model.UnionpayCollection;
 import com.mybank.pc.exception.BaseCollectionRuntimeException;
-import com.mybank.pc.exception.TxnKey;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDKConstants;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.BatchCollectionResponse;
@@ -26,36 +24,64 @@ import com.mybank.pc.kits.unionpay.acp.file.collection.model.ResponseHead;
 
 public class CBatchQuerySrv {
 
-	public void batchQuery(UnionpayBatchCollection unionpayBatchCollection) {
-		UnionpayBatchCollectionQuery unionpayBatchCollectionQuery = unionpayBatchCollection.buildQueryResult();
-		saveBatchQueryRecord(unionpayBatchCollectionQuery);
-		sendBatchQueryOrder(unionpayBatchCollection);
-	}
-
-	@Before({ Tx.class })
-	@TxnKey("saveBatchQueryOrder")
-	public void saveBatchQueryRecord(UnionpayBatchCollectionQuery unionpayBatchCollectionQuery) {
+	public void batchQuery() {
+		int count = 0;
+		List<UnionpayBatchCollection> ubcList = null;
+		Kv kv = Kv.create();
+		Date now = new Date();
 		try {
-			unionpayBatchCollectionQuery.save();
+			String uuid = UUID.randomUUID().toString();
+			kv.set("sysQueryId", uuid).set("mat", now);
+			count = UnionpayBatchCollection.updateNeedQueryBatchCollectionPrepare(kv);
+			if (count > 0) {
+				ubcList = UnionpayBatchCollection.findNeedQueryBatchCollectionBySysQueryId(kv);
+				for (UnionpayBatchCollection unionpayBatchCollection : ubcList) {
+					batchQuery(unionpayBatchCollection);
+				}
+			}
 		} catch (Exception e) {
-			unionpayBatchCollectionQuery
-					.setExceInfo(JsonKit.toJson(BaseCollectionRuntimeException.getExceptionInfo(e)));
-			throw e;
+			if (ubcList != null) {
+				for (UnionpayBatchCollection unionpayBatchCollection : ubcList) {
+					try {
+						unionpayBatchCollection.setStatus("0");
+						unionpayBatchCollection.update();
+					} catch (Exception ubce) {
+						ubce.printStackTrace();
+					}
+				}
+			}
 		}
+
 	}
 
-	@Before({ Tx.class })
-	@TxnKey("batch-sendQueryOrder")
-	public void sendBatchQueryOrder(UnionpayBatchCollection unionpayBatchCollection) {
+	public void batchQuery(UnionpayBatchCollection unionpayBatchCollection) {
+		UnionpayBatchCollectionQuery unionpayBatchCollectionQuery = null;
+		boolean isSaved = false;
 		try {
+			unionpayBatchCollectionQuery = unionpayBatchCollection.buildQueryResult();
+			isSaved = unionpayBatchCollectionQuery.save();
 			unionpayBatchCollection.queryResult();
 			handlingBatchQueryResult(unionpayBatchCollection);
 		} catch (Exception e) {
 			e.printStackTrace();
+
+			if (unionpayBatchCollectionQuery != null) {
+				unionpayBatchCollectionQuery
+						.setExceInfo(JsonKit.toJson(BaseCollectionRuntimeException.getExceptionInfo(e)));
+				if (!isSaved) {
+					unionpayBatchCollectionQuery.save();
+				} else {
+					unionpayBatchCollectionQuery.update();
+				}
+			}
+		} finally {
+			unionpayBatchCollection.setStatus("0");
+			unionpayBatchCollection.setSysQueryId("");
+			unionpayBatchCollection.update();
 		}
 	}
 
-	private boolean handlingBatchQueryResult(UnionpayBatchCollection unionpayBatchCollection) {
+	private boolean handlingBatchQueryResult(UnionpayBatchCollection unionpayBatchCollection) throws Exception {
 		boolean isSuccess = false;
 		try {
 			UnionpayBatchCollectionQuery unionpayBatchCollectionQuery = unionpayBatchCollection.getQuery();
@@ -104,16 +130,16 @@ public class CBatchQuerySrv {
 
 			Integer queryCount = unionpayBatchCollection.getQueryResultCount();
 			unionpayBatchCollection.setQueryResultCount(queryCount == null ? 1 : queryCount + 1);
+			unionpayBatchCollection.setNextAllowQueryDate();
 
 			Date now = new Date();
 			unionpayBatchCollectionQuery.setMat(now);
 			unionpayBatchCollectionQuery.update();
 
 			unionpayBatchCollection.setMat(now);
-			unionpayBatchCollection.update();
 		} catch (Exception e) {
 			isSuccess = false;
-			// throw e;
+			throw e;
 		}
 		return isSuccess;
 	}

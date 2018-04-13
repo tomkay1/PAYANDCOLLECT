@@ -22,13 +22,14 @@ import com.mybank.pc.interceptors.EntrustExceptionInterceptor;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.kits.unionpay.acp.SDKConfig;
+import com.mybank.pc.kits.unionpay.acp.SDKConstants;
 
 public class CEntrustSrv {
 
 	public Kv[] establishAll(Kv kv) {
-		Kv[] result = new Kv[2];
+		Kv[] result = new Kv[3];
 		try {
-			result[0] = this.establish(kv.set("merCode", SDK.MER_CODE_REALTIME));
+			result[0] = this.establish(kv.set("merCode", SDK.MER_CODE_REALTIME_YS_2));
 		} catch (EntrustRuntimeException e) {
 			result[0] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
 		} catch (Exception e) {
@@ -36,11 +37,19 @@ public class CEntrustSrv {
 		}
 
 		try {
-			result[1] = this.establish(kv.set("merCode", SDK.MER_CODE_BATCH));
+			result[1] = this.establish(kv.set("merCode", SDK.MER_CODE_REALTIME_YS_4));
 		} catch (EntrustRuntimeException e) {
 			result[1] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
 		} catch (Exception e) {
 			result[1] = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
+		}
+
+		try {
+			result[2] = this.establish(kv.set("merCode", SDK.MER_CODE_BATCH_CH));
+		} catch (EntrustRuntimeException e) {
+			result[2] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
+		} catch (Exception e) {
+			result[2] = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
 		}
 		return result;
 	}
@@ -82,8 +91,6 @@ public class CEntrustSrv {
 			unionpayEntrust.setExpired(expired);
 			unionpayEntrust.setTradeNo(new SimpleDateFormat("yyyyMMddHHmmssSSS").format(now) + certifId);
 			unionpayEntrust.setOrderId(orderId);
-			unionpayEntrust.setTxnType("72");
-			unionpayEntrust.setTxnSubType("11");
 			unionpayEntrust.setTxnTime(txnTime);
 			unionpayEntrust.setMerchantID(String.valueOf(merchantID));
 			unionpayEntrust.setCat(now);
@@ -91,67 +98,19 @@ public class CEntrustSrv {
 			unionpayEntrust.setOperID(operID);
 
 			SDK sdk = SDK.getSDK(merCode);
-			SDKConfig sdkConfig = sdk.getSdkConfig();
 			AcpService acpService = sdk.getAcpService();
-			String encoding = "UTF-8";
 			String merId = sdk.getMerId();
-
 			unionpayEntrust.setMerId(merId);
 
-			Map<String, String> contentData = new HashMap<String, String>();
+			if (SDK.MER_CODE_REALTIME_YS_2.equals(merCode) || SDK.MER_CODE_REALTIME_YS_4.equals(merCode)) {
+				unionpayEntrust.toRealAuthBack();
+			} else {
+				unionpayEntrust.toEntrust();
+			}
 
-			/*** 银联全渠道系统，产品参数，除了encoding自行选择外其他不需修改 ***/
-			contentData.put("version", sdkConfig.getVersion()); // 版本号
-			contentData.put("encoding", encoding); // 字符集编码 可以使用UTF-8,GBK两种方式
-			contentData.put("signMethod", sdkConfig.getSignMethod()); // 签名方法
-																		// 目前只支持01-RSA方式证书加密
-			contentData.put("txnType", "72"); // 交易类型
-			contentData.put("txnSubType", "11"); // 交易子类型
-			contentData.put("bizType", "000501"); // 业务类型
-			contentData.put("channelType", "07"); // 渠道类型
-
-			/*** 商户接入参数 ***/
-			contentData.put("merId", merId); // 商户号码（商户号码777290058110097仅做为测试调通交易使用，该商户号配置了需要对敏感信息加密）测试时请改成自己申请的商户号，【自己注册的测试777开头的商户号不支持代收产品】
-			contentData.put("accessType", "0"); // 接入类型，商户接入固定填0，不需修改
-			contentData.put("orderId", orderId); // 商户订单号，8-40位数字字母，不能含“-”或“_”，可以自行定制规则
-			contentData.put("txnTime", txnTime); // 订单发送时间，格式为YYYYMMDDhhmmss，必须取当前时间，否则会报txnTime无效
-			contentData.put("accType", "01"); // 账号类型
-
-			// 姓名，证件类型+证件号码至少二选一必送，手机号可选，贷记卡的cvn2,expired可选。
-			Map<String, String> customerInfoMap = new HashMap<String, String>();
-			customerInfoMap.put("certifTp", certifTp); // 证件类型
-			customerInfoMap.put("certifId", certifId); // 证件号码
-			customerInfoMap.put("customerNm", customerNm); // 姓名
-
-			customerInfoMap.put("phoneNo", phoneNo); // 手机号
-			// 当卡号为贷记卡的时候cvn2,expired可选上送
-			customerInfoMap.put("cvn2", cvn2); // 卡背面的cvn2三位数字
-			customerInfoMap.put("expired", expired); // 有效期 年在前月在后
-
-			// 如果商户号开通了【商户对敏感信息加密】的权限那么需要对
-			// accNo，pin和phoneNo，cvn2，expired加密（如果这些上送的话），对敏感信息加密使用：
-			String accNoEnc = acpService.encryptData(accNo, encoding); // 这里测试的时候使用的是测试卡号，正式环境请使用真实卡号
-			contentData.put("accNo", accNoEnc);
-			contentData.put("encryptCertId", acpService.getEncryptCertId()); // 加密证书的certId，配置在acp_sdk.properties文件
-																				// acpsdk.encryptCert.path属性下
-			String customerInfoStr = acpService.getCustomerInfoWithEncrypt(customerInfoMap, null, encoding);
-
-			// 如果商户号未开通【商户对敏感信息加密】权限那么不需对敏感信息加密使用：
-			// contentData.put("accNo", "6216261000000000018");
-			// //这里测试的时候使用的是测试卡号，正式环境请使用真实卡号
-			// String customerInfoStr =
-			// DemoBase.getCustomerInfo(customerInfoMap,null);
-
-			contentData.put("customerInfo", customerInfoStr);
-			unionpayEntrust.setReq(JsonKit.toJson(contentData));
-
-			/** 对请求参数进行签名并发送http post请求，接收同步应答报文 **/
-			Map<String, String> reqData = acpService.sign(contentData, encoding); // 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
-			String requestBackUrl = sdkConfig.getBackRequestUrl(); // 交易请求url从配置文件读取对应属性文件acp_sdk.properties中的
-																	// acpsdk.backTransUrl
-			Map<String, String> rspData = acpService.post(reqData, requestBackUrl, encoding); // 发送请求报文并接受同步应答（默认连接超时时间30秒，读取返回结果超时时间30秒）;这里调用signData之后，调用submitUrl之前不能对submitFromData中的键值对做任何修改，如果修改会导致验签不通过
-			unionpayEntrust.setResp(JsonKit.toJson(rspData));
-			isSuccess = handlingEstablishResult(rspData, acpService, encoding, unionpayEntrust);
+			Map<String, String> entrustRspData = unionpayEntrust.sendEntrustRequest();
+			isSuccess = handlingEstablishResult(entrustRspData, acpService, SDKConstants.UTF_8_ENCODING,
+					unionpayEntrust);
 			return respKv.set("isSuccess", isSuccess);
 		} catch (EntrustRuntimeException e) {
 			throw e;

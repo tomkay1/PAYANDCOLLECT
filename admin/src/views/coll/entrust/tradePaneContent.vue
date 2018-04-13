@@ -4,7 +4,10 @@
             <Col span="24">
             <Card>
                 <Row>
-                    <Col span="24" align="right">
+                    <Col span="8">
+                    <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
+                    </Col>
+                    <Col span="16" align="right">
                     <Select v-model="txnType" style="width: 120px; text-align: center;">
                         <Option v-for="item in txnTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                     </Select>
@@ -52,11 +55,21 @@
                     search: this.searchKey,
                     pn: pn,
                     ps: this.pageSize,
-                    txnType: this.txnType === '0' ? '72' : '74',
-                    txnSubType: this.txnType === '0' ? '11' : '04'
+                    txnType: this.txnType,
                 }
                 this.$store.dispatch('get_entrust_trade_list', param)
-            }
+            },
+            refresh() {
+                let param = {
+                    'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
+                    'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
+                    search: this.searchKey,
+                    pn: this.pageNumber,
+                    ps: this.pageSize,
+                    txnType: this.txnType,
+                }
+                this.$store.dispatch('get_entrust_trade_list', param)
+            },
         },
         mounted() {
             let param = {
@@ -64,8 +77,7 @@
                 'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
                 search: this.searchKey,
                 ps: this.pageSize,
-                txnType: this.txnType === '0' ? '72' : '74',
-                txnSubType: this.txnType === '0' ? '11' : '04'
+                txnType: this.txnType,
             }
             this.$store.dispatch('get_entrust_trade_list', param)
         },
@@ -74,9 +86,13 @@
                 bTime: new Date(),
                 eTime: new Date(),
                 searchKey: '',
-                pageSize: 10,
+                pageSize: 30,
                 txnType: '0',
                 txnTypeList: [
+                    {
+                        value: '',
+                        label: '全部'
+                    },
                     {
                         value: '0',
                         label: '建立委托关系'
@@ -89,44 +105,48 @@
                 tableColums: [
                     {
                         title: '姓名',
-                        key: 'customerNm'
+                        key: 'customerNm',
+                        align: 'center',
                     },
                     {
                         title: '证件号码',
                         key: 'certifId',
+                        align: 'center',
                     },
                     {
                         title: '卡号',
                         key: 'accNo',
+                        align: 'center',
                     },
                     {
                         title: '手机号',
                         key: 'phoneNo',
+                        align: 'center',
                     },
                     {
                         title: '订单号',
                         key: 'orderId',
+                        align: 'center',
                     },
                     {
                         title: '应答码',
                         key: 'respCode',
+                        align: 'center',
                     },
                     {
                         title: '应答信息',
                         key: 'respMsg',
+                        align: 'center',
                     },
                     {
-                        title: '商户类型',
-                        key: 'type',
-                        render: (h, params) => {
-                            const row = params.row;
-                            const type = row.merId === '945230148160197' ? '实时' : '批量';
-                            return h('span', type);
-                        }
+                        title: '商户',
+                        key: 'merId',
+                        align: 'center',
                     },
                     {
                         title: '创建时间',
                         key: 'cat',
+                        align: 'center',
                     }
                 ]
             }

@@ -129,4 +129,17 @@
 	        AND bankcardNo = #para(bankcardNo)
 	    #end
 #end
+#sql("tradeHomePageTotal")
+	SELECT
+		sum(ct.amount) AS currentDayTotalAmount,
+		count(1) AS urrentDayTotalCount,
+		sum(ct.merFee) AS urrentDayTotalMerFee
+	FROM
+		collection_trade ct
+	WHERE 1=1 
+		#if(merchantID)
+	 		AND ct.merchantID =#para(merchantID)
+	 	#end
+	    AND date_format(ct.cat,'%Y%m%d') =#para(dayDate)
+#end
 

@@ -58,6 +58,13 @@ public class UnionpayBatchCollectionBatchno extends BaseUnionpayBatchCollectionB
 		return -1;
 	}
 
+	public static boolean decrementBatchNo(String txnTime, String batchNoToString) {
+		Kv kv = Kv.create();
+		int ibatchNo = Integer.valueOf(batchNoToString);
+		kv.set("txnTime", txnTime).set("batchNo", ibatchNo).set("newBatchNo", ibatchNo - 1);
+		return updateBatchNo(kv) ? true : decrementBatchNo(txnTime);
+	}
+
 	public static boolean decrementBatchNo(String txnTime) {
 		UnionpayBatchCollectionBatchno batchNo = null;
 		Kv kv = Kv.create();

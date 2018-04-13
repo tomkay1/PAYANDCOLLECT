@@ -46,11 +46,16 @@ public class CEntrustCtr extends CoreController {
 		String bTime = getPara("bTime");
 		String eTime = getPara("eTime");
 		String txnType = getPara("txnType");
-		String txnSubType = getPara("txnSubType");
+
+		// 建立委托
+		if ("0".equals(txnType)) {
+			txnType = "72";
+		} else if ("1".equals(txnType)) {// 解除委托
+			txnType = "74";
+		}
 
 		Kv kv = Kv.create();
-		kv.set("search", serach).set("bTime", bTime).set("eTime", eTime).set("txnType", txnType).set("txnSubType",
-				txnSubType);
+		kv.set("search", serach).set("bTime", bTime).set("eTime", eTime).set("txnType", txnType);
 		if (merInfo != null) {
 			kv.set("merchantID", merInfo.getId());
 		}
@@ -85,18 +90,14 @@ public class CEntrustCtr extends CoreController {
 				kv.set("merchantID", merInfo.getId());
 			}
 
-			boolean isSuccess = false;
+			boolean isSuccess = true;
 			Kv respKv = null;
 			if (merCode.equals("all")) {
 				try {
-					respKv = cEntrustSrv.establish(kv.set("merCode", "0"));
-					isSuccess = respKv.getBoolean("isSuccess");
-				} catch (Exception e) {
-					isSuccess = false;
-				}
-				try {
-					respKv = cEntrustSrv.establish(kv.set("merCode", "1"));
-					isSuccess = respKv.getBoolean("isSuccess") && isSuccess;
+					Kv[] resultKvs = cEntrustSrv.establishAll(kv);
+					for (int i = 0; i < resultKvs.length; ++i) {
+						isSuccess = isSuccess && resultKvs[i].getBoolean("isSuccess");
+					}
 				} catch (Exception e) {
 					isSuccess = false;
 				}
