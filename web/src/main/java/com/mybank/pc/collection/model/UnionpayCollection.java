@@ -8,6 +8,7 @@ import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.LogKit;
 import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseUnionpayCollection;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
@@ -193,6 +194,11 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 	public static List<UnionpayCollection> findToBeSentUnionpayCollectionByBatchNo(Kv kv) {
 		SqlPara sqlPara = Db.getSqlPara("collection_batch.findToBeSentUnionpayCollectionByBatchNo", kv);
 		return UnionpayCollection.dao.find(sqlPara);
+	}
+
+	public static Record tradeHomePageTotal(Kv kv) {
+		SqlPara sqlPara = Db.getSqlPara("collection_trade.tradeHomePageTotal", kv);
+		return Db.findFirst(sqlPara);
 	}
 
 	public void resetBatchStatus() {

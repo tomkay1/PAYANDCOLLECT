@@ -158,6 +158,16 @@
                         align: 'center',
                     },
                     {
+                        title: '交易结果码',
+                        key: 'resultCode',
+                        align: 'center',
+                    },
+                    {
+                        title: '交易结果信息',
+                        key: 'resultMsg',
+                        align: 'center',
+                    },
+                    {
                         title: '最终处理结果',
                         key: 'finalCode',
                         render: (h, params) => {

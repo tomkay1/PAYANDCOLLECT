@@ -31,18 +31,22 @@
 	    	AND merId = #para(merId)
 	    #end
 #end
-#sql("findNeedQueryBatchCollection")
-	SELECT ubc.* FROM unionpay_batch_collection ubc WHERE
-		respCode = '00' AND finalCode = '1'
+#sql("updateNeedQueryBatchCollectionPrepare")
+	UPDATE unionpay_batch_collection  ubc SET sysQueryId = #para(sysQueryId) , status = '1' , mat = #para(mat) WHERE 
+	    respCode = '00' AND finalCode = '1'
 		AND (
 			ubc.queryResultCount IS NULL
-			OR ubc.queryResultCount <= 5
+			OR ubc.queryResultCount <= 7
 		)
 		AND round(
 			(
 				UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(IFNULL(nextQueryTime,cat))
 			) / 60
 		) > IF(ISNULL(nextQueryTime), 120, 0)
+#end
+#sql("findNeedQueryBatchCollectionBySysQueryId")
+	SELECT ubc.* FROM unionpay_batch_collection ubc WHERE
+		sysQueryId = #para(sysQueryId)
 #end
 
 

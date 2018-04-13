@@ -3,6 +3,7 @@ package com.mybank.pc.collection.trade;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -23,9 +24,38 @@ import com.mybank.pc.kits.unionpay.acp.file.collection.model.ResponseHead;
 
 public class CBatchQuerySrv {
 
+	public void batchQuery() {
+		int count = 0;
+		List<UnionpayBatchCollection> ubcList = null;
+		Kv kv = Kv.create();
+		Date now = new Date();
+		try {
+			String uuid = UUID.randomUUID().toString();
+			kv.set("sysQueryId", uuid).set("mat", now);
+			count = UnionpayBatchCollection.updateNeedQueryBatchCollectionPrepare(kv);
+			if (count > 0) {
+				ubcList = UnionpayBatchCollection.findNeedQueryBatchCollectionBySysQueryId(kv);
+				for (UnionpayBatchCollection unionpayBatchCollection : ubcList) {
+					batchQuery(unionpayBatchCollection);
+				}
+			}
+		} catch (Exception e) {
+			if (ubcList != null) {
+				for (UnionpayBatchCollection unionpayBatchCollection : ubcList) {
+					try {
+						unionpayBatchCollection.setStatus("0");
+						unionpayBatchCollection.update();
+					} catch (Exception ubce) {
+						ubce.printStackTrace();
+					}
+				}
+			}
+		}
+
+	}
+
 	public void batchQuery(UnionpayBatchCollection unionpayBatchCollection) {
 		UnionpayBatchCollectionQuery unionpayBatchCollectionQuery = null;
-
 		boolean isSaved = false;
 		try {
 			unionpayBatchCollectionQuery = unionpayBatchCollection.buildQueryResult();
@@ -44,9 +74,11 @@ public class CBatchQuerySrv {
 					unionpayBatchCollectionQuery.update();
 				}
 			}
-
+		} finally {
+			unionpayBatchCollection.setStatus("0");
+			unionpayBatchCollection.setSysQueryId("");
+			unionpayBatchCollection.update();
 		}
-
 	}
 
 	private boolean handlingBatchQueryResult(UnionpayBatchCollection unionpayBatchCollection) throws Exception {
@@ -105,7 +137,6 @@ public class CBatchQuerySrv {
 			unionpayBatchCollectionQuery.update();
 
 			unionpayBatchCollection.setMat(now);
-			unionpayBatchCollection.update();
 		} catch (Exception e) {
 			isSuccess = false;
 			throw e;

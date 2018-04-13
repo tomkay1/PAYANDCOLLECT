@@ -202,12 +202,36 @@ public abstract class BaseUnionpayBatchCollection<M extends BaseUnionpayBatchCol
 		return getStr("exceInfo");
 	}
 
+	public void setStatus(java.lang.String status) {
+		set("status", status);
+	}
+
+	public java.lang.String getStatus() {
+		return getStr("status");
+	}
+
+	public void setSysQueryId(java.lang.String sysQueryId) {
+		set("sysQueryId", sysQueryId);
+	}
+
+	public java.lang.String getSysQueryId() {
+		return getStr("sysQueryId");
+	}
+
 	public void setQueryResultCount(java.lang.Integer queryResultCount) {
 		set("queryResultCount", queryResultCount);
 	}
 
 	public java.lang.Integer getQueryResultCount() {
 		return getInt("queryResultCount");
+	}
+
+	public void setNextQueryTime(java.util.Date nextQueryTime) {
+		set("nextQueryTime", nextQueryTime);
+	}
+
+	public java.util.Date getNextQueryTime() {
+		return get("nextQueryTime");
 	}
 
 	public void setCat(java.util.Date cat) {
@@ -224,14 +248,6 @@ public abstract class BaseUnionpayBatchCollection<M extends BaseUnionpayBatchCol
 
 	public java.util.Date getMat() {
 		return get("mat");
-	}
-
-	public void setNextQueryTime(java.util.Date nextQueryTime) {
-		set("nextQueryTime", nextQueryTime);
-	}
-
-	public java.util.Date getNextQueryTime() {
-		return get("nextQueryTime");
 	}
 
 	public void setOperID(java.lang.String operID) {

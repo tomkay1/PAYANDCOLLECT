@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.jfinal.kit.JsonKit;
+import com.jfinal.kit.Kv;
 import com.jfinal.kit.LogKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseUnionpayBatchCollection;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
@@ -155,6 +158,7 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 		// 平台调用相关参数
 		SDK sdk = SDK.getSDK(SDK.MER_CODE_BATCH_CH);
 		String finalCode = "3";// 最终处理结果：0成功 1处理中 2失败 3待初始化
+		String status = "0";// 0 待查询 1 查询中
 
 		UnionpayBatchCollection unionpayBatchCollection = new UnionpayBatchCollection();
 		unionpayBatchCollection.setTxnType(txnType);
@@ -167,6 +171,7 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 		unionpayBatchCollection.setTxnTime(txnTime);
 		unionpayBatchCollection.setQueryResultCount(0);
 		unionpayBatchCollection.setFinalCode(finalCode);
+		unionpayBatchCollection.setStatus(status);
 		unionpayBatchCollection.setCat(now);
 		unionpayBatchCollection.setMat(now);
 
@@ -234,6 +239,16 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 		}
 		calendar.add(Calendar.MINUTE, blankingTime[(queryResultCount - 1) % blankingTime.length]);
 		setNextQueryTime(calendar.getTime());
+	}
+
+	public static int updateNeedQueryBatchCollectionPrepare(Kv kv) {
+		SqlPara sqlPara = Db.getSqlPara("collection_batch.updateNeedQueryBatchCollectionPrepare", kv);
+		return Db.update(sqlPara);
+	}
+
+	public static List<UnionpayBatchCollection> findNeedQueryBatchCollectionBySysQueryId(Kv kv) {
+		SqlPara sqlPara = Db.getSqlPara("collection_batch.findNeedQueryBatchCollectionBySysQueryId", kv);
+		return UnionpayBatchCollection.dao.find(sqlPara);
 	}
 
 	public UnionpayBatchCollectionQuery getQuery() {
