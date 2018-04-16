@@ -131,9 +131,9 @@
 #end
 #sql("tradeHomePageTotal")
 	SELECT
-		sum(ct.amount) AS currentDayTotalAmount,
+		IFNULL(sum(ct.amount),0) AS currentDayTotalAmount,
 		count(1) AS urrentDayTotalCount,
-		sum(ct.merFee) AS urrentDayTotalMerFee
+		IFNULL(sum(ct.merFee),0) AS urrentDayTotalMerFee
 	FROM
 		collection_trade ct
 	WHERE 1=1 

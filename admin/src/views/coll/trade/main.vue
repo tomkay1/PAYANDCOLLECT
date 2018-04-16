@@ -1,25 +1,24 @@
 <template>
     <div>
-        <Tabs>
-            <TabPane label="交易">
+        <tradeContent ref="tc"></tradeContent>
+        <!-- <Tabs>
+            <TabPane label="交易管理">
                 <tradeContent ref="tc"></tradeContent>
             </TabPane>
-            <!-- <TabPane label="客户计划">
-                <merCustContent ref="mcc"></merCustContent>
-            </TabPane> -->
-        </Tabs>
+            <TabPane label="批量交易管理">
+                <batchTradeContent ref="btc"></batchTradeContent>
+            </TabPane>
+        </Tabs> -->
     </div>
 </template>
 
 <script>
     import { mapState } from 'vuex'
     import tradeContent from './tradeContent.vue'
-    import merCustContent from './merCustContent.vue'
 
     export default {
         components: {
             tradeContent: tradeContent,
-            merCustContent: merCustContent
         },
     }
 </script>

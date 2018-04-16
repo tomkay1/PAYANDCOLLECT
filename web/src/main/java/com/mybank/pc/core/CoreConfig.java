@@ -121,14 +121,13 @@ public class CoreConfig extends JFinalConfig{
             }
         });
 
-
-        //清分模块路由
-        routes.add(new Routes() {
-            @Override
-            public void config() {
-                add("/cc", CClearCtr.class);
-            }
-        });
+		// 清分模块路由
+		routes.add(new Routes() {
+			@Override
+			public void config() {
+				add("/cc", CClearCtr.class);
+			}
+		});
         routes.add(new Routes() {
             @Override
             public void config() {

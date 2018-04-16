@@ -1,3 +1,36 @@
+#define ubcHeadColumn()
+	id, txnType, txnSubType, bizType, channelType, accessType, merId, batchNo, txnTime, totalQty, totalAmt, respCode, respMsg, resultCode, resultMsg, finalCode, successAmt, successQty, status, sysQueryId, queryResultCount, nextQueryTime, cat, mat
+#end
+
+#sql("findUnionpayBatchCollectionHeadColumn")
+	SELECT #@ubcHeadColumn?() FROM unionpay_batch_collection WHERE 1=1
+		#if(id)
+	        AND id = #para(id)
+	    #end
+		#if(txnType)
+	        AND txnType = #para(txnType)
+	    #end
+		#if(txnSubType)
+	        AND txnSubType = #para(txnSubType)
+	    #end
+		#if(merId)
+	        AND merId = #para(merId)
+	    #end
+		#if(finalCode)
+	        AND finalCode = #para(finalCode)
+	    #end
+		#if(finalCode)
+	        AND finalCode = #para(finalCode)
+	    #end
+	    #if(bTime)
+	    	AND DATE(cat) >= #para(bTime)
+	    #end
+	    #if(eTime)
+	    	AND DATE(cat) <= #para(eTime)
+	    #end
+		ORDER BY
+			mat DESC,cat DESC
+#end
 #sql("findBatchNo")
 	SELECT * FROM unionpay_batch_collection_batchno  WHERE 1=1
 		#if(txnTime)
