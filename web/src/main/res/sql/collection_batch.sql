@@ -33,7 +33,11 @@
 #end
 #sql("updateNeedQueryBatchCollectionPrepare")
 	UPDATE unionpay_batch_collection  ubc SET sysQueryId = #para(sysQueryId) , status = '1' , mat = #para(mat) WHERE 
-	    respCode = '00' AND finalCode = '1'
+	    respCode = '00' AND finalCode = '1' 
+	    AND (
+	    	status = '0'
+	    	OR status IS NULL
+	    )
 		AND (
 			ubc.queryResultCount IS NULL
 			OR ubc.queryResultCount <= 7
