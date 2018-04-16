@@ -48,8 +48,9 @@ public class HomeCtr extends CoreController {
 		} else {
 			custCount = merchantCustSrv.totalLastCust(null);
 		}
-		Record tradeHomePageTotalRecord = UnionpayCollection.tradeHomePageTotal(
-				Kv.create().set("merchantID", merInfo.getId()).set("dayDate", new DateTime().toString("yyyyMMdd")));
+		Record tradeHomePageTotalRecord = UnionpayCollection
+				.tradeHomePageTotal(Kv.create().set("merchantID", merInfo == null ? "" : merInfo.getId()).set("dayDate",
+						new DateTime().toString("yyyyMMdd")));
 
 		Map map = new HashMap();
 		map.put("amount", tradeHomePageTotalRecord.get("currentDayTotalAmount"));

@@ -14,8 +14,8 @@
                             <Select v-model="finalCode" style="width: 120px; text-align: center;" placeholder="最终处理结果">
                                 <Option v-for="item in finalCodeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                             </Select>
-                            <DatePicker type="date" placeholder="开始日期" style="width: 200px" v-model="bTime" format="yyyy-MM-dd" :clearable="false"></DatePicker>
-                            <DatePicker type="date" placeholder="结束日期" style="width: 200px" v-model="eTime" format="yyyy-MM-dd" :clearable="false"></DatePicker>
+                            <DatePicker type="date" placeholder="开始日期" style="width: 200px" v-model="bTime" format="yyyy-MM-dd" :transfer="true" :clearable="false"></DatePicker>
+                            <DatePicker type="date" placeholder="结束日期" style="width: 200px" v-model="eTime" format="yyyy-MM-dd" :transfer="true" :clearable="false"></DatePicker>
                             <Input v-model="searchKey" placeholder="请输入..." style="width: 200px" />
                             <span @click="search" style="margin: 0 10px;">
                                 <Button type="primary" icon="search">搜索</Button>
@@ -158,29 +158,77 @@
                         align: 'center',
                     },
                     {
-                        title: '交易结果码',
-                        key: 'resultCode',
-                        align: 'center',
-                    },
-                    {
-                        title: '交易结果信息',
-                        key: 'resultMsg',
-                        align: 'center',
-                    },
-                    {
                         title: '最终处理结果',
                         key: 'finalCode',
                         render: (h, params) => {
                             const row = params.row;
                             var finalStatus = '';
+                            var statusType = '';
+                            var color = ''
                             if (row.finalCode === '0') {
                                 finalStatus = '成功'
+                                statusType = 'success'
+                                color = '#19be6b';//绿色
                             } else if (row.finalCode === '1') {
                                 finalStatus = '处理中'
+                                statusType = 'primary'
+                                color = '#2d8cf0';//蓝色
                             } else if (row.finalCode === '2') {
                                 finalStatus = '失败'
+                                statusType = 'error'
+                                color = '#ed3f14';//红色
                             }
-                            return h('span', finalStatus);
+                            return h('Poptip', {
+                                props: {
+                                    trigger: 'hover',
+                                    //title: '结果详情',
+                                    placement: 'top',
+                                    width: '100%'
+                                }
+                            }, [
+                                    h('Button', {
+                                        props: {
+                                            type: statusType,
+                                            //shape: 'circle',
+                                            size: 'small',
+                                            long: true,
+                                            color: color,
+                                        },
+                                        style: {
+                                            width: '80px'
+                                        },
+                                    }, finalStatus),
+                                    h('div', {
+                                        slot: 'content'
+                                    }, [
+                                            h('p', [
+                                                h('span', {
+                                                    style: {
+                                                        'margin-right': '10px',
+                                                    }
+                                                }, '发起交易'),
+                                                h('strong', {
+                                                    style: {
+                                                        'margin-right': '10px',
+                                                    }
+                                                }, row.resCode),
+                                                h('strong', row.resMsg),
+                                            ]),
+                                            h('p', [
+                                                h('span', {
+                                                    style: {
+                                                        'margin-right': '10px',
+                                                    }
+                                                }, '交易结果'),
+                                                h('strong', {
+                                                    style: {
+                                                        'margin-right': '10px',
+                                                    }
+                                                }, row.resultCode),
+                                                h('strong', row.resultMsg),
+                                            ]),
+                                        ])
+                                ]);
                         },
                         align: 'center',
                     },
