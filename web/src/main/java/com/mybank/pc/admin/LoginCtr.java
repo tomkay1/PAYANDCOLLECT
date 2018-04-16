@@ -21,10 +21,7 @@ import com.mybank.pc.kits.CookieKit;
 import com.mybank.pc.kits.ResKit;
 import com.mybank.pc.kits.ext.BCrypt;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by yuhaihui8913 on 2018/1/26. 登录请求 处理
@@ -85,7 +82,7 @@ public class LoginCtr extends CoreController {
             if (user.getStatus().equals(Consts.STATUS.enable.getVal())) {
 
                 Map<String, Object> data = new HashMap<String, Object>();
-                List<Res> resList = Res.dao.findResesByUserId(user.getId());
+                Set<Res> resList = Res.dao.findAllResByUserId(user.getId());
                 data.put("resList", resList);
                 data.put("username", user.getNickname());
                 data.put("loginname", user.getLoginname());

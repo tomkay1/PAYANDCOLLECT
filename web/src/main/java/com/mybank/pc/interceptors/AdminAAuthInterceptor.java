@@ -10,7 +10,10 @@ import com.mybank.pc.core.CoreException;
 import com.mybank.pc.kits.ReqKit;
 import com.mybank.pc.kits.ResKit;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by yuhaihui8913 on 2017/11/16.
@@ -27,11 +30,10 @@ public class AdminAAuthInterceptor implements Interceptor{
         User user=controller.getAttr(Consts.CURR_USER);
         HttpServletRequest request=controller.getRequest();
         boolean flag=false;
-        List<Res> resList=controller.getAttr(Consts.CURR_USER_RESES);
-        for (Res res:resList){
-            if(res.getUrl().equals(ak)){
-                flag=true;
-            }
+        Set<String> resStrs=controller.getAttr(Consts.CURR_USER_RESES);
+
+        if(resStrs.contains(ak)){
+            flag=true;
         }
 
         //是否需要用户身份认证,方便测试
@@ -50,4 +52,16 @@ public class AdminAAuthInterceptor implements Interceptor{
 
 
     }
+
+
+    private void getAllRes(Set<String> allRes,Res res){
+        if (!res.getChildren().isEmpty()){
+            List<Res> children=res.getChildren();
+            for (Res res1:children){
+                allRes.add(res1.getUrl());
+                getAllRes(allRes,res1);
+            }
+        }
+    }
+
 }

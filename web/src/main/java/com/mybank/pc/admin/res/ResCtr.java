@@ -2,12 +2,14 @@ package com.mybank.pc.admin.res;
 
 
 import com.jfinal.aop.Before;
+import com.jfinal.aop.Clear;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.Res;
 import com.mybank.pc.admin.model.RoleRes;
 import com.mybank.pc.core.CoreController;
+import com.mybank.pc.interceptors.AdminAAuthInterceptor;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 
 import java.util.List;
@@ -38,6 +40,7 @@ public class ResCtr extends CoreController {
      * @author: 于海慧  2016/12/5
      * @Description: 树形json数据
      **/
+    @Clear(AdminAAuthInterceptor.class)
     public void listTree() {
         int id = getParaToInt("id",0);
         renderJson(Res.dao.listTree(null));
