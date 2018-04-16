@@ -31,6 +31,7 @@ import com.mybank.pc.admin.user.UserCtr;
 import com.mybank.pc.collection.clear.CClearCtr;
 import com.mybank.pc.collection.entrust.CEntrustCtr;
 import com.mybank.pc.collection.trade.BackRcvResponse;
+import com.mybank.pc.collection.trade.CBatchTradeCtr;
 import com.mybank.pc.collection.trade.CTradeCtr;
 import com.mybank.pc.interceptors.AdminAAuthInterceptor;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
@@ -90,6 +91,7 @@ public class CoreConfig extends JFinalConfig{
             @Override
             public void config() {
             	add("/coll/trade", CTradeCtr.class);
+            	add("/coll/batch", CBatchTradeCtr.class);
 				add("/coll/entrust", CEntrustCtr.class);
 				add("/coll/backRcvResponse", BackRcvResponse.class);
             }
