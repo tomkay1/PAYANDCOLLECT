@@ -523,10 +523,10 @@
             vFeeChange(b) {
                 if (!b) {
                     this.$refs['formFeeValidate'].resetFields()
-                    vm.merFee.tradeType =''
-                    vm.merFee.feeType =''
-                    vm.merFee.amountUpper = null
-                    vm.merFee.amount = null
+                    this.merFee.tradeType =''
+                    this.merFee.feeType =''
+                    this.merFee.amountUpper = null
+                    this.merFee.amount = null
                 }
             },
         },

@@ -99,11 +99,13 @@ export default {
     },
     mounted () {
         this.$store.dispatch('login_merInfo').then((res)=> {
+            let now = new Date().getTime();
+
             this.merInfo = res
-            this.urlCard = consts.devLocation + "/cmn/act04?picid=" + this.merInfo.cardImg;
-            this.urlCardF = consts.devLocation + "/cmn/act04?picid=" + this.merInfo.cardF;
-            this.urlCardZ = consts.devLocation + "/cmn/act04?picid=" + this.merInfo.cardZ;
-            this.urlEWImg = consts.devLocation + "/cmn/act05?merNo=" + this.merInfo.merchantNo;
+            this.urlCard = consts.devLocation + "/cmn/act04?tt="+now+"&picid=" + this.merInfo.cardImg;
+            this.urlCardF = consts.devLocation + "/cmn/act04?tt="+now+"&picid=" + this.merInfo.cardF;
+            this.urlCardZ = consts.devLocation + "/cmn/act04?tt="+now+"&picid=" + this.merInfo.cardZ;
+            this.urlEWImg = consts.devLocation + "/cmn/act05?tt="+now+"&merNo=" + this.merInfo.merchantNo;
         });
     }
 };

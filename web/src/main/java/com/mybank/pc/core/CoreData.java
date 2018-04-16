@@ -22,7 +22,7 @@ public class CoreData {
 
 	public static void loadParam() {
 		List<Param> list = Param.dao.find("select * from " + Param.TABLE);
-
+		CacheKit.removeAll(Consts.CACHE_NAMES.paramCache.name());
         for (Param p : list) {
 
             // RenderManager.me().getEngine().getEngineConfig().addSharedObject(p.getK(),p.getVal());

@@ -175,9 +175,10 @@ public class CMNCtr extends CoreController {
     public void act05(){
         String merNo = getPara("merNo");
         String path =  CacheKit.get(Consts.CACHE_NAMES.paramCache.name(),"siteDomain")+"/mer01/cust?merNo="+merNo;
-        QrCodeRender qrCodeRender  = new  QrCodeRender(path,300,300);
-        qrCodeRender.setContext(getRequest(),getResponse());
-        qrCodeRender.render();
+//        QrCodeRender qrCodeRender  = new  QrCodeRender(path,300,300);
+//        qrCodeRender.setContext(getRequest(),getResponse());
+//        qrCodeRender.render();
+        renderQrCode(path,300,300);
     }
 
 

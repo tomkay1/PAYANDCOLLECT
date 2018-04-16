@@ -90,6 +90,13 @@
                                 <Input v-model="param.clearTime" placeholder="请输入..." style="width: 300px"></Input>
                             </FormItem>
                         </Tab-pane>
+                        <Tab-pane label="金额设置" icon="amt">
+
+                            <FormItem label="交易最小金额">
+                                <Input v-model="param.minAmt" placeholder="请输入..." style="width: 300px"></Input>
+                            </FormItem>
+
+                        </Tab-pane>
                         <Tab-pane label="其他设置" icon="settings">
 
                             <FormItem label="图片上传最大值">
@@ -100,6 +107,7 @@
                             </FormItem>
 
                         </Tab-pane>
+
                     </Tabs>
                     <FormItem>
                     <Button type="success" :loading="buttonLoading" icon="checkmark-round" @click="saveData">
