@@ -15,6 +15,8 @@ import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.jfinal.plugin.activerecord.tx.Tx;
+import com.jfinal.plugin.ehcache.CacheKit;
+import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.CardBin;
 import com.mybank.pc.collection.model.CollectionEntrust;
 import com.mybank.pc.collection.model.CollectionTrade;
@@ -103,15 +105,28 @@ public class CTradeSrv {
 				throw new ValidateCTRException("非法的业务类型[" + bussType + "]");
 			}
 			BigDecimal originaltxnAmt = null;
+			long numTxnAmt = -1;
 			try {
 				originaltxnAmt = new BigDecimal(txnAmt = txnAmt.trim());
-				long numTxnAmt = originaltxnAmt.multiply(new BigDecimal(100)).longValue();
+				numTxnAmt = originaltxnAmt.multiply(new BigDecimal(100)).longValue();
 				if (numTxnAmt < 1) {
 					throw new RuntimeException();
 				}
 				txnAmt = String.valueOf(numTxnAmt);
 			} catch (Exception e) {
 				throw new ValidateCTRException("非法的交易金额[" + txnAmt + "]");
+			}
+			Object miniAmt = CacheKit.get(Consts.CACHE_NAMES.paramCache.name(), "miniAmt");
+			if (miniAmt != null) {
+				try {
+					long numMiniAmt = new BigDecimal(String.valueOf(miniAmt).trim()).multiply(new BigDecimal(100))
+							.longValue();
+					if (numTxnAmt < numMiniAmt) {
+						throw new RuntimeException();
+					}
+				} catch (Exception e) {
+					throw new ValidateCTRException("交易金额不得小于[" + txnAmt + "]");
+				}
 			}
 			if (StringUtils.isBlank(merchantID)) {
 				throw new ValidateCTRException("商户ID不能为空");
