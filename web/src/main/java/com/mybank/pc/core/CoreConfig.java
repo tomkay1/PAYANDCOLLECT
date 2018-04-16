@@ -19,6 +19,7 @@ import com.jfinal.render.JsonRender;
 import com.jfinal.template.Engine;
 import com.mybank.pc.CMNCtr;
 import com.mybank.pc.Consts;
+import com.mybank.pc.IndexCtr;
 import com.mybank.pc.admin.HomeCtr;
 import com.mybank.pc.admin.LoginCtr;
 import com.mybank.pc.admin.art.ArtCtr;
@@ -126,6 +127,12 @@ public class CoreConfig extends JFinalConfig{
             @Override
             public void config() {
                 add("/cc", CClearCtr.class);
+            }
+        });
+        routes.add(new Routes() {
+            @Override
+            public void config() {
+                add("/", IndexCtr.class);
             }
         });
 
