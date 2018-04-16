@@ -119,11 +119,13 @@
                         title: '系统商户号',
                         key: 'merId',
                         align: 'center',
+                        minWidth: 150
                     },
                     {
                         title: '订单发送时间',
                         key: 'txnTime',
                         align: 'center',
+                        minWidth: 150
                     },
                     {
                         title: '批次号',
@@ -193,8 +195,8 @@
                                                     style: {
                                                         'margin-right': '10px',
                                                     }
-                                                }, row.resCode),
-                                                h('strong', row.resMsg),
+                                                }, row.respCode),
+                                                h('strong', row.respMsg),
                                             ]),
                                             h('p', [
                                                 h('span', {
@@ -212,7 +214,7 @@
                                         ])
                                 ]);
                         },
-                        align: 'center',
+                        // align: 'center',
                     },
                     {
                         title: '成功金额',
@@ -228,11 +230,13 @@
                         title: '创建时间',
                         key: 'cat',
                         align: 'center',
+                        minWidth: 150
                     },
                     {
                         title: '修改时间',
                         key: 'mat',
                         align: 'center',
+                        minWidth: 150
                     },
                 ]
             }

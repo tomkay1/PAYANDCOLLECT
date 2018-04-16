@@ -158,13 +158,13 @@
                         title: '商户号',
                         key: 'merNO',
                         fixed: 'left',
-                        width:100
+                        width: 100
                     },
                     {
                         title: '商户名',
                         key: 'merName',
                         fixed: 'left',
-                        width:100
+                        width: 100
                     },
                     {
                         title: '清分流水号',

@@ -125,7 +125,7 @@
                         title: '交易流水号',
                         key: 'tradeNo',
                         align: 'center',
-                        width: '245px',
+                        minWidth: 245,
                     },
                     {
                         title: '交易时间',
