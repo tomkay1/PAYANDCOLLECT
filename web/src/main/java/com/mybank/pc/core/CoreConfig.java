@@ -10,6 +10,7 @@ import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
 import com.jfinal.json.FastJsonFactory;
 import com.jfinal.kit.PathKit;
+import com.jfinal.kit.PropKit;
 import com.jfinal.log.Log4jLogFactory;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.cron4j.Cron4jPlugin;
@@ -17,6 +18,8 @@ import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.plugin.ehcache.EhCachePlugin;
 import com.jfinal.render.JsonRender;
 import com.jfinal.template.Engine;
+import com.jfplugin.mail.MailKit;
+import com.jfplugin.mail.MailPlugin;
 import com.mybank.pc.CMNCtr;
 import com.mybank.pc.Consts;
 import com.mybank.pc.IndexCtr;
@@ -44,6 +47,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by yuhaihui8913 on 2017/11/14.
@@ -185,9 +190,8 @@ public class CoreConfig extends JFinalConfig{
         jFinalPlugin.setDatabase(ResKit.getConfig("mongodb.db"));
         jFinalPlugin.auth(ResKit.getConfig("mongodb.user"),ResKit.getConfig("mongodb.pwd"));
         plugins.add(jFinalPlugin);
-
-
-
+        //mail 插件
+        plugins.add(new MailPlugin(PropKit.use("mail.properties").getProperties()));
 
     }
 
@@ -231,5 +235,7 @@ public class CoreConfig extends JFinalConfig{
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+
+
     }
 }

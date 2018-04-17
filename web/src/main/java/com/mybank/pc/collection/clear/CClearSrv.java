@@ -2,10 +2,13 @@ package com.mybank.pc.collection.clear;
 
 import com.jfinal.aop.Before;
 import com.jfinal.kit.LogKit;
+import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.jfinal.plugin.activerecord.tx.Tx;
+import com.jfinal.render.RenderManager;
+import com.jfplugin.mail.MailKit;
 import com.mybank.pc.Consts;
 import com.mybank.pc.collection.model.CollectionClear;
 import com.mybank.pc.collection.model.CollectionCleartotle;
@@ -15,9 +18,7 @@ import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.merchant.model.MerchantInfo;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class CClearSrv  {
 
@@ -144,6 +145,22 @@ public class CClearSrv  {
             updateTradeClearStatus(collectionClear1.getMerID(), collectionClear1.getId(), date);
 
         }
+
+        LogKit.info("发送清分邮件开始===================================");
+        Map<String,Object> map=new HashMap<>();
+        for(CollectionClear cc : collectionClears){
+            map.put("merName",cc.getMerName());
+            map.put("clearData",DateKit.dateToStr(cc.getClearTime(),DateKit.yyyy_MM_dd));
+            map.put("tradeCount",cc.getTradeCount());
+            map.put("amountSum",cc.getAmountSum());
+            map.put("amountFeeSum",cc.getAmountFeeSum());
+            map.put("amountOff",cc.getAmountOff());
+            merchantInfo=MerchantInfo.dao.findById(cc.getMerID());
+            MailKit.send(merchantInfo.getEmail(),null,(String)map.get("clearData")+"清分数据", RenderManager.me().getEngine().getTemplate("/WEB-INF/template/common/mail.html").renderToString(map));
+        }
+        LogKit.info("发送清分邮件结束====================================");
+
+
         LogKit.info("每日清分处理结束，一共处理了:" + collectionClears.size() + "个商户的清分数据");
     }
 

@@ -126,6 +126,10 @@
 			<groupId>com.google.zxing</groupId>
 			<artifactId>javase</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>cn.fsdev</groupId>
+			<artifactId>jfinal-mail-plugin</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>mybank-pc</finalName>

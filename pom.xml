@@ -181,6 +181,11 @@
                 <artifactId>javase</artifactId>
                 <version>${zxing4javase.version}</version>
             </dependency>
+            <dependency>
+                <groupId>cn.fsdev</groupId>
+                <artifactId>jfinal-mail-plugin</artifactId>
+                <version>3.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -1,0 +1,34 @@
+<style>
+    table {
+        width: 100%;
+        font-size: .938em;
+        border-collapse: collapse;/*边框会合并为一个单一的边框*/
+    }
+
+    th {
+        text-align: left;
+        padding: .5em .5em;
+        font-weight: bold;
+        background: #66677c;color: #fff;
+    }
+
+    td {
+        padding: .5em .5em;
+        border-bottom: solid 1px #ccc;
+    }
+
+    table,table tr th, table tr td { border:1px solid #0094ff; }/*设置边框的*/
+</style>
+商户：#(merName) 您好。系统邮件，无须回复！<br>
+<table >
+    <thead>
+    <tr>
+        <th>清分日期</th><th>交易笔数</th><th>交易金额</th><th>手续费</th><th>出账金额</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>#(clearData)</td><td>#(tradeCount)</td><td>#(amountSum)</td><td>#(amountFeeSum)</td><td>#(amountOff)</td>
+    </tr>
+    </tbody>
+</table>
