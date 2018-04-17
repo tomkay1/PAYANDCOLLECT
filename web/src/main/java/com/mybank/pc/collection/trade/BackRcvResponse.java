@@ -10,6 +10,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.jfinal.aop.Clear;
+import com.mybank.pc.interceptors.AdminAAuthInterceptor;
+import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import org.apache.commons.io.IOUtils;
 
 import com.jfinal.aop.Duang;
@@ -39,7 +42,7 @@ import com.mybank.pc.kits.unionpay.acp.SDKConstants;
  * 为保证安全，涉及资金类的交易，收到通知后请再发起查询接口确认交易成功。不涉及资金的交易可以以通知接口respCode=00判断成功。
  * 未收到通知时，查询接口调用时间点请参照此FAQ：https://open.unionpay.com/ajweb/help/faq/list?id=77&level=0&from=0
  */
-
+@Clear(AdminIAuthInterceptor.class)
 public class BackRcvResponse extends CoreController {
 
 	private CTradeSrv cTradeSrv = Duang.duang(CTradeSrv.class);

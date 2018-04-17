@@ -2,7 +2,7 @@ import env from '../../build/env';
 let consts={
 
 }
-consts.devLocation=(env == 'development' ? 'http://localhost:8082' : '')
+consts.devLocation=(env == 'development' ? 'http://localhost:8082' : 'https://pac.mybank.cc')
 consts.env=(env == 'development' ? '/api' : '');
 consts.imgUploadUrl=(env == 'development' ? '/api' : '') + '/cmn/act01'
 consts.editBtn=(vm,h,param)=>{

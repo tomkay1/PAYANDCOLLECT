@@ -477,7 +477,7 @@ public class CClearCtr extends CoreController {
         }
         ExcelWriter writer = ExcelUtil.getWriter();
         List<Map> excelList=new ArrayList<>();
-        collectionClearToExcelData(list,excelList);
+        collectionClearToExcelData4Mer(list,excelList);
         writer.merge(11,excelTitle);
         Map<String, String> alias = new HashMap<>();
         alias.put("clearNo", "清分流水号");
@@ -504,7 +504,7 @@ public class CClearCtr extends CoreController {
         writer.writeCellValue(5,r,collectionClear.getAmountFeeSum().toString());
         writer.writeCellValue(6,r,collectionClear.getAccountFee().toString());
         writer.writeCellValue(7,r,collectionClear.getTradeFee().toString());
-        writer.writeCellValue(9,r,collectionClear.getAmountOff().toString());
+        writer.writeCellValue(8,r,collectionClear.getAmountOff().toString());
 
         String fileFolder="qfmx/"+DateKit.dateToStr(new Date(),DateKit.yyyy_MM_dd)+"/";
         File file=FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() +fileFolder);
@@ -550,6 +550,38 @@ public class CClearCtr extends CoreController {
             map.put("bankFee",collectionClear.getBankFee()!=null?collectionClear.getBankFee().toString():"0");
             map.put("amountOff",collectionClear.getAmountOff()!=null?collectionClear.getAmountOff().toString():"0");
             map.put("profit",collectionClear.getProfit());//利润
+            map.put("clearTime",DateKit.dateToStr(collectionClear.getClearTime(),DateKit.format4Login));
+            map.put("chargeAt",DateKit.dateToStr(collectionClear.getChargeAt(),DateKit.format4Login));
+            map.put("chargeOffTradeNo",collectionClear.getChargeOffTradeNo());
+
+            ret.add(map);
+        }
+
+
+    }
+
+    /**
+     *
+     * Excel 辅助数据转换方法 collectionClear
+     *
+     * @param list
+     * @param ret
+     */
+    private void collectionClearToExcelData4Mer(List<CollectionClear> list,List<Map> ret){
+        Map<String,String> map=null;
+        for (CollectionClear collectionClear:list){
+            map=new LinkedHashMap<>();
+            map.put("clearNo",collectionClear.getClearNo());
+            map.put("merNo",collectionClear.getMerNO());
+            map.put("merName",collectionClear.getMerName());
+            map.put("tradeCount",collectionClear.getTradeCount()!=null?collectionClear.getTradeCount().toString():"0");
+            map.put("amountSum",collectionClear.getAmountSum()!=null?collectionClear.getAmountSum().toString():"0");
+            map.put("amountFeeSum",collectionClear.getAmountFeeSum()!=null?collectionClear.getAmountFeeSum().toString():"0");
+            map.put("accountFee",collectionClear.getAccountFee()!=null?collectionClear.getAccountFee().toString():"0");
+            map.put("tradeFee",collectionClear.getTradeFee()!=null?collectionClear.getTradeFee().toString():"0");
+//            map.put("bankFee",collectionClear.getBankFee()!=null?collectionClear.getBankFee().toString():"0");
+            map.put("amountOff",collectionClear.getAmountOff()!=null?collectionClear.getAmountOff().toString():"0");
+//            map.put("profit",collectionClear.getProfit());//利润
             map.put("clearTime",DateKit.dateToStr(collectionClear.getClearTime(),DateKit.format4Login));
             map.put("chargeAt",DateKit.dateToStr(collectionClear.getChargeAt(),DateKit.format4Login));
             map.put("chargeOffTradeNo",collectionClear.getChargeOffTradeNo());

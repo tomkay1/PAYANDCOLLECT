@@ -38,7 +38,7 @@
     import {mapState} from 'vuex'
     import dateKit from '../../libs/date'
     import Input from "iview/src/components/input/input";
-
+    import consts from '../../libs/consts'
     export default {
         computed: {
             ...mapState({
@@ -77,7 +77,7 @@
 
                     {
                         title: '清分日期',
-                        key: 'clearDateTxt',
+                        key: 'clearTimeTxt',
                     },
                     {
                         title: '交易笔数',
@@ -103,10 +103,10 @@
                         title: '交易抵扣手续费金额',
                         key: 'tradeFee',
                     },
-                    {
-                        title: '出账金额',
-                        key: 'chargeOff',
-                    },
+                    // {
+                    //     title: '出账金额',
+                    //     key: 'chargeOff',
+                    // },
                     {
                         title: '出账时间',
                         key: 'chargeAtTxt',
@@ -148,7 +148,7 @@
                 }
                 this.$store.dispatch("cc_list_export_4mer", param).then((res)=>{
                     if(res&&res.resCode&&res.resCode=='success'){
-                        let url=res.resData;
+                        let url=consts.devLocation+'/cmn/act02?ePath='+res.resData;
                         window.open(url,'_blank')
                     }else if(res&&res.resCode&&res.resCode=='fail'){
                         // this.$Message.success("导出失败>>"+res.resMsg);
