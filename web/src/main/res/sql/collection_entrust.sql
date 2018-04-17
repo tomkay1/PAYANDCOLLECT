@@ -57,4 +57,35 @@
 	        AND merId = #para(merId)
 	    #end
 #end
-
+#sql("findUnionpayOne")
+	SELECT ue.* FROM unionpay_entrust ue WHERE 1=1
+		#if(version)
+	        AND version = #para(version)
+	    #end
+	    #if(txnType)
+	        AND txnType = #para(txnType)
+	    #end
+	    #if(txnSubType)
+	        AND txnSubType = #para(txnSubType)
+	    #end
+	    #if(accNo)
+	        AND accNo = #para(accNo)
+	    #end
+	    #if(customerNm)
+	        AND customerNm = #para(customerNm)
+	    #end
+	    #if(certifId)
+	        AND certifId = #para(certifId)
+	    #end
+	    #if(phoneNo)
+	        AND phoneNo = #para(phoneNo)
+	    #end
+	    #if(merId)
+	        AND merId = #para(merId)
+	    #end
+	    #if(finalCode)
+	        AND finalCode = #para(finalCode)
+	    #end
+	    ORDER BY mat DESC
+       LIMIT 1
+#end

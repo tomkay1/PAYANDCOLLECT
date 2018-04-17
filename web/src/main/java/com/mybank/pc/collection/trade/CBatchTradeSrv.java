@@ -136,6 +136,30 @@ public class CBatchTradeSrv {
 				// 其他应答码为失败请排查原因
 				unionpayBatchCollection.setFinalCode("2");// 失败
 				isSuccess = false;
+
+				// 重复交易
+				if ("12".equals(respCode)) {
+					if (CollectionUtils.isNotEmpty(toBeSentOrder)) {
+						for (UnionpayCollection unionpayCollection : toBeSentOrder) {
+							unionpayCollection.setStatus("0");// 待发送
+							unionpayCollection.setRespCode(respCode);
+							unionpayCollection.setRespMsg(respMsg);
+							unionpayCollection.setMat(now);
+							unionpayCollection.update();
+						}
+					}
+				} else {
+					if (CollectionUtils.isNotEmpty(toBeSentOrder)) {
+						for (UnionpayCollection unionpayCollection : toBeSentOrder) {
+							unionpayCollection.setFinalCode("2");// 失败
+							unionpayCollection.setRespCode(respCode);
+							unionpayCollection.setRespMsg(respMsg);
+							unionpayCollection.setMat(now);
+							unionpayCollection.update();
+						}
+					}
+				}
+
 			}
 
 			unionpayBatchCollection.setMat(now);

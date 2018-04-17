@@ -214,7 +214,7 @@
                                         ])
                                 ]);
                         },
-                        // align: 'center',
+                        align: 'center',
                     },
                     {
                         title: '成功金额',

@@ -55,7 +55,6 @@ export default {
 
         //页面加载时或数据方法
         this.$axios.post('/home/total').then((res) => {
-
             this.amount=res.amount;
             this.custCount=res.custCount;
             this.tradeCount=res.tradeCount;
@@ -69,7 +68,6 @@ export default {
             custCount:0,
             tradeCount:0,
             feeAmount:0,
-
         }
     },
 };

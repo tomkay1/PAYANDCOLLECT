@@ -89,7 +89,8 @@ export default {
                 let endVal = res.val;
                 this.unit = res.unit;
                 let demo = {};
-                this.demo = demo = new CountUp(this.idName, this.startVal, endVal, this.decimals, this.duration, this.options);
+                let decimals=(Number.isInteger(endVal)||this.unit!=='')?this.decimals:2;
+                this.demo = demo = new CountUp(this.idName, this.startVal, endVal, decimals, this.duration, this.options);
                 if (!demo.error) {
                     demo.start();
                 }

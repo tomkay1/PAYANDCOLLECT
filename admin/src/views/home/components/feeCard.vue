@@ -2,7 +2,7 @@
 
 <template>
     <Row :gutter="10">
-        <Col span="24" style="marginBottom: '10px">
+        <Col span="24" style="margin-bottom: '10px">
             <Card>
                 <Row >
                     <Col :xs="24" :sm="12" :md="12"  align="center" class="feeCol">
