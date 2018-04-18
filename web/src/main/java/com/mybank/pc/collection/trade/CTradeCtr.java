@@ -2,6 +2,8 @@ package com.mybank.pc.collection.trade;
 
 import java.util.ArrayList;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.jfinal.aop.Duang;
 import com.jfinal.core.ActionKey;
 import com.jfinal.kit.Kv;
@@ -71,7 +73,8 @@ public class CTradeCtr extends CoreController {
 			kv.set("search", serach).set("merchantID", merInfo.getId());
 
 			SqlPara sqlPara = Db.getSqlPara("collection_trade.findMerchantCustListPage", kv);
-			renderJson(MerchantCust.dao.find(sqlPara));
+			renderJson(JSON.toJSONString(MerchantCust.dao.find(sqlPara),
+					SerializerFeature.DisableCircularReferenceDetect));
 		}
 	}
 

@@ -7,12 +7,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.LogKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseUnionpayBatchCollection;
+import com.mybank.pc.exception.ValidateUnionpayRespException;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.kits.unionpay.acp.SDKConfig;
@@ -101,24 +104,29 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 	}
 
 	public boolean validateBatchOrderResp() {
-		SDK sdk = SDK.getByMerId(getMerId());
-		AcpService acpService = sdk.getAcpService();
+		try {
+			SDK sdk = SDK.getByMerId(getMerId());
+			AcpService acpService = sdk.getAcpService();
 
-		boolean isEmpty = batchRspData.isEmpty();
-		boolean isValidate = acpService.validate(batchRspData, SDKConstants.UTF_8_ENCODING);
+			boolean isEmpty = batchRspData.isEmpty();
+			boolean isValidate = acpService.validate(batchRspData, SDKConstants.UTF_8_ENCODING);
 
-		// 未返回正确的http状态
-		if (isEmpty) {
-			LogKit.error("未获取到返回报文或返回http状态码非200");
-			throw new RuntimeException("未获取到返回报文或返回http状态码非200");
+			// 未返回正确的http状态
+			if (isEmpty) {
+				LogKit.error("未获取到返回报文或返回http状态码非200");
+				throw new RuntimeException("未获取到返回报文或返回http状态码非200");
+			}
+			if (isValidate) {
+				LogKit.info("验证签名成功");
+			} else {
+				LogKit.error("验证签名失败");
+				throw new RuntimeException("验证签名失败");
+			}
+
+			return isValidate;
+		} catch (Exception e) {
+			throw new ValidateUnionpayRespException(e);
 		}
-		if (isValidate) {
-			LogKit.info("验证签名成功");
-		} else {
-			LogKit.error("验证签名失败");
-			throw new RuntimeException("验证签名失败");
-		}
-		return isValidate;
 	}
 
 	public UnionpayBatchCollectionQuery buildQueryResult() {
@@ -147,7 +155,8 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 		return this.query.queryResult();
 	}
 
-	public static UnionpayBatchCollection buildUnionpayBatchCollection(Date now, String txnTime, String batchNo) {
+	public static UnionpayBatchCollection buildUnionpayBatchCollection(Date now, String txnTime, String batchNo,
+			List<UnionpayCollection> toBeSentOrder) {
 		// 银联调用相关参数
 		String txnType = "21"; // 交易类型
 		String txnSubType = "02"; // 交易子类型
@@ -174,6 +183,10 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 		unionpayBatchCollection.setStatus(status);
 		unionpayBatchCollection.setCat(now);
 		unionpayBatchCollection.setMat(now);
+
+		if (CollectionUtils.isNotEmpty(toBeSentOrder)) {
+			unionpayBatchCollection.claimToBeSentOrder(toBeSentOrder);
+		}
 
 		return unionpayBatchCollection;
 	}

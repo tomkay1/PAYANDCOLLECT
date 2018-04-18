@@ -204,9 +204,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 	public void resetBatchStatus() {
 		setBatchNo("");
 		setTxnTime("");
-		if ("1".equals(getStatus())) {
-			setStatus("0");
-		}
+		setStatus("0");
 	}
 
 	public Map<String, String> getRealtimeReqData() {
