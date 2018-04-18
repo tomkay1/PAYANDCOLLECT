@@ -46,7 +46,7 @@
                 <Icon type="information-circled"></Icon>
                 <span>发起确认</span>
             </p>
-            <div style="height: 235px;font-size: 1.2em; padding-left:20px;">
+            <div style="height: 200px;font-size: 1.2em; padding-left:20px;">
                 <div>
                     <span style="font-size: 1.5em;">{{custNameForSelected}}</span>
                     <span style="font-size: 1.5em; margin-left:5px; color:#ccc">{{cardIDForSelected}}</span>
@@ -67,19 +67,13 @@
                         </div>
                     </div>
                 </div>
-                <div style="margin-top: 10px;">
+                <div style="margin-top: 20px;">
                     <span>交易金额</span>
                     <span style="font-size: 1.8em; color: rgb(220, 147, 135); margin-left: 5px;">
                         <span>{{trade.txnAmt}}</span>
                     </span>
                     <span style="margin-left:5px;">({{bussTypeToString}})</span>
-                </div>
-                <div style="margin-top: 5px;">
-                    <span>银行手续费</span>
-                    <span style="font-size: 1.8em; color: rgb(220, 147, 135); margin-left: 5px;">
-                        <span>{{collectionTrade.bankFee}}</span>
-                    </span>
-                    <span style="margin-left:30px">商户手续费</span>
+                    <span style="margin-left:45px">商户手续费</span>
                     <span style="font-size: 1.8em; color: rgb(220, 147, 135); margin-left: 5px;">
                         <span>{{collectionTrade.merFee}}</span>
                     </span>
@@ -203,15 +197,17 @@
                 this.modalLoading = true;
                 this.$refs['formValidate'].validate((valid) => {
                     if (valid) {
-                        this.addConfirmModal = true;
                         this.$axios.post('/coll/trade/fee', this.trade).then((res) => {
                             this.feeResult = res
                             this.collectionTrade = this.feeResult.collectionTrade;
                             if (this.feeResult.errorMessage) {
+                                this.modalLoading = false;
                                 this.$Message.error({
                                     content: this.feeResult.errorMessage,
                                     duration: 5
                                 });
+                            }else{
+                                this.addConfirmModal = true;
                             }
                         });
                     } else {
