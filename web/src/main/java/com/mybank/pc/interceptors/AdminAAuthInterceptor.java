@@ -53,15 +53,4 @@ public class AdminAAuthInterceptor implements Interceptor{
 
     }
 
-
-    private void getAllRes(Set<String> allRes,Res res){
-        if (!res.getChildren().isEmpty()){
-            List<Res> children=res.getChildren();
-            for (Res res1:children){
-                allRes.add(res1.getUrl());
-                getAllRes(allRes,res1);
-            }
-        }
-    }
-
 }
