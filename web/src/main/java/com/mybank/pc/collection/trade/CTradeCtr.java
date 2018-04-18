@@ -75,6 +75,31 @@ public class CTradeCtr extends CoreController {
 		}
 	}
 
+	@ActionKey("/coll/trade/fee")
+	public void fee() {
+		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
+		String operID = CookieKit.get(this, Consts.USER_ACCESS_TOKEN);
+
+		String bussType = getPara("bussType");
+		String accNo = getPara("accNo");
+		String txnAmt = getPara("txnAmt");
+		String custID = getPara("custID");
+		String merchantID = merInfo == null ? getPara("merchantID") : String.valueOf(merInfo.getId());
+
+		Kv kv = Kv.create();
+		kv.set("bussType", bussType).set("accNo", accNo).set("txnAmt", txnAmt).set("custID", custID)
+				.set("merchantID", merchantID).set("operID", operID);
+
+		Kv initiateRequest = null;
+		try {
+			initiateRequest = cCTradeSrvSrv.validateRequestAndGetFee(kv);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		renderJson(initiateRequest);
+	}
+
 	@ActionKey("/coll/trade/initiate")
 	public void initiate() {
 		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);

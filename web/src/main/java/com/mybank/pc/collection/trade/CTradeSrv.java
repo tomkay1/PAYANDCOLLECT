@@ -70,15 +70,117 @@ public class CTradeSrv {
 		return isSuccess;
 	}
 
+	public Kv validateRequestAndGetFee(Kv kv) {
+		String merchantFeeTradeType = null;// 商户手续费交易类型 1加急 2标准
+
+		Kv result = Kv.create();
+		boolean isValidate = false;
+
+		CollectionTrade collectionTrade = new CollectionTrade();
+		try {
+			String bussType = kv.getStr("bussType");
+			String accNo = kv.getStr("accNo");
+			String txnAmt = kv.getStr("txnAmt");
+			String custID = kv.getStr("custID");
+			String merchantID = kv.getStr("merchantID");
+
+			if (StringUtils.isBlank(bussType) || (!(bussType = bussType.trim()).equals("1") && !bussType.equals("2"))) {
+				throw new ValidateCTRException("非法的业务类型[" + bussType + "]");
+			}
+			BigDecimal originaltxnAmt = null;
+			long numTxnAmt = -1;
+			try {
+				originaltxnAmt = new BigDecimal(txnAmt = txnAmt.trim());
+				numTxnAmt = originaltxnAmt.multiply(new BigDecimal(100)).longValue();
+				if (numTxnAmt < 1) {
+					throw new RuntimeException();
+				}
+				txnAmt = String.valueOf(numTxnAmt);
+			} catch (Exception e) {
+				throw new ValidateCTRException("非法的交易金额[" + txnAmt + "]");
+			}
+			Object minAmt = CacheKit.get(Consts.CACHE_NAMES.paramCache.name(), "minAmt");
+			if (minAmt != null) {
+				try {
+					long numMiniAmt = new BigDecimal(String.valueOf(minAmt).trim()).multiply(new BigDecimal(100))
+							.longValue();
+					if (numTxnAmt < numMiniAmt) {
+						throw new RuntimeException();
+					}
+				} catch (Exception e) {
+					throw new ValidateCTRException("交易金额不得小于[" + minAmt + "]");
+				}
+			}
+			if (StringUtils.isBlank(merchantID)) {
+				throw new ValidateCTRException("商户ID不能为空");
+			}
+			MerchantInfo merchantInfo = MerchantInfo.dao.findById(merchantID = merchantID.trim());
+			if (merchantInfo == null || "1".equals(merchantInfo.getStatus()) || merchantInfo.getDat() != null) {
+				throw new ValidateCTRException("商户[" + merchantID + "]" + "不存在或已停用/已删除");
+			}
+			if (StringUtils.isBlank(custID)) {
+				throw new ValidateCTRException("客户ID不能为空");
+			}
+			MerchantCust merchantCust = MerchantCust.dao.findById(custID = custID.trim());
+			if (merchantCust == null || merchantCust.getDat() != null) {
+				throw new ValidateCTRException("客户[" + custID + "]" + "不存在或已删除");
+			}
+			if (StringUtils.isBlank(accNo) && StringUtils.isBlank(accNo = merchantCust.getBankcardNo())) {
+				throw new ValidateCTRException("账号不能为空");
+			}
+			CardBin cardBin = FeeKit.getCardBin(accNo = accNo.trim());
+			if (cardBin == null) {
+				throw new ValidateCTRException("不支持的卡类型!!");
+			}
+			boolean isRealtimeBuss = "1".equals(bussType) ? true : false;
+
+			String merId = null;
+			if (isRealtimeBuss) {// 加急
+				if (Long.valueOf(txnAmt) > 500000) {
+					merId = SDK.getSDK(SDK.MER_CODE_REALTIME_YS_4).getMerId();
+				} else {
+					merId = SDK.getSDK(SDK.MER_CODE_REALTIME_YS_2).getMerId();
+				}
+				merchantFeeTradeType = "1";
+			} else if ("2".equals(bussType)) {// 批量
+				merId = SDK.getSDK(SDK.MER_CODE_BATCH_CH).getMerId();
+				merchantFeeTradeType = "2";
+			}
+
+			CollectionEntrust query = new CollectionEntrust();
+			query.setAccNo(accNo);
+			query.setMerId(merId);
+			CollectionEntrust collectionEntrust = query.findOne();
+			if (collectionEntrust == null || !"0".equals(collectionEntrust.getStatus())) {
+				throw new ValidateCTRException("客户委托信息不存在或未处于已委托状态");
+			}
+
+			// 银行手续费
+			collectionTrade.setBankFee(FeeKit.getBankFeeByYuan(originaltxnAmt, cardBin, merId));
+			// 商户手续费
+			if ("2".equals(merchantInfo.getMerchantType())) {// 外部商户
+				collectionTrade.setMerFee(
+						FeeKit.getMerchantFee(originaltxnAmt, Integer.valueOf(merchantID), merchantFeeTradeType));
+			} else if ("1".equals(merchantInfo.getMerchantType())) {// 内部商户
+				collectionTrade.setMerFee(new BigDecimal(0));
+			}
+
+			isValidate = true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			isValidate = false;
+			result.set("errorMessage", e.getMessage());
+			result.set("exception", e);
+		} finally {
+			result.set("isValidate", isValidate);
+			result.set("collectionTrade", collectionTrade);
+		}
+		return result;
+	}
+
 	public Kv validateAndBuildInitiateRequest(Kv kv) {
 		// 银联调用相关参数
 		String txnType = null; // 交易类型
-		// String txnSubType = "02"; // 交易子类型
-		// String currencyCode = "156"; // 交易币种（境内商户一般是156 人民币）
-		// String channelType = "07";// 渠道类型
-		// String accessType = "0";// 接入类型，商户接入固定填0，不需修改
-		// String bizType = "000501";// 业务类型
-		// String accType = "01";// 账号类型
 
 		// 平台调用相关参数
 		SDK sdk = null;
@@ -116,16 +218,16 @@ public class CTradeSrv {
 			} catch (Exception e) {
 				throw new ValidateCTRException("非法的交易金额[" + txnAmt + "]");
 			}
-			Object miniAmt = CacheKit.get(Consts.CACHE_NAMES.paramCache.name(), "miniAmt");
-			if (miniAmt != null) {
+			Object minAmt = CacheKit.get(Consts.CACHE_NAMES.paramCache.name(), "minAmt");
+			if (minAmt != null) {
 				try {
-					long numMiniAmt = new BigDecimal(String.valueOf(miniAmt).trim()).multiply(new BigDecimal(100))
+					long numMiniAmt = new BigDecimal(String.valueOf(minAmt).trim()).multiply(new BigDecimal(100))
 							.longValue();
 					if (numTxnAmt < numMiniAmt) {
 						throw new RuntimeException();
 					}
 				} catch (Exception e) {
-					throw new ValidateCTRException("交易金额不得小于[" + txnAmt + "]");
+					throw new ValidateCTRException("交易金额不得小于[" + minAmt + "]");
 				}
 			}
 			if (StringUtils.isBlank(merchantID)) {
@@ -152,7 +254,7 @@ public class CTradeSrv {
 			boolean isRealtimeBuss = "1".equals(bussType) ? true : false;
 			String merId = null;
 			if (isRealtimeBuss) {// 加急
-				if (Integer.valueOf(txnAmt) > 500000) {
+				if (Long.valueOf(txnAmt) > 500000) {
 					sdk = SDK.getSDK(SDK.MER_CODE_REALTIME_YS_4);
 				} else {
 					sdk = SDK.getSDK(SDK.MER_CODE_REALTIME_YS_2);

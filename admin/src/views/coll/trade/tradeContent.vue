@@ -148,9 +148,20 @@
                         align: 'center',
                     },
                     {
+                        title: '银行手续费',
+                        key: 'bankFee',
+                        align: 'center',
+                    },
+                    {
+                        title: '商户手续费',
+                        key: 'merFee',
+                        align: 'center',
+                    },
+                    {
                         title: '身份证号',
                         key: 'cardID',
                         align: 'center',
+                        minWidth: 160,
                     },
                     {
                         title: '客户姓名',
@@ -230,7 +241,8 @@
                                         ])
                                 ]);
                         },
-                        align: 'center',
+                        // align: 'center',
+                        minWidth: 120,
                     },
                     {
                         title: '清分状态',

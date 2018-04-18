@@ -33,10 +33,10 @@ const collTrade = {
         collTrade_set: function ({ commit, state }, param) {
             commit('collTrade_set', param);
         },
-        trade_save: function ({ commit, state }) {
+        trade_save: function ({ commit, state }, param) {
             let vm = this._vm;
             return new Promise(function (resolve, reject) {
-                vm.$axios.post('/coll/trade/initiate', state.collTrade).then((res) => {
+                vm.$axios.post('/coll/trade/initiate', param).then((res) => {
                     resolve(res.resCode);
                 });
             });

@@ -108,12 +108,70 @@ public class CEntrustSrv {
 				unionpayEntrust.toEntrust();
 			}
 
+			// 如果存在成功实名认证/建立委托调用记录则直接处理
+			try {
+				UnionpayEntrust tmpUnionpayEntrust = unionpayEntrust.findSuccessOne();
+				if (tmpUnionpayEntrust != null) {
+					isSuccess = handlingSuccessCase(tmpUnionpayEntrust);
+					respKv.set("unionpayEntrust", tmpUnionpayEntrust);
+					return respKv.set("isSuccess", isSuccess);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 			Map<String, String> entrustRspData = unionpayEntrust.sendEntrustRequest();
 			isSuccess = handlingEstablishResult(entrustRspData, acpService, SDKConstants.UTF_8_ENCODING,
 					unionpayEntrust);
 			return respKv.set("isSuccess", isSuccess);
 		} catch (EntrustRuntimeException e) {
 			throw e;
+		} catch (Exception e) {
+			EntrustRuntimeException xe = new EntrustRuntimeException(e);
+			xe.setContext(unionpayEntrust);
+			throw xe;
+		}
+	}
+
+	/**
+	 * 存在成功的实名认证/建立委托调用记录，直接更新委托状态
+	 * 
+	 * @param unionpayEntrust
+	 * @return
+	 */
+	private boolean handlingSuccessCase(UnionpayEntrust unionpayEntrust) {
+		boolean result = true;
+		try {
+			CollectionEntrust query = new CollectionEntrust();
+			query.setCustomerNm(unionpayEntrust.getCustomerNm());
+			query.setCertifId(unionpayEntrust.getCertifId());
+			query.setAccNo(unionpayEntrust.getAccNo());
+			query.setMerId(unionpayEntrust.getMerId());
+
+			CollectionEntrust collectionEntrust = query.findOne();
+			boolean needSave = collectionEntrust == null;
+			if (needSave) {
+				collectionEntrust = new CollectionEntrust();
+				collectionEntrust.setCustomerNm(unionpayEntrust.getCustomerNm());
+				collectionEntrust.setCertifTp(unionpayEntrust.getCertifTp());
+				collectionEntrust.setCertifId(unionpayEntrust.getCertifId());
+				collectionEntrust.setAccNo(unionpayEntrust.getAccNo());
+				collectionEntrust.setPhoneNo(unionpayEntrust.getPhoneNo());
+				collectionEntrust.setCvn2(unionpayEntrust.getCvn2());
+				collectionEntrust.setExpired(unionpayEntrust.getExpired());
+				collectionEntrust.setMerId(unionpayEntrust.getMerId());
+				collectionEntrust.setCat(unionpayEntrust.getCat());
+			}
+			collectionEntrust.setMat(new Date());
+			collectionEntrust.setOperID(unionpayEntrust.getOperID());
+			collectionEntrust.setStatus("0");
+
+			if (needSave) {
+				collectionEntrust.save();
+			} else {
+				collectionEntrust.update();
+			}
+			return result;
 		} catch (Exception e) {
 			EntrustRuntimeException xe = new EntrustRuntimeException(e);
 			xe.setContext(unionpayEntrust);

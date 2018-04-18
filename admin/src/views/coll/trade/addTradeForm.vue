@@ -40,6 +40,56 @@
                 <Button type="error" @click="initiateTradeModal=false">关闭</Button>
             </div>
         </Modal>
+
+        <Modal v-model="addConfirmModal" :closable="false" :mask-closable="false">
+            <p slot="header" style="color:#f60;text-align:center">
+                <Icon type="information-circled"></Icon>
+                <span>发起确认</span>
+            </p>
+            <div style="height: 235px;font-size: 1.2em; padding-left:20px;">
+                <div>
+                    <span style="font-size: 1.5em;">{{custNameForSelected}}</span>
+                    <span style="font-size: 1.5em; margin-left:5px; color:#ccc">{{cardIDForSelected}}</span>
+                </div>
+                <div style="position: relative;">
+                    <div style="margin-top: 15px;width:400px;border: 1px solid rgb(233, 233, 233);border-radius: 5px; ">
+                        <div style="background: rgb(43, 133, 228);color: #fff;font-size: 1em;border-top-left-radius: 5px;border-top-right-radius: 5px;">
+                            <div style="padding-left:10px;">
+                                <span style="margin-left:5px;">{{bankNameForSelected}}</span>
+                            </div>
+                        </div>
+                        <div style="padding-left:10px;">
+                            <p>
+                                <span style="font-size: 1.8em;">{{bankcardNoForSelected}}</span>
+                                <span style="padding-left:10px;">{{cardTypeForSelected}}</span>
+                            </p>
+                            <p style="color:#ccc">{{cardNameForSelected}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <span>交易金额</span>
+                    <span style="font-size: 1.8em; color: rgb(220, 147, 135); margin-left: 5px;">
+                        <span>{{trade.txnAmt}}</span>
+                    </span>
+                    <span style="margin-left:5px;">({{bussTypeToString}})</span>
+                </div>
+                <div style="margin-top: 5px;">
+                    <span>银行手续费</span>
+                    <span style="font-size: 1.8em; color: rgb(220, 147, 135); margin-left: 5px;">
+                        <span>{{collectionTrade.bankFee}}</span>
+                    </span>
+                    <span style="margin-left:30px">商户手续费</span>
+                    <span style="font-size: 1.8em; color: rgb(220, 147, 135); margin-left: 5px;">
+                        <span>{{collectionTrade.merFee}}</span>
+                    </span>
+                </div>
+            </div>
+            <div slot="footer">
+                <Button type="ghost" @click="cancelConfirm">取消</Button>
+                <Button type="primary" ref="confirmButton" :disabled="disableConfirmButton" @click="confirmed">确认</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -51,25 +101,97 @@
     export default {
         name: 'initiateTradeModal',
         props: [
-            'pageSize','finalCode','bTime','eTime','searchKey'
+            'pageSize', 'finalCode', 'bTime', 'eTime', 'searchKey'
         ],
         computed: {
-            ...mapState({
-                'trade': state => state.collTrade.collTrade,
-            })
+            disableConfirmButton: function(){
+                return this.feeResult.errorMessage ?true :false;
+            },
+            custNameForSelected: function () {
+                if (this.custMap && this.trade.custID) {
+                    return this.custMap[this.trade.custID].custName;
+                } else {
+                    return '';
+                }
+            },
+            cardIDForSelected: function () {
+                if (this.custMap && this.trade.custID) {
+                    return this.custMap[this.trade.custID].cardID;
+                } else {
+                    return '';
+                }
+            },
+            bankcardNoForSelected: function () {
+                if (this.custMap && this.trade.custID) {
+                    return this.custMap[this.trade.custID].bankcardNo;
+                } else {
+                    return '';
+                }
+            },
+            bankNameForSelected: function () {
+                if (this.custMap && this.trade.custID) {
+                    return this.custMap[this.trade.custID].cardBin.bankName;
+                } else {
+                    return '';
+                }
+            },
+            cardNameForSelected: function () {
+                if (this.custMap && this.trade.custID) {
+                    return this.custMap[this.trade.custID].cardBin.cardName;
+                } else {
+                    return '';
+                }
+            },
+            cardTypeForSelected: function () {
+                if (this.custMap && this.trade.custID) {
+                    if (this.custMap[this.trade.custID].cardBin) {
+                        var cardBin = this.custMap[this.trade.custID].cardBin;
+                        return cardBin.cardType === '0' ? '借记卡' : cardBin.cardType === '1' ? '贷记卡' : '其他';
+                    } else {
+                        return '其他';
+                    }
+                } else {
+                    return '其他';
+                }
+            },
+            bussTypeToString: function () {
+                return this.trade.bussType === '1' ? '加急' : '批量';
+            },
         },
         methods: {
+            confirmed() {
+                this.addConfirmModal = false;
+                this.$store.dispatch('trade_save', this.trade).then((res) => {
+                    let param = {
+                        finalCode: this.finalCode,
+                        'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
+                        'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
+                        search: this.searchKey,
+                        ps: this.pageSize
+                    }
+                    this.$store.dispatch('trade_list', param)
+                    this.close()
+                })
+            },
+            cancelConfirm() {
+                this.addConfirmModal = false;
+                this.modalLoading = false;
+            },
             open() {
                 this.initiateTradeModal = true;
-                this.$store.commit('collTrade_set', {});
+                this.trade = {};
                 this.modalLoading = false;
                 this.$axios.post('/coll/trade/getMerCust').then((res) => {
                     this.custIDOptionsList = res;
+                    for (var i in this.custIDOptionsList) {
+                        var option = this.custIDOptionsList[i];
+                        this.custMap[option.id] = option;
+                    }
                 });
             },
             close() {
                 this.initiateTradeModal = false;
-                this.$store.commit('collTrade_set', {});
+                this.trade = {};
                 this.modalLoading = false;
             },
             vChange(b) {
@@ -81,24 +203,24 @@
                 this.modalLoading = true;
                 this.$refs['formValidate'].validate((valid) => {
                     if (valid) {
-                        this.$store.dispatch('trade_save').then((res) => {
-                            let param = {
-                                finalCode: this.finalCode,
-                                'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
-                                'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
-                                search: this.searchKey,
-                                ps: this.pageSize
+                        this.addConfirmModal = true;
+                        this.$axios.post('/coll/trade/fee', this.trade).then((res) => {
+                            this.feeResult = res
+                            this.collectionTrade = this.feeResult.collectionTrade;
+                            if (this.feeResult.errorMessage) {
+                                this.$Message.error({
+                                    content: this.feeResult.errorMessage,
+                                    duration: 5
+                                });
                             }
-                            this.$store.dispatch('trade_list', param)
-                            this.close()
-                        })
+                        });
                     } else {
                         this.modalLoading = false;
                     }
                 })
             },
             reset() {
-                this.$store.dispatch('collTrade_set', {})
+                this.trade = {};
             },
             selectCustID(query) {
                 if (query !== '') {
@@ -119,12 +241,17 @@
         data() {
             return {
                 self: this,
+                trade: {},
                 initiateTradeModal: false,
+                addConfirmModal: false,
+                collectionTrade: {},
+                feeResult: {},
                 modalTitle: '发起交易',
                 modalLoading: false,
                 custIDOptions: [],
                 selectCustIdLoading: false,
                 custIDOptionsList: [],
+                custMap: {},
                 bussTypeList: [
                     {
                         value: '1',
