@@ -41,12 +41,12 @@
             </div>
         </Modal>
 
-        <Modal v-model="addConfirmModal" :closable="false" :mask-closable="false" @on-ok="confirmed" @on-cancel="cancelConfirm">
+        <Modal v-model="addConfirmModal" :closable="false" :mask-closable="false">
             <p slot="header" style="color:#f60;text-align:center">
                 <Icon type="information-circled"></Icon>
                 <span>发起确认</span>
             </p>
-            <div style="height: 180px;font-size: 1.2em; padding-left:20px;">
+            <div style="height: 235px;font-size: 1.2em; padding-left:20px;">
                 <div>
                     <span style="font-size: 1.5em;">{{custNameForSelected}}</span>
                     <span style="font-size: 1.5em; margin-left:5px; color:#ccc">{{cardIDForSelected}}</span>
@@ -74,9 +74,21 @@
                     </span>
                     <span style="margin-left:5px;">({{bussTypeToString}})</span>
                 </div>
-
+                <div style="margin-top: 5px;">
+                    <span>银行手续费</span>
+                    <span style="font-size: 1.8em; color: rgb(220, 147, 135); margin-left: 5px;">
+                        <span>{{collectionTrade.bankFee}}</span>
+                    </span>
+                    <span style="margin-left:30px">商户手续费</span>
+                    <span style="font-size: 1.8em; color: rgb(220, 147, 135); margin-left: 5px;">
+                        <span>{{collectionTrade.merFee}}</span>
+                    </span>
+                </div>
             </div>
-
+            <div slot="footer">
+                <Button type="ghost" @click="cancelConfirm">取消</Button>
+                <Button type="primary" ref="confirmButton" :disabled="disableConfirmButton" @click="confirmed">确认</Button>
+            </div>
         </Modal>
     </div>
 </template>
@@ -92,6 +104,9 @@
             'pageSize', 'finalCode', 'bTime', 'eTime', 'searchKey'
         ],
         computed: {
+            disableConfirmButton: function(){
+                return this.feeResult.errorMessage ?true :false;
+            },
             custNameForSelected: function () {
                 if (this.custMap && this.trade.custID) {
                     return this.custMap[this.trade.custID].custName;
@@ -189,6 +204,16 @@
                 this.$refs['formValidate'].validate((valid) => {
                     if (valid) {
                         this.addConfirmModal = true;
+                        this.$axios.post('/coll/trade/fee', this.trade).then((res) => {
+                            this.feeResult = res
+                            this.collectionTrade = this.feeResult.collectionTrade;
+                            if (this.feeResult.errorMessage) {
+                                this.$Message.error({
+                                    content: this.feeResult.errorMessage,
+                                    duration: 5
+                                });
+                            }
+                        });
                     } else {
                         this.modalLoading = false;
                     }
@@ -219,6 +244,8 @@
                 trade: {},
                 initiateTradeModal: false,
                 addConfirmModal: false,
+                collectionTrade: {},
+                feeResult: {},
                 modalTitle: '发起交易',
                 modalLoading: false,
                 custIDOptions: [],

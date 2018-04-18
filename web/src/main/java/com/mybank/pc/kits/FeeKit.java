@@ -136,6 +136,9 @@ public class FeeKit {
 			} else {
 				fee = new BigDecimal(170);
 			}
+			if (fee.longValue() < 70) {
+				fee = new BigDecimal(70);
+			}
 		} else if (SDK.getSDK(SDK.MER_CODE_REALTIME_YS_4).getMerId().equals(merId)) {
 			fee = new BigDecimal(400);
 		} else if (SDK.getSDK(SDK.MER_CODE_REALTIME_YS_2).getMerId().equals(merId)) {
