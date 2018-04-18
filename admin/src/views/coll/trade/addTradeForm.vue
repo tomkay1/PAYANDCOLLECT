@@ -48,16 +48,13 @@
             </p>
             <div style="height: 180px;font-size: 1.2em; padding-left:20px;">
                 <div>
-                    <span>客户</span>
-                    <span style="font-size: 1.6em; margin-left:25px;">{{custNameForSelected}}</span>
+                    <span style="font-size: 1.5em;">{{custNameForSelected}}</span>
                     <span style="font-size: 1.5em; margin-left:5px; color:#ccc">{{cardIDForSelected}}</span>
                 </div>
                 <div style="position: relative;">
-                    <div style="width:50px;float: left;position: absolute;bottom: 0;">卡信息</div>
-                    <div style="margin-top: 15px;margin-left:60px;width:400px;border: 1px solid rgb(45, 140, 240); ">
-                        <div style="background: rgb(43, 133, 228);color: #fff;font-size: 1em;">
+                    <div style="margin-top: 15px;width:400px;border: 1px solid rgb(233, 233, 233);border-radius: 5px; ">
+                        <div style="background: rgb(43, 133, 228);color: #fff;font-size: 1em;border-top-left-radius: 5px;border-top-right-radius: 5px;">
                             <div style="padding-left:10px;">
-                                <Icon type="card"></Icon>
                                 <span style="margin-left:5px;">{{bankNameForSelected}}</span>
                             </div>
                         </div>
