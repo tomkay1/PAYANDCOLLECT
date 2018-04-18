@@ -136,7 +136,7 @@ public class CTradeSrv {
 
 			String merId = null;
 			if (isRealtimeBuss) {// 加急
-				if (Integer.valueOf(txnAmt) > 500000) {
+				if (Long.valueOf(txnAmt) > 500000) {
 					merId = SDK.getSDK(SDK.MER_CODE_REALTIME_YS_4).getMerId();
 				} else {
 					merId = SDK.getSDK(SDK.MER_CODE_REALTIME_YS_2).getMerId();
@@ -254,7 +254,7 @@ public class CTradeSrv {
 			boolean isRealtimeBuss = "1".equals(bussType) ? true : false;
 			String merId = null;
 			if (isRealtimeBuss) {// 加急
-				if (Integer.valueOf(txnAmt) > 500000) {
+				if (Long.valueOf(txnAmt) > 500000) {
 					sdk = SDK.getSDK(SDK.MER_CODE_REALTIME_YS_4);
 				} else {
 					sdk = SDK.getSDK(SDK.MER_CODE_REALTIME_YS_2);
