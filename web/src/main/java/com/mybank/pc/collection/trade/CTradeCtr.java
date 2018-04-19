@@ -95,7 +95,7 @@ public class CTradeCtr extends CoreController {
 
 		Kv initiateRequest = null;
 		try {
-			initiateRequest = cCTradeSrvSrv.validateRequestAndGetFee(kv);
+			initiateRequest = cCTradeSrvSrv.validateAndBuildInitiateRequest(kv);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

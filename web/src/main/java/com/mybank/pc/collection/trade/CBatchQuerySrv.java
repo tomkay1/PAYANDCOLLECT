@@ -24,15 +24,26 @@ import com.mybank.pc.kits.unionpay.acp.file.collection.model.ResponseHead;
 
 public class CBatchQuerySrv {
 
+	public void batchQueryOne(Map<String, String> reqParam) {
+		batchQuery(Kv.create().set(reqParam), true);
+	}
+
 	public void batchQuery() {
+		batchQuery(Kv.create(), false);
+	}
+
+	private void batchQuery(Kv kv, boolean isOne) {
 		int count = 0;
 		List<UnionpayBatchCollection> ubcList = null;
-		Kv kv = Kv.create();
 		Date now = new Date();
 		try {
 			String uuid = UUID.randomUUID().toString();
 			kv.set("sysQueryId", uuid).set("mat", now);
-			count = UnionpayBatchCollection.updateNeedQueryBatchCollectionPrepare(kv);
+			if (isOne) {
+				count = UnionpayBatchCollection.updateNeedQueryBatchCollectionPrepareOne(kv);
+			} else {
+				count = UnionpayBatchCollection.updateNeedQueryBatchCollectionPrepare(kv);
+			}
 			if (count > 0) {
 				ubcList = UnionpayBatchCollection.findNeedQueryBatchCollectionBySysQueryId(kv);
 				for (UnionpayBatchCollection unionpayBatchCollection : ubcList) {
@@ -44,6 +55,7 @@ public class CBatchQuerySrv {
 				for (UnionpayBatchCollection unionpayBatchCollection : ubcList) {
 					try {
 						unionpayBatchCollection.setStatus("0");
+						unionpayBatchCollection.setSysQueryId("");
 						unionpayBatchCollection.update();
 					} catch (Exception ubce) {
 						ubce.printStackTrace();
@@ -51,7 +63,6 @@ public class CBatchQuerySrv {
 				}
 			}
 		}
-
 	}
 
 	public void batchQuery(UnionpayBatchCollection unionpayBatchCollection) {
@@ -59,9 +70,10 @@ public class CBatchQuerySrv {
 		boolean isSaved = false;
 		try {
 			unionpayBatchCollectionQuery = unionpayBatchCollection.buildQueryResult();
-			isSaved = unionpayBatchCollectionQuery.save();
-			unionpayBatchCollection.queryResult();
-			handlingBatchQueryResult(unionpayBatchCollection);
+			if (isSaved = unionpayBatchCollectionQuery.save()) {
+				unionpayBatchCollection.queryResult();
+				handlingBatchQueryResult(unionpayBatchCollection);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -86,6 +98,7 @@ public class CBatchQuerySrv {
 		try {
 			UnionpayBatchCollectionQuery unionpayBatchCollectionQuery = unionpayBatchCollection.getQuery();
 			unionpayBatchCollectionQuery.validateBatchQueryResp();
+
 			Map<String, String> rspData = unionpayBatchCollectionQuery.getQueryRspData();
 
 			String respCode = rspData.get("respCode");
@@ -110,7 +123,11 @@ public class CBatchQuerySrv {
 
 				List<ResponseContent> responsesContents = batchCollectionResponse.getContents();
 				for (ResponseContent responseContent : responsesContents) {
-					updateOrderStatus(responseContent);
+					try {
+						updateOrderStatus(responseContent);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 
 				String successCount = responseHead.getSuccessCount();

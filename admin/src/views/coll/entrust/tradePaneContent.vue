@@ -107,46 +107,55 @@
                         title: '姓名',
                         key: 'customerNm',
                         align: 'center',
+                        minWidth: 80,
                     },
                     {
                         title: '证件号码',
                         key: 'certifId',
                         align: 'center',
+                        minWidth: 180,
                     },
                     {
                         title: '卡号',
                         key: 'accNo',
                         align: 'center',
+                        minWidth: 180,
                     },
                     {
                         title: '手机号',
                         key: 'phoneNo',
                         align: 'center',
+                        minWidth: 150,
                     },
                     {
                         title: '订单号',
                         key: 'orderId',
                         align: 'center',
+                        minWidth: 200,
                     },
                     {
                         title: '应答码',
                         key: 'respCode',
                         align: 'center',
+                        minWidth: 80,
                     },
                     {
                         title: '应答信息',
                         key: 'respMsg',
                         align: 'center',
+                        minWidth: 220,
                     },
                     {
                         title: '商户',
                         key: 'merId',
                         align: 'center',
+                        minWidth: 180,
                     },
                     {
                         title: '创建时间',
                         key: 'cat',
                         align: 'center',
+                        minWidth: 150,
                     }
                 ]
             }

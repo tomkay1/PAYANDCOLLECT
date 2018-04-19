@@ -131,11 +131,13 @@
                         title: '批次号',
                         key: 'batchNo',
                         align: 'center',
+                        minWidth: 100,
                     },
                     {
                         title: '交易总金额',
                         key: 'totalAmt',
                         align: 'center',
+                        minWidth: 120,
                     },
                     {
                         title: '交易比数',
@@ -214,18 +216,20 @@
                                         ])
                                 ]);
                         },
-                        //align: 'center',
-                        minWidth: 100,
+                        align: 'center',
+                        minWidth: 120,
                     },
                     {
                         title: '成功金额',
                         key: 'successAmt',
                         align: 'center',
+                        minWidth: 120,
                     },
                     {
                         title: '成功笔数',
                         key: 'successQty',
                         align: 'center',
+                        minWidth: 120,
                     },
                     {
                         title: '创建时间',

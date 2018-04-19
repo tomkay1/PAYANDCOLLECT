@@ -38,8 +38,7 @@ public class CBatchTradeSrv {
 
 			kv.set("batchNo", nextBatchNo).set("txnTime", txnTime)
 					.set("merId", SDK.getSDK(SDK.MER_CODE_BATCH_CH).getMerId()).set("mat", now);
-			count = UnionpayCollection.updateToBeSentUnionpayCollectionBatchNo(kv);
-			if (count > 0) {
+			if ((count = UnionpayCollection.updateToBeSentUnionpayCollectionBatchNo(kv)) > 0) {
 				toBeSentOrder = UnionpayCollection.findToBeSentUnionpayCollectionByBatchNo(kv);
 				unionpayBatchCollection = UnionpayBatchCollection.buildUnionpayBatchCollection(now, txnTime,
 						nextBatchNo, toBeSentOrder);
@@ -49,19 +48,18 @@ public class CBatchTradeSrv {
 					sendResult = unionpayBatchCollection.sendBatchOrder();
 					handlingBatchTradeResult(unionpayBatchCollection, toBeSentOrder);
 				}
-			} else {
-				UnionpayBatchCollectionBatchno.decrementBatchNo(txnTime, nextBatchNo);
 			}
-		} catch (ValidateUnionpayRespException vure) {
+		} catch (ValidateUnionpayRespException vure) {// 校验响应信息失败，需后续处理
 			if (unionpayBatchCollection != null && isSaved) {
 				unionpayBatchCollection.setExceInfo(JsonKit.toJson(vure.getExceptionInfo()));
 				unionpayBatchCollection.update();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
 
 			try {
-				if ((!isSaved) && StringUtils.isNotBlank(txnTime) && StringUtils.isNotBlank(nextBatchNo)
+				if (count <= 0 || (!isSaved) && StringUtils.isNotBlank(txnTime) && StringUtils.isNotBlank(nextBatchNo)
 						&& nextBatchNo.length() == 4) {
 					UnionpayBatchCollectionBatchno.decrementBatchNo(txnTime, nextBatchNo);
 				}
@@ -70,15 +68,19 @@ public class CBatchTradeSrv {
 			}
 
 			try {
-				if (count != 0 && CollectionUtils.isEmpty(toBeSentOrder)) {
+				if (count > 0 && CollectionUtils.isEmpty(toBeSentOrder)) {
 					toBeSentOrder = UnionpayCollection.findToBeSentUnionpayCollectionByBatchNo(kv);
 				}
 				if (CollectionUtils.isNotEmpty(toBeSentOrder) && sendResult != null) {
 					String respCode = sendResult.get("respCode");
+					// 没有成功也没有最终失败需要更新订单状态为待发送
 					if (!isSuccessed(respCode) && !isFailed(respCode)) {
 						for (UnionpayCollection unionpayCollection : toBeSentOrder) {
-							if ("2".equals(unionpayCollection.getFinalCode())// 已失败或为待发送状态则不需要更新订单状态
-									|| "0".equals(unionpayCollection.getStatus())) {
+							// 已成功，已失败或为待发送，已发送状态则不需要更新订单状态
+							if ("0".equals(unionpayCollection.getFinalCode())
+									|| "2".equals(unionpayCollection.getFinalCode())
+									|| "0".equals(unionpayCollection.getStatus())
+									|| "2".equals(unionpayCollection.getStatus())) {
 								continue;
 							}
 							try {
@@ -93,18 +95,6 @@ public class CBatchTradeSrv {
 				}
 			} catch (Exception e2) {
 				e2.printStackTrace();
-			}
-
-			try {
-				if (isSaved) {
-					if (sendResult == null || sendResult.isEmpty()) {
-						unionpayBatchCollection.setMat(now);
-						unionpayBatchCollection.setFinalCode("2");
-					}
-					unionpayBatchCollection.update();
-				}
-			} catch (Exception e3) {
-				e3.printStackTrace();
 			}
 		}
 	}
@@ -122,6 +112,7 @@ public class CBatchTradeSrv {
 		boolean isSuccess = false;
 		try {
 			unionpayBatchCollection.validateBatchOrderResp();
+
 			Map<String, String> rspData = unionpayBatchCollection.getBatchRspData();
 			String respCode = rspData.get("respCode");
 			String respMsg = rspData.get("respMsg");
@@ -167,7 +158,7 @@ public class CBatchTradeSrv {
 							unionpayCollection.setRespMsg(respMsg);
 							unionpayCollection.setMat(now);
 
-							updateOrderStatus(unionpayCollection, isFailed);
+							updateOrderStatusInNotSuccess(unionpayCollection, isFailed);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -202,7 +193,7 @@ public class CBatchTradeSrv {
 				|| "14".equals(respCode));
 	}
 
-	public void updateOrderStatus(UnionpayCollection unionpayCollection, boolean isFailed) {
+	public void updateOrderStatusInNotSuccess(UnionpayCollection unionpayCollection, boolean isFailed) {
 		if (isFailed) {
 			unionpayCollection.setFinalCode("2");// 失败
 			unionpayCollection.update();

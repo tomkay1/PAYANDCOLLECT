@@ -131,6 +131,7 @@
                         title: '交易时间',
                         key: 'tradeTime',
                         align: 'center',
+                        minWidth: 180,
                     },
                     {
                         title: '业务类型',
@@ -141,16 +142,19 @@
                             return h('span', type);
                         },
                         align: 'center',
+                        minWidth: 100,
                     },
                     {
                         title: '金额',
                         key: 'amount',
                         align: 'center',
+                        minWidth: 100,
                     },
                     {
                         title: '商户手续费',
                         key: 'merFee',
                         align: 'center',
+                        minWidth: 100,
                     },
                     {
                         title: '身份证号',
@@ -162,6 +166,7 @@
                         title: '客户姓名',
                         key: 'custName',
                         align: 'center',
+                        minWidth: 100,
                     },
                     {
                         title: '最终处理结果',
@@ -236,8 +241,8 @@
                                         ])
                                 ]);
                         },
-                        // align: 'center',
-                        minWidth: 100,
+                        align: 'center',
+                        minWidth: 120,
                     },
                     {
                         title: '清分状态',
@@ -253,11 +258,13 @@
                             return h('span', clearStatus);
                         },
                         align: 'center',
+                        minWidth: 100,
                     },
                     {
                         title: '创建时间',
                         key: 'cat',
                         align: 'center',
+                        minWidth: 180,
                     },
                 ]
             }

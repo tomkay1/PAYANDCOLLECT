@@ -4,6 +4,9 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.jfinal.kit.LogKit;
+import com.mybank.pc.exception.ValidateUnionpayRespException;
+
 public class SDK {
 
 	/** 春城实时商户 945230148160197 */
@@ -82,6 +85,36 @@ public class SDK {
 				|| REALTIME_YS_2_SDK.getAcpService().validate(reqParam, encoding)
 				|| REALTIME_YS_4_SDK.getAcpService().validate(reqParam, encoding)
 				|| BATCH_CH_SDK.getAcpService().validate(reqParam, encoding);
+	}
+
+	public static boolean validateResp(Map<String, String> rspData, String merid, String encoding)
+			throws ValidateUnionpayRespException {
+		try {
+			if (StringUtils.isBlank(encoding)) {
+				encoding = SDKConstants.UTF_8_ENCODING;
+			}
+			SDK sdk = SDK.getByMerId(merid);
+			AcpService acpService = sdk.getAcpService();
+
+			boolean isEmpty = rspData.isEmpty();
+			boolean isValidate = acpService.validate(rspData, encoding);
+
+			// 未返回正确的http状态
+			if (isEmpty) {
+				LogKit.error("未获取到返回报文或返回http状态码非200");
+				throw new RuntimeException("未获取到返回报文或返回http状态码非200");
+			}
+			if (isValidate) {
+				LogKit.info("验证签名成功");
+			} else {
+				LogKit.error("验证签名失败");
+				throw new RuntimeException("验证签名失败");
+			}
+
+			return isValidate;
+		} catch (Exception e) {
+			throw new ValidateUnionpayRespException(e);
+		}
 	}
 
 	public SDKConfig getSdkConfig() {

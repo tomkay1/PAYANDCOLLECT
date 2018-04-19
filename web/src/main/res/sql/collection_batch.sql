@@ -64,6 +64,27 @@
 	    	AND merId = #para(merId)
 	    #end
 #end
+#sql("updateNeedQueryBatchCollectionPrepareOne")
+	UPDATE unionpay_batch_collection  ubc SET sysQueryId = #para(sysQueryId) , status = '1' , mat = #para(mat) WHERE 
+	    respCode = '00' AND finalCode = '1' 
+	    AND (
+	    	status = '0'
+	    	OR status IS NULL
+	    )
+		AND (
+			ubc.queryResultCount IS NULL
+			OR ubc.queryResultCount <= 10
+		)
+		#if(txnTime)
+	    	AND ubc.txnTime = #para(txnTime)
+	    #end
+	    #if(batchNo)
+	    	AND ubc.batchNo = #para(batchNo)
+	    #end
+	    #if(merId)
+	    	AND ubc.merId = #para(merId)
+	    #end
+#end
 #sql("updateNeedQueryBatchCollectionPrepare")
 	UPDATE unionpay_batch_collection  ubc SET sysQueryId = #para(sysQueryId) , status = '1' , mat = #para(mat) WHERE 
 	    respCode = '00' AND finalCode = '1' 
@@ -73,7 +94,7 @@
 	    )
 		AND (
 			ubc.queryResultCount IS NULL
-			OR ubc.queryResultCount <= 7
+			OR ubc.queryResultCount <= 10
 		)
 		AND round(
 			(

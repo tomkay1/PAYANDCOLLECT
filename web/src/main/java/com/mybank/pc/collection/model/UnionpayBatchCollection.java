@@ -11,11 +11,9 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
-import com.jfinal.kit.LogKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseUnionpayBatchCollection;
-import com.mybank.pc.exception.ValidateUnionpayRespException;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.kits.unionpay.acp.SDKConfig;
@@ -104,29 +102,7 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 	}
 
 	public boolean validateBatchOrderResp() {
-		try {
-			SDK sdk = SDK.getByMerId(getMerId());
-			AcpService acpService = sdk.getAcpService();
-
-			boolean isEmpty = batchRspData.isEmpty();
-			boolean isValidate = acpService.validate(batchRspData, SDKConstants.UTF_8_ENCODING);
-
-			// 未返回正确的http状态
-			if (isEmpty) {
-				LogKit.error("未获取到返回报文或返回http状态码非200");
-				throw new RuntimeException("未获取到返回报文或返回http状态码非200");
-			}
-			if (isValidate) {
-				LogKit.info("验证签名成功");
-			} else {
-				LogKit.error("验证签名失败");
-				throw new RuntimeException("验证签名失败");
-			}
-
-			return isValidate;
-		} catch (Exception e) {
-			throw new ValidateUnionpayRespException(e);
-		}
+		return SDK.validateResp(batchRspData, getMerId(), SDKConstants.UTF_8_ENCODING);
 	}
 
 	public UnionpayBatchCollectionQuery buildQueryResult() {
@@ -252,6 +228,11 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 		}
 		calendar.add(Calendar.MINUTE, blankingTime[(queryResultCount - 1) % blankingTime.length]);
 		setNextQueryTime(calendar.getTime());
+	}
+
+	public static int updateNeedQueryBatchCollectionPrepareOne(Kv kv) {
+		SqlPara sqlPara = Db.getSqlPara("collection_batch.updateNeedQueryBatchCollectionPrepareOne", kv);
+		return Db.update(sqlPara);
 	}
 
 	public static int updateNeedQueryBatchCollectionPrepare(Kv kv) {

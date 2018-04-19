@@ -10,17 +10,16 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.jfinal.aop.Clear;
-import com.mybank.pc.interceptors.AdminAAuthInterceptor;
-import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import org.apache.commons.io.IOUtils;
 
+import com.jfinal.aop.Clear;
 import com.jfinal.aop.Duang;
 import com.jfinal.core.ActionKey;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.LogKit;
 import com.mybank.pc.collection.model.UnionpayCallbackLog;
 import com.mybank.pc.core.CoreController;
+import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.kits.unionpay.acp.SDKConstants;
 
@@ -46,7 +45,7 @@ import com.mybank.pc.kits.unionpay.acp.SDKConstants;
 public class BackRcvResponse extends CoreController {
 
 	private CTradeSrv cTradeSrv = Duang.duang(CTradeSrv.class);
-	private CBatchTradeSrv cBatchTradeSrv = Duang.duang(CBatchTradeSrv.class);
+	private CBatchQuerySrv cBatchQuerySrv = Duang.duang(CBatchQuerySrv.class);
 
 	@ActionKey("/coll/backRcvResponse/receive")
 	public void receive() {
@@ -63,6 +62,14 @@ public class BackRcvResponse extends CoreController {
 			if ("11".equals(unionpayCallbackLog.getTxnType()) && ("02".equals(unionpayCallbackLog.getTxnSubType())
 					|| "00".equals(unionpayCallbackLog.getTxnSubType()))) {
 				cTradeSrv.updateOrderStatus(reqParam);
+			}
+
+			// 批量代收回调
+			if ("21".equals(unionpayCallbackLog.getTxnType()) && "02".equals(unionpayCallbackLog.getTxnSubType())) {
+				// 00 批次[xxxx]已处理完成，请发起批量查询交易
+				if ("00".equals(unionpayCallbackLog.getRespCode())) {
+					cBatchQuerySrv.batchQueryOne(reqParam);
+				}
 			}
 
 		}
@@ -96,6 +103,9 @@ public class BackRcvResponse extends CoreController {
 			String settleDate = reqParam.get("settleDate");
 			String traceNo = reqParam.get("traceNo");
 			String traceTime = reqParam.get("traceTime");
+			String batchNo = reqParam.get("batchNo");
+			String merId = reqParam.get("merId");
+			String txnTime = reqParam.get("txnTime");
 			String txnType = reqParam.get("txnType");
 			String txnSubType = reqParam.get("txnSubType");
 			String txnAmt = reqParam.get("txnAmt");
@@ -109,6 +119,9 @@ public class BackRcvResponse extends CoreController {
 			unionpayCallbackLog.setSettleDate(settleDate);
 			unionpayCallbackLog.setTraceNo(traceNo);
 			unionpayCallbackLog.setTraceTime(traceTime);
+			unionpayCallbackLog.setBatchNo(batchNo);
+			unionpayCallbackLog.setMerId(merId);
+			unionpayCallbackLog.setTxnTime(txnTime);
 			unionpayCallbackLog.setTxnType(txnType);
 			unionpayCallbackLog.setTxnSubType(txnSubType);
 			unionpayCallbackLog.setTxnAmt(txnAmt);

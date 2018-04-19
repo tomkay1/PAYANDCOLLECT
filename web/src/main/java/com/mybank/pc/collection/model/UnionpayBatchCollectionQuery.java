@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.jfinal.kit.JsonKit;
-import com.jfinal.kit.LogKit;
 import com.mybank.pc.collection.model.base.BaseUnionpayBatchCollectionQuery;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
@@ -84,24 +83,7 @@ public class UnionpayBatchCollectionQuery extends BaseUnionpayBatchCollectionQue
 	}
 
 	public boolean validateBatchQueryResp() {
-		SDK sdk = SDK.getByMerId(getMerId());
-		AcpService acpService = sdk.getAcpService();
-
-		boolean isEmpty = queryRspData.isEmpty();
-		boolean isValidate = acpService.validate(queryRspData, SDKConstants.UTF_8_ENCODING);
-
-		// 未返回正确的http状态
-		if (isEmpty) {
-			LogKit.error("未获取到返回报文或返回http状态码非200");
-			throw new RuntimeException("未获取到返回报文或返回http状态码非200");
-		}
-		if (isValidate) {
-			LogKit.info("验证签名成功");
-		} else {
-			LogKit.error("验证签名失败");
-			throw new RuntimeException("验证签名失败");
-		}
-		return isValidate;
+		return SDK.validateResp(queryRspData, getMerId(), SDKConstants.UTF_8_ENCODING);
 	}
 
 	public Map<String, String> getQueryReqData() {
