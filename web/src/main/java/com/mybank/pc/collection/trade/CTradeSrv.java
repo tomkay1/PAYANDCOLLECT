@@ -47,8 +47,9 @@ public class CTradeSrv {
 				if (isRealtime) {
 					unionpayCollection.assemblyRealtimeRequest();
 				}
-				saveOrder(unionpayCollection, collectionTrade);
-				isSuccess = isRealtime ? sendRealtimeOrder(unionpayCollection, collectionTrade) : true;
+				if (saveOrder(unionpayCollection, collectionTrade)) {
+					isSuccess = isRealtime ? sendRealtimeOrder(unionpayCollection, collectionTrade) : true;
+				}
 			} catch (TradeRuntimeException e) {
 				throw e;
 			} catch (Exception e) {
@@ -257,10 +258,9 @@ public class CTradeSrv {
 	 */
 	@Before({ TradeExceptionInterceptor.class, Tx.class })
 	@TxnKey("saveOrder")
-	public void saveOrder(UnionpayCollection unionpayCollection, CollectionTrade collectionTrade) {
+	public boolean saveOrder(UnionpayCollection unionpayCollection, CollectionTrade collectionTrade) {
 		try {
-			unionpayCollection.save();
-			collectionTrade.save();
+			return unionpayCollection.save() && collectionTrade.save();
 		} catch (Exception e) {
 			collectionTrade.setFinalCode("2");
 			unionpayCollection.setFinalCode("2");
