@@ -23,7 +23,7 @@
                     </div>
 
                     <Row class="margin-top-10">
-                        <Table border :data="headBatchTradeList" :columns="tableColums" stripe></Table>
+                        <Table border="false" :data="headBatchTradeList" :columns="tableColums" stripe></Table>
                     </Row>
                     <div style="margin: 10px;overflow: hidden">
                         <div style="float: right;">

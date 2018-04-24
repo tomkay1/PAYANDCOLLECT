@@ -22,11 +22,9 @@
                             </span>
                             </Col>
                         </Row>
-
                     </div>
-
                     <Row class="margin-top-10">
-                        <Table border :data="tradeList" :columns="tableColums" stripe></Table>
+                        <Table :border="false" :data="tradeList" :columns="tableColums" stripe></Table>
                     </Row>
                     <div style="margin: 10px;overflow: hidden">
                         <div style="float: right;">
@@ -42,9 +40,11 @@
 </template>
 
 <script>
+    import Vue from 'vue'
     import { mapState } from 'vuex'
     import dateKit from '../../../libs/date'
     import addTradeModal from './addTradeForm.vue'
+    import FinalCodeContent from './finalCodeContent.vue'
 
     export default {
         computed: {
@@ -83,7 +83,8 @@
             },
         },
         components: {
-            addForm: addTradeModal
+            addForm: addTradeModal,
+            FinalCodeContent: FinalCodeContent
         },
         mounted() {
             let param = {
@@ -121,17 +122,53 @@
                     },
                 ],
                 tableColums: [
+
                     {
-                        title: '交易流水号',
-                        key: 'tradeNo',
+                        title: '详情',
+                        key: 'action',
+                        width: 60,
                         align: 'center',
-                        minWidth: 245,
+                        fixed: 'right',
+                        render: (h, params) => {
+                            const row = params.row;
+                            return h('div', {
+                                style: {
+                                    'padding-left': '0px',
+                                    'padding-right': '0px',
+                                }
+                            }, [
+                                    h('a', {
+                                        style: {
+                                            display: 'inline-block',
+                                            width: '100%',
+                                        },
+                                        on: {
+                                            click: () => {
+                                                // this.remove(params.index)
+                                            }
+                                        }
+                                    }, [
+                                            h('Icon', {
+                                                props: {
+                                                    type: 'chevron-right',
+                                                    size: 18
+                                                }
+                                            })
+                                        ]),
+                                ]);
+                        }
                     },
                     {
                         title: '交易时间',
                         key: 'tradeTime',
                         align: 'center',
                         minWidth: 180,
+                    },
+                    {
+                        title: '交易流水号',
+                        key: 'tradeNo',
+                        align: 'center',
+                        minWidth: 255,
                     },
                     {
                         title: '业务类型',
@@ -145,7 +182,7 @@
                         minWidth: 100,
                     },
                     {
-                        title: '金额',
+                        title: '交易金额',
                         key: 'amount',
                         align: 'center',
                         minWidth: 100,
@@ -157,19 +194,7 @@
                         minWidth: 100,
                     },
                     {
-                        title: '身份证号',
-                        key: 'cardID',
-                        align: 'center',
-                        minWidth: 160,
-                    },
-                    {
-                        title: '客户姓名',
-                        key: 'custName',
-                        align: 'center',
-                        minWidth: 100,
-                    },
-                    {
-                        title: '最终处理结果',
+                        title: '处理结果',
                         key: 'finalCode',
                         render: (h, params) => {
                             const row = params.row;
@@ -191,58 +216,48 @@
                             }
                             return h('Poptip', {
                                 props: {
-                                    trigger: 'hover',
-                                    //title: '结果详情',
-                                    placement: 'top',
+                                    trigger: 'click',
+                                    placement: 'bottom',
                                     width: '100%'
-                                }
+                                },
                             }, [
                                     h('Button', {
                                         props: {
                                             type: statusType,
-                                            //shape: 'circle',
-                                            size: 'small',
+                                            shape: 'circle',
                                             long: true,
                                             color: color,
                                         },
                                         style: {
-                                            width: '80px'
+                                            'min-width': '70px',
                                         },
                                     }, finalStatus),
-                                    h('div', {
-                                        slot: 'content'
-                                    }, [
-                                            h('p', [
-                                                h('span', {
-                                                    style: {
-                                                        'margin-right': '10px',
-                                                    }
-                                                }, '发起交易'),
-                                                h('strong', {
-                                                    style: {
-                                                        'margin-right': '10px',
-                                                    }
-                                                }, row.resCode),
-                                                h('strong', row.resMsg),
-                                            ]),
-                                            h('p', [
-                                                h('span', {
-                                                    style: {
-                                                        'margin-right': '10px',
-                                                    }
-                                                }, '交易结果'),
-                                                h('strong', {
-                                                    style: {
-                                                        'margin-right': '10px',
-                                                    }
-                                                }, row.resultCode),
-                                                h('strong', row.resultMsg),
-                                            ]),
-                                        ])
+                                    h(FinalCodeContent, {
+                                        slot: 'content',
+                                        props: {
+                                            tradeInfo: row,
+                                        },
+                                        style: {
+                                            padding: '0px'
+                                        }
+                                    }),
                                 ]);
                         },
                         align: 'center',
                         minWidth: 120,
+                    },
+
+                    {
+                        title: '客户姓名',
+                        key: 'custName',
+                        align: 'center',
+                        minWidth: 100,
+                    },
+                    {
+                        title: '身份证号',
+                        key: 'cardID',
+                        align: 'center',
+                        minWidth: 160,
                     },
                     {
                         title: '清分状态',
@@ -259,12 +274,6 @@
                         },
                         align: 'center',
                         minWidth: 100,
-                    },
-                    {
-                        title: '创建时间',
-                        key: 'cat',
-                        align: 'center',
-                        minWidth: 180,
                     },
                 ]
             }
