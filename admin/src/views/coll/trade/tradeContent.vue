@@ -122,7 +122,6 @@
                     },
                 ],
                 tableColums: [
-
                     {
                         title: '详情',
                         key: 'action',
@@ -221,21 +220,34 @@
                                     width: '100%'
                                 },
                             }, [
-                                    h('Button', {
-                                        props: {
-                                            type: statusType,
-                                            shape: 'circle',
-                                            long: true,
-                                            color: color,
-                                        },
+                                    h('div', {
                                         style: {
-                                            'min-width': '70px',
+                                            'min-width': '80px',
+                                            color: color,
+                                            cursor: 'pointer',
+                                            padding: '7px 5px'
                                         },
-                                    }, finalStatus),
+                                    }, [
+                                            h('span', {
+                                                style: {
+                                                    'margin-right': '4px',
+                                                }
+                                            }, finalStatus),
+                                            h('Icon', {
+                                                props: {
+                                                    type: 'chevron-right',
+                                                },
+                                                style: {
+
+                                                }
+                                            }),
+                                        ]
+                                    ),
                                     h(FinalCodeContent, {
                                         slot: 'content',
                                         props: {
-                                            tradeInfo: row,
+                                            index: params.index,
+                                            tradeInfo: row
                                         },
                                         style: {
                                             padding: '0px'

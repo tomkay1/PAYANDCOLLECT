@@ -1,12 +1,12 @@
 package com.mybank.pc.collection.model;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
-import com.jfinal.kit.LogKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.SqlPara;
@@ -24,6 +24,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 
 	public static final UnionpayCollection dao = new UnionpayCollection().dao();
 
+	private UnionpayCollectionQuery query = null;
 	private Map<String, String> realtimeReqData = null;
 	private Map<String, String> realtimeRspData = null;
 
@@ -32,6 +33,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 		SDKConfig sdkConfig = sdk.getSdkConfig();
 
 		setVersion(sdkConfig.getVersion());
+		setEncoding(SDKConstants.UTF_8_ENCODING);
 		setTxnSubType("02");
 		setAccType("01");// 账号类型
 		setAccessType("0");// 接入类型，商户接入固定填0，不需修改
@@ -166,24 +168,46 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 	}
 
 	public boolean validateRealtimeResp() {
-		SDK sdk = SDK.getByMerId(getMerId());
-		AcpService acpService = sdk.getAcpService();
+		return SDK.validateResp(realtimeRspData, getMerId(), SDKConstants.UTF_8_ENCODING);
+	}
 
-		boolean isEmpty = realtimeRspData.isEmpty();
-		boolean isValidate = acpService.validate(realtimeRspData, SDKConstants.UTF_8_ENCODING);
+	public UnionpayCollectionQuery buildQueryResult() {
+		return buildQueryResult(null);
+	}
 
-		// 未返回正确的http状态
-		if (isEmpty) {
-			LogKit.error("未获取到返回报文或返回http状态码非200");
-			throw new RuntimeException("未获取到返回报文或返回http状态码非200");
+	public UnionpayCollectionQuery buildQueryResult(String operID) {
+		Date now = new Date();
+		this.query = new UnionpayCollectionQuery();
+
+		query.setTxnType("00");
+		query.setTxnSubType("00");
+		query.setBizType("000501");
+		query.setAccessType("0");
+
+		query.setMerId(getMerId());
+		query.setOrderId(getOrderId());
+		query.setTxnTime(getTxnTime());
+
+		query.setPlanId(getPlanId());
+		query.setExecutionId(getExecutionId());
+		query.setVersion(getVersion());
+		query.setEncoding(SDKConstants.UTF_8_ENCODING);
+		query.setBatchNo(getBatchNo());
+		query.setMerchantID(getMerchantID());
+
+		query.setCat(now);
+		query.setMat(now);
+		query.setOperID(operID);
+
+		query.assemblyQueryRequest();
+		return query;
+	}
+
+	public Map<String, String> queryResult() throws Exception {
+		if (this.query == null) {
+			buildQueryResult();
 		}
-		if (isValidate) {
-			LogKit.info("验证签名成功");
-		} else {
-			LogKit.error("验证签名失败");
-			throw new RuntimeException("验证签名失败");
-		}
-		return isValidate;
+		return this.query.queryResult();
 	}
 
 	public static int updateToBeSentUnionpayCollectionBatchNo(Kv kv) {
@@ -201,10 +225,28 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 		return Db.findFirst(sqlPara);
 	}
 
+	public static UnionpayCollection findByOrderId(String orderId) {
+		SqlPara sqlPara = Db.getSqlPara("collection_trade.findUnionpayCollection", Kv.create().set("orderId", orderId));
+		return UnionpayCollection.dao.findFirst(sqlPara);
+	}
+
+	public static UnionpayCollection findByTradeNo(String tradeNo) {
+		SqlPara sqlPara = Db.getSqlPara("collection_trade.findUnionpayCollection", Kv.create().set("tradeNo", tradeNo));
+		return UnionpayCollection.dao.findFirst(sqlPara);
+	}
+
 	public void resetBatchStatus() {
 		setBatchNo("");
 		setTxnTime("");
 		setStatus("0");
+	}
+
+	public UnionpayCollectionQuery getQuery() {
+		return query;
+	}
+
+	public void setQuery(UnionpayCollectionQuery query) {
+		this.query = query;
 	}
 
 	public Map<String, String> getRealtimeReqData() {

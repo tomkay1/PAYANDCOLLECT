@@ -107,6 +107,41 @@
 	        AND finalCode = #para(finalCode)
 	    #end
 #end
+#sql("findUnionpayCollectionQuery")
+	SELECT * FROM unionpay_collection_query  WHERE 1=1
+	    #if(planId)
+	        AND planId = #para(planId)
+	    #end
+	    #if(executionId)
+	        AND executionId = #para(executionId)
+	    #end
+	    #if(certifId)
+	        AND certifId = #para(certifId)
+	    #end
+	    #if(txnType)
+	        AND txnType = #para(txnType)
+	    #end
+	    #if(txnSubType)
+	        AND txnSubType = #para(txnSubType)
+	    #end
+	    #if(merId)
+	        AND merId = #para(merId)
+	    #end
+	     #if(orderId)
+	        AND orderId = #para(orderId)
+	    #end
+	    #if(txnTime)
+	        AND txnTime = #para(txnTime)
+	    #end
+	     #if(queryId)
+	        AND queryId = #para(queryId)
+	    #end
+	    #if(merchantID)
+	        AND merchantID = #para(merchantID)
+	    #end
+	    ORDER BY
+			cat DESC
+#end
 #sql("findMerchantFee")
 	SELECT * FROM merchant_fee WHERE 1=1
 		AND amountLower < #para(amount)

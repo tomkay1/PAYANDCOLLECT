@@ -41,6 +41,14 @@ public abstract class BaseUnionpayCollection<M extends BaseUnionpayCollection<M>
 		return getStr("version");
 	}
 
+	public void setEncoding(java.lang.String encoding) {
+		set("encoding", encoding);
+	}
+
+	public java.lang.String getEncoding() {
+		return getStr("encoding");
+	}
+
 	public void setCustomerNm(java.lang.String customerNm) {
 		set("customerNm", customerNm);
 	}

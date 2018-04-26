@@ -23,6 +23,7 @@ import com.mybank.pc.collection.model.UnionpayBatchCollectionBatchno;
 import com.mybank.pc.collection.model.UnionpayBatchCollectionQuery;
 import com.mybank.pc.collection.model.UnionpayCallbackLog;
 import com.mybank.pc.collection.model.UnionpayCollection;
+import com.mybank.pc.collection.model.UnionpayCollectionQuery;
 import com.mybank.pc.collection.model.UnionpayEntrust;
 import com.mybank.pc.merchant.model.MerchantCust;
 import com.mybank.pc.merchant.model.MerchantFee;
@@ -70,6 +71,7 @@ public class _MappingKit {
 		arp.addMapping("unionpay_batch_collection_query", "id", UnionpayBatchCollectionQuery.class);
 		arp.addMapping("unionpay_callback_log", "id", UnionpayCallbackLog.class);
 		arp.addMapping("unionpay_collection", "id", UnionpayCollection.class);
+		arp.addMapping("unionpay_collection_query", "id", UnionpayCollectionQuery.class);
 		arp.addMapping("unionpay_entrust", "id", UnionpayEntrust.class);
 	}
 }

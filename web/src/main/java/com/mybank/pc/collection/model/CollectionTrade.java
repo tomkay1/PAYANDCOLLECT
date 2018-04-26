@@ -1,5 +1,7 @@
 package com.mybank.pc.collection.model;
 
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseCollectionTrade;
 
 /**
@@ -8,4 +10,9 @@ import com.mybank.pc.collection.model.base.BaseCollectionTrade;
 @SuppressWarnings("serial")
 public class CollectionTrade extends BaseCollectionTrade<CollectionTrade> {
 	public static final CollectionTrade dao = new CollectionTrade().dao();
+
+	public static CollectionTrade findByTradeNo(UnionpayCollection unionpayCollection) {
+		SqlPara sqlPara = Db.getSqlPara("collection_trade.findByTradeNo", unionpayCollection);
+		return dao.findFirst(sqlPara);
+	}
 }

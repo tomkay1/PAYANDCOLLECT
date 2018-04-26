@@ -12,6 +12,7 @@ import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.Consts;
 import com.mybank.pc.collection.model.CollectionTrade;
+import com.mybank.pc.collection.model.UnionpayCollection;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.exception.ValidateCTRException;
 import com.mybank.pc.kits.CookieKit;
@@ -134,6 +135,27 @@ public class CTradeCtr extends CoreController {
 			renderSuccessJSON("发起交易成功");
 		} else {
 			renderFailJSON(errorMsg);
+		}
+	}
+
+	@ActionKey("/coll/trade/syncOrderStatus")
+	public void syncOrderStatus() throws Exception {
+		String tradeNo = getPara("tradeNo");
+		UnionpayCollection unionpayCollection = null;
+		boolean isThrowException = false;
+		try {
+			unionpayCollection = UnionpayCollection.findByTradeNo(tradeNo);
+			cCTradeSrvSrv.syncOrderStatus(unionpayCollection);
+		} catch (Exception e) {
+			e.printStackTrace();
+			isThrowException = true;
+		} finally {
+			CollectionTrade updatedcollectionTrade = null;
+			if (isThrowException || unionpayCollection == null
+					|| (updatedcollectionTrade = CollectionTrade.findByTradeNo(unionpayCollection)) == null) {
+				renderJson(new CollectionTrade());
+			}
+			renderJson(updatedcollectionTrade);
 		}
 	}
 

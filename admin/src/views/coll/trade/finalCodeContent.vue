@@ -1,57 +1,62 @@
 <template>
+
     <div class="fcc">
-
-        <div class="fcc-steps-item" v-bind:class="computedResItemClass">
-            <div class="fcc-steps-tail">
-                <i></i>
-            </div>
-            <div class="fcc-steps-head">
-                <div class="fcc-steps-head-inner">
-                    <span>发起交易</span>
+        <div class="fcc-refresh" v-on:click="syncStatus">
+            <Icon type="refresh"></Icon>
+        </div>
+        <div class="fcc-steps">
+            <div class="fcc-steps-item" v-bind:class="computedResItemClass">
+                <div class="fcc-steps-tail">
+                    <i></i>
                 </div>
-            </div>
-            <div class="fcc-steps-main" v-bind:class="computedResClass">
-                <div class="fcc-steps-main-code-block">
-                    <div class="fcc-steps-fs-15">{{resCode}}</div>
-                    <span class="fcc-steps-main-intro-text">响应码</span>
-                </div>
-                <div class="fcc-steps-main-block">
-                    <div class="fcc-steps-fs-15">
-                        <span class="fcc-steps-main-msg">{{resMsg}}</span>
+                <div class="fcc-steps-head">
+                    <div class="fcc-steps-head-inner">
+                        <span>发起交易</span>
                     </div>
-                    <span class="fcc-steps-main-intro-text">响应信息</span>
+                </div>
+                <div class="fcc-steps-main" v-bind:class="computedResClass">
+                    <div class="fcc-steps-main-code-block">
+                        <div class="fcc-steps-fs-15">{{resCode}}</div>
+                        <span class="fcc-steps-main-intro-text">响应码</span>
+                    </div>
+                    <div class="fcc-steps-main-block">
+                        <div class="fcc-steps-fs-15">
+                            <span class="fcc-steps-main-msg">{{resMsg}}</span>
+                        </div>
+                        <span class="fcc-steps-main-intro-text">响应信息</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fcc-steps-item" v-bind:class="computedResultItemClass">
+                <div class="fcc-steps-tail">
+                    <i></i>
+                </div>
+                <div class="fcc-steps-head">
+                    <div class="fcc-steps-head-inner">
+                        <span>处理结果</span>
+                    </div>
+                </div>
+                <div class="fcc-steps-main" v-bind:class="computedResultClass">
+                    <div class="fcc-steps-main-code-block">
+                        <div class="fcc-steps-fs-15">{{resultCode}}</div>
+                        <span class="fcc-steps-main-intro-text">响应码</span>
+                    </div>
+                    <div class="fcc-steps-main-block">
+                        <div class="fcc-steps-fs-15">
+                            <span class="fcc-steps-main-msg">{{resultMsg}}</span>
+                        </div>
+                        <span class="fcc-steps-main-intro-text">响应信息</span>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="fcc-steps-item" v-bind:class="computedResultItemClass">
-            <div class="fcc-steps-tail">
-                <i></i>
-            </div>
-            <div class="fcc-steps-head">
-                <div class="fcc-steps-head-inner">
-                    <span>处理结果</span>
-                </div>
-            </div>
-            <div class="fcc-steps-main" v-bind:class="computedResultClass">
-                <div class="fcc-steps-main-code-block">
-                    <div class="fcc-steps-fs-15">{{resultCode}}</div>
-                    <span class="fcc-steps-main-intro-text">响应码</span>
-                </div>
-                <div class="fcc-steps-main-block">
-                    <div class="fcc-steps-fs-15">
-                        <span class="fcc-steps-main-msg">{{resultMsg}}</span>
-                    </div>
-                    <span class="fcc-steps-main-intro-text">响应信息</span>
-                </div>
-            </div>
-        </div>
-
     </div>
 </template>
 
 
 <script>
+    import Vue from 'vue'
     import { mapState } from 'vuex'
 
     function isBlank(o) {
@@ -61,9 +66,16 @@
     export default {
         name: 'FinalCodeContent',
         props: [
-            'tradeInfo'
+            'index', 'tradeInfo'
         ],
         computed: {
+            ...mapState({
+                'tradeList': state => state.collTrade.tradeList,
+                'totalPage': state => state.collTrade.totalPage,
+                'pageNumber': state => state.collTrade.pageNumber,
+                'total': state => state.collTrade.totalRow,
+                'collTrade': state => state.collTrade.collTrade,
+            }),
             resCode: function () {
                 return isBlank(this.tradeInfo.resCode) ? '暂无' : this.tradeInfo.resCode;
             },
@@ -108,6 +120,12 @@
             },
         },
         methods: {
+            syncStatus() {
+                console.log("1234")
+                this.$axios.post('/coll/trade/syncOrderStatus',this.tradeInfo).then((res) => {
+                    Vue.set(this.tradeList, this.index, res)
+                });
+            }
         },
         data() {
             return {
