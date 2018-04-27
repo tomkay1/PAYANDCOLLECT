@@ -1,5 +1,10 @@
 package com.mybank.pc.collection.model;
 
+import java.util.List;
+
+import com.jfinal.kit.Kv;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseUnionpayCallbackLog;
 
 /**
@@ -8,4 +13,9 @@ import com.mybank.pc.collection.model.base.BaseUnionpayCallbackLog;
 @SuppressWarnings("serial")
 public class UnionpayCallbackLog extends BaseUnionpayCallbackLog<UnionpayCallbackLog> {
 	public static final UnionpayCallbackLog dao = new UnionpayCallbackLog().dao();
+
+	public static List<UnionpayCallbackLog> findCallbackByOrderId(String orderId) {
+		SqlPara sqlPara = Db.getSqlPara("collection_trade.findCallbackByOrderId", Kv.create().set("orderId", orderId));
+		return dao.find(sqlPara);
+	}
 }

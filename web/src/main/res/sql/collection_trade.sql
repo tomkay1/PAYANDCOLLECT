@@ -59,6 +59,14 @@
 	        AND tradeNo = #para(tradeNo)
 	    #end
 #end
+#sql("findCallbackByOrderId")
+	SELECT * FROM unionpay_callback_log WHERE 1=1
+	    #if(orderId)
+	        AND orderId = #para(orderId)
+	    #end
+	    ORDER BY
+			cat DESC
+#end
 #sql("findUnionpayCollection")
 	SELECT * FROM unionpay_collection  WHERE 1=1
 	    #if(customerNm)

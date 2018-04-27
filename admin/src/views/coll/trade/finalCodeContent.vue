@@ -1,9 +1,15 @@
 <template>
-
     <div class="fcc">
+
         <div class="fcc-refresh" v-on:click="syncStatus">
-            <Icon type="refresh"></Icon>
+            <Tooltip placement="top" :delay="1000">
+                <Icon type="refresh"></Icon>
+                <div slot="content">
+                    <p>同步订单状态</p>
+                </div>
+            </Tooltip>
         </div>
+
         <div class="fcc-steps">
             <div class="fcc-steps-item" v-bind:class="computedResItemClass">
                 <div class="fcc-steps-tail">
@@ -53,7 +59,6 @@
         </div>
     </div>
 </template>
-
 
 <script>
     import Vue from 'vue'
@@ -122,7 +127,7 @@
         methods: {
             syncStatus() {
                 console.log("1234")
-                this.$axios.post('/coll/trade/syncOrderStatus',this.tradeInfo).then((res) => {
+                this.$axios.post('/coll/trade/syncOrderStatus', this.tradeInfo).then((res) => {
                     Vue.set(this.tradeList, this.index, res)
                 });
             }

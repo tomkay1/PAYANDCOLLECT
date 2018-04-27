@@ -287,6 +287,12 @@
                         align: 'center',
                         minWidth: 100,
                     },
+                    {
+                        title: '修改时间',
+                        key: 'mat',
+                        align: 'center',
+                        minWidth: 180,
+                    },
                 ]
             }
         }

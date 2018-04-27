@@ -20,6 +20,7 @@ import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.CardBin;
 import com.mybank.pc.collection.model.CollectionEntrust;
 import com.mybank.pc.collection.model.CollectionTrade;
+import com.mybank.pc.collection.model.UnionpayCallbackLog;
 import com.mybank.pc.collection.model.UnionpayCollection;
 import com.mybank.pc.collection.model.UnionpayCollectionQuery;
 import com.mybank.pc.exception.BaseCollectionRuntimeException;
@@ -345,21 +346,55 @@ public class CTradeSrv {
 	}
 
 	public void updateOrderStatus(Map<String, String> reqParam) {
-		UnionpayCollection unionpayCollection = null;
+		String respCode = reqParam.get("respCode");
 		String orderId = reqParam.get("orderId");
-		if (StringUtils.isBlank(orderId)) {
-			return;
-		}
 		try {
-			unionpayCollection = UnionpayCollection.findByOrderId(orderId);
-			
-			
-			
-			
-			
-			syncOrderStatus(unionpayCollection);
+			UnionpayCollection unionpayCollection = UnionpayCollection.findByOrderId(orderId);
+			if ("00".equals(respCode) || "A6".equals(respCode)) {// 交易成功
+				syncOrderStatus(unionpayCollection);
+			} else if ("03".equals(respCode) || "04".equals(respCode) || "05".equals(respCode)) {// 订单处理中或交易状态未明
+				setResultByCallback(unionpayCollection, reqParam, "1");// 处理中
+			} else {// 交易失败
+				setResultByCallback(unionpayCollection, reqParam, "2");// 失败
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void setResultByCallback(UnionpayCollection unionpayCollection, Map<String, String> reqParam,
+			String finalCode) {
+		Date now = new Date();
+		String respCode = reqParam.get("respCode");
+		String respMsg = reqParam.get("respMsg");
+
+		String queryId = reqParam.get("queryId");
+		String settleAmt = reqParam.get("settleAmt");
+		String settleCurrencyCode = reqParam.get("settleCurrencyCode");
+		String settleDate = reqParam.get("settleDate");
+		String traceNo = reqParam.get("traceNo");
+		String traceTime = reqParam.get("traceTime");
+		if (unionpayCollection != null) {
+			unionpayCollection.setFinalCode(finalCode);
+			unionpayCollection.setResultCode(respCode);
+			unionpayCollection.setResultMsg(respMsg);
+			unionpayCollection.setResult(JsonKit.toJson(reqParam));
+			unionpayCollection.setQueryId(queryId);
+			unionpayCollection.setSettleAmt(settleAmt);
+			unionpayCollection.setSettleCurrencyCode(settleCurrencyCode);
+			unionpayCollection.setSettleDate(settleDate);
+			unionpayCollection.setTraceNo(traceNo);
+			unionpayCollection.setTraceTime(traceTime);
+			unionpayCollection.setMat(now);
+			unionpayCollection.update();
+		}
+		CollectionTrade collectionTrade = CollectionTrade.findByTradeNo(unionpayCollection);
+		if (collectionTrade != null) {
+			collectionTrade.setFinalCode(finalCode);
+			collectionTrade.setResultCode(respCode);
+			collectionTrade.setResultMsg(respMsg);
+			collectionTrade.setMat(now);
+			collectionTrade.update();
 		}
 	}
 
@@ -376,9 +411,7 @@ public class CTradeSrv {
 					CollectionTrade collectionTrade = CollectionTrade.findByTradeNo(unionpayCollection);
 					UnionpayCollectionQuery lastsQuery = queryHistory.get(0);
 
-					String resultCode = unionpayCollection.getResultCode();
-					String finalCode = unionpayCollection.getFinalCode();
-
+					String respCode = lastsQuery.getRespCode();
 					String origRespCode = lastsQuery.getOrigRespCode();
 					String origRespMsg = lastsQuery.getOrigRespMsg();
 					String resp = lastsQuery.getResp();
@@ -389,13 +422,15 @@ public class CTradeSrv {
 					String traceNo = query.getTraceNo();
 					String traceTime = query.getTraceTime();
 
-					boolean respCodeIsNotBlank = StringUtils.isNotBlank(origRespCode);
+					boolean isFail = false;
+					boolean origRespCodeIsNotBlank = StringUtils.isNotBlank(origRespCode);
 					boolean isUnkonwOrigRespCode = "03".equals(origRespCode) || "04".equals(origRespCode)
 							|| "05".equals(origRespCode);// 订单处理中或交易状态未明
 
-					if (respCodeIsNotBlank && "00".equals(origRespCode)) {// 成功
-						Date now = new Date();
-						if ((!"00".equals(resultCode)) || (!"0".equals(finalCode))) {
+					// 查询成功
+					if ("00".equals(respCode)) {
+						if ("00".equals(origRespCode)) {// 成功
+							Date now = new Date();
 							unionpayCollection.setFinalCode("0");// 成功
 							unionpayCollection.setResultCode(origRespCode);
 							unionpayCollection.setResultMsg(origRespMsg);
@@ -408,21 +443,15 @@ public class CTradeSrv {
 							unionpayCollection.setTraceTime(traceTime);
 							unionpayCollection.setMat(now);
 							unionpayCollection.update();
-						}
-						if (collectionTrade != null) {
-							String ctResultCode = collectionTrade.getResultCode();
-							String ctFinalCode = collectionTrade.getFinalCode();
-							if ((!"00".equals(ctResultCode)) || (!"0".equals(ctFinalCode))) {
+							if (collectionTrade != null) {
 								collectionTrade.setFinalCode("0");// 成功
 								collectionTrade.setResultCode(origRespCode);
 								collectionTrade.setResultMsg(origRespMsg);
 								collectionTrade.setMat(now);
 								collectionTrade.update();
 							}
-						}
-					} else if (respCodeIsNotBlank && (!isUnkonwOrigRespCode)) {// 失败
-						Date now = new Date();
-						if (!"2".equals(finalCode)) {
+						} else if (origRespCodeIsNotBlank && (!isUnkonwOrigRespCode)) {// 失败
+							Date now = new Date();
 							unionpayCollection.setFinalCode("2");// 失败
 							unionpayCollection.setResultCode(origRespCode);
 							unionpayCollection.setResultMsg(origRespMsg);
@@ -435,10 +464,8 @@ public class CTradeSrv {
 							unionpayCollection.setTraceTime(traceTime);
 							unionpayCollection.setMat(now);
 							unionpayCollection.update();
-						}
-						if (collectionTrade != null) {
-							String ctFinalCode = collectionTrade.getFinalCode();
-							if (!"2".equals(ctFinalCode)) {
+
+							if (collectionTrade != null) {
 								collectionTrade.setFinalCode("0");// 失败
 								collectionTrade.setResultCode(origRespCode);
 								collectionTrade.setResultMsg(origRespMsg);
@@ -446,7 +473,12 @@ public class CTradeSrv {
 								collectionTrade.update();
 							}
 						}
-					} else if ((!respCodeIsNotBlank) || isUnkonwOrigRespCode) {// 查询失败/订单处理中或交易状态未明
+					} else if ("34".equals(respCode)) {// 订单不存在
+						isFail = syncInRespCode34(unionpayCollection);
+					}
+
+					// 订单处理中或交易状态未明
+					if (isUnkonwOrigRespCode || ((!"00".equals(respCode)) && !isFail)) {
 						queryResult(unionpayCollection);
 					}
 				}
@@ -457,6 +489,48 @@ public class CTradeSrv {
 				throw e;
 			}
 		}
+	}
+
+	private boolean syncInRespCode34(UnionpayCollection unionpayCollection) {
+		boolean isFail = false;
+		UnionpayCallbackLog lastsCallbackLog = null;
+		try {
+			List<UnionpayCallbackLog> callbackLog = UnionpayCallbackLog
+					.findCallbackByOrderId(unionpayCollection.getOrderId());
+			if (CollectionUtils.isNotEmpty(callbackLog)) {
+				lastsCallbackLog = callbackLog.get(0);
+				isFail = UnionpayCollection.isFail(lastsCallbackLog.getRespCode());
+			} else {
+				String respCode = unionpayCollection.getRespCode();
+				String resultCode = unionpayCollection.getResultCode();
+				isFail = UnionpayCollection.isFail(respCode) || UnionpayCollection.isFail(resultCode);
+			}
+			Date now = new Date();
+			if (isFail) {
+				unionpayCollection.setFinalCode("2");// 失败
+				if (lastsCallbackLog != null) {
+					unionpayCollection.setResultCode(lastsCallbackLog.getRespCode());
+					unionpayCollection.setResultMsg(lastsCallbackLog.getRespMsg());
+					unionpayCollection.setResult(lastsCallbackLog.getInfo());
+				}
+				unionpayCollection.setMat(now);
+				unionpayCollection.update();
+
+				CollectionTrade collectionTrade = CollectionTrade.findByTradeNo(unionpayCollection);
+				if (collectionTrade != null) {
+					collectionTrade.setFinalCode("2");// 失败
+					if (lastsCallbackLog != null) {
+						collectionTrade.setResultCode(lastsCallbackLog.getRespCode());
+						collectionTrade.setResultMsg(lastsCallbackLog.getRespMsg());
+					}
+					collectionTrade.setMat(now);
+					collectionTrade.update();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return isFail;
 	}
 
 	public void queryResult(UnionpayCollection unionpayCollection) throws Exception {
@@ -512,7 +586,7 @@ public class CTradeSrv {
 			CollectionTrade collectionTrade = CollectionTrade.findByTradeNo(unionpayCollection);
 			if (collectionTrade != null) {
 				collectionTrade.setResultCode(origRespCode);
-				collectionTrade.setResMsg(origRespMsg);
+				collectionTrade.setResultMsg(origRespMsg);
 				collectionTrade.setMat(now);
 			}
 
@@ -540,7 +614,7 @@ public class CTradeSrv {
 				}
 			}
 		} else if (("34").equals(respCode)) {
-			// 订单不存在，可认为交易状态未明，需要稍后发起交易状态查询，或依据对账结果为准
+			syncInRespCode34(unionpayCollection);
 		} else {
 			// 查询交易本身失败，如应答码10/11检查查询报文是否正确
 		}

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Db;
@@ -208,6 +210,11 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 			buildQueryResult();
 		}
 		return this.query.queryResult();
+	}
+
+	public static boolean isFail(String resultCode) {
+		return StringUtils.isNotBlank(resultCode) && !("00".equals(resultCode) || "A6".equals(resultCode)
+				|| "03".equals(resultCode) || "04".equals(resultCode) || "05".equals(resultCode));
 	}
 
 	public static int updateToBeSentUnionpayCollectionBatchNo(Kv kv) {
