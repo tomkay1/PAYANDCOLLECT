@@ -503,7 +503,10 @@ public class CTradeSrv {
 			} else {
 				String respCode = unionpayCollection.getRespCode();
 				String resultCode = unionpayCollection.getResultCode();
-				isFail = UnionpayCollection.isFail(respCode) || UnionpayCollection.isFail(resultCode);
+				String exceptionInfo = unionpayCollection.getExceInfo();
+
+				isFail = UnionpayCollection.isFail(respCode) || UnionpayCollection.isFail(resultCode)
+						|| StringUtils.isBlank(respCode) || StringUtils.isNotBlank(exceptionInfo);
 			}
 			Date now = new Date();
 			if (isFail) {

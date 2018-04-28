@@ -1,13 +1,18 @@
 <template>
     <div class="fcc">
 
-        <div class="fcc-refresh" v-on:click="syncStatus">
-            <Tooltip placement="top" :delay="1000">
-                <Icon type="refresh"></Icon>
-                <div slot="content">
-                    <p>同步订单状态</p>
-                </div>
-            </Tooltip>
+        <div class="fcc-refresh">
+            <div class="fcc-refresh-content" v-on:click="syncStatus" v-if="!syncStatusLoadingShow">
+                <Tooltip placement="top" :delay="1000" :transfer="transfer">
+                    <Icon type="refresh"></Icon>
+                    <div slot="content">
+                        <p>同步订单状态</p>
+                    </div>
+                </Tooltip>
+            </div>
+            <Spin v-if="syncStatusLoadingShow">
+                <SyncStatusLoading></SyncStatusLoading>
+            </Spin>
         </div>
 
         <div class="fcc-steps">
@@ -63,6 +68,10 @@
 <script>
     import Vue from 'vue'
     import { mapState } from 'vuex'
+    import env from '../../../../build/env'
+    import axios from 'axios'
+    import qs from 'qs'
+    import syncStatusLoading from './syncStatusLoading.vue'
 
     function isBlank(o) {
         return !o || o === '';
@@ -73,6 +82,9 @@
         props: [
             'index', 'tradeInfo'
         ],
+        components: {
+            SyncStatusLoading: syncStatusLoading
+        },
         computed: {
             ...mapState({
                 'tradeList': state => state.collTrade.tradeList,
@@ -126,14 +138,44 @@
         },
         methods: {
             syncStatus() {
-                console.log("1234")
-                this.$axios.post('/coll/trade/syncOrderStatus', this.tradeInfo).then((res) => {
-                    Vue.set(this.tradeList, this.index, res)
+                this.syncStatusLoadingShow = true;
+                setTimeout(() => {
+                    this.syncStatusLoadingShow=false;
+                }, 5000);
+                
+                let axiosIns=this.createAxios();
+                axiosIns.post('/coll/trade/syncOrderStatus', this.tradeInfo).then((res) => {
+                    console.log(res);
+                    Vue.set(this.tradeList, this.index, res.data);
+                    this.syncStatusLoadingShow = false;
                 });
+            },
+            createAxios(){
+                let axiosIns = axios.create({});
+                if (env === 'development') {
+                    axiosIns.defaults.baseURL = '/api';
+                } else if (env === 'debug') {
+                    axiosIns.defaults.baseURL = '/api';
+                } else if (env === 'production') {
+                    axiosIns.defaults.baseURL = '';
+                }
+                axiosIns.defaults.headers.post['X-Requested-With'] = 'XMLHttpRequest';
+                axiosIns.defaults.headers.get['X-Requested-With'] = 'XMLHttpRequest';
+                axiosIns.defaults.responseType = 'json';
+                axiosIns.defaults.transformRequest = [function (data) {
+                    if (data instanceof FormData) {
+                        return data;
+                    }
+                    return qs.stringify(data);
+                }
+                ];
+                return axiosIns;
             }
         },
         data() {
             return {
+                transfer: true,
+                syncStatusLoadingShow: false
             }
         }
     }

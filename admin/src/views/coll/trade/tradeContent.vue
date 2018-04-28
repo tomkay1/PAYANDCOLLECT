@@ -221,6 +221,10 @@
                                 },
                             }, [
                                     h('div', {
+                                        class: ['expand-expanded']
+
+
+                                        ,
                                         style: {
                                             'min-width': '80px',
                                             color: color,
