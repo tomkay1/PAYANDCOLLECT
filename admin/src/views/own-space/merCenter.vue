@@ -69,6 +69,11 @@
                         <div style="margin-top: 30px"><img :src="urlEWImg"  width="150"></div>
                 <div style="margin-top: 10px">客户请扫描此二维码进行银行卡绑定</div>
                 </i-col>
+                    <i-col span="10" align="center">
+
+                        <Button type="success" @click="downloadDoc">下载代扣授权书</Button>
+                       <button></button>
+                    </i-col>
                 </Row>
                 <div slot="footer">
 
@@ -92,10 +97,15 @@ export default {
             urlCardZ: '',
             urlCardF: '',
             urlEWImg: '',
+            downUrl:'',
         };
     },
     methods: {
+        downloadDoc() {
+            this.downUrl = consts.devLocation + "/cmn/act06";
+                this.$axios.post(this.downUrl)
 
+            },
     },
     mounted () {
         this.$store.dispatch('login_merInfo').then((res)=> {
