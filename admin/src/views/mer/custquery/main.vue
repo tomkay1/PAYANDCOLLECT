@@ -289,5 +289,5 @@
         margin: 5px 0px;
         padding: 5px 5px;
     }
-    .ivu-page-options-elevator input{padding-bottom: 2px}
+
 </style>

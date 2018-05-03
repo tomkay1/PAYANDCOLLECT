@@ -746,5 +746,5 @@
         font-size: 12px;
         line-height: 30px;
     }
-    .ivu-page-options-elevator input{padding-bottom: 2px}
+
 </style>
