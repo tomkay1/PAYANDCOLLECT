@@ -5,8 +5,8 @@ const collTrade = {
         totalPage: 0,
         pageNumber: 1,
         totalRow: 0,
-        collTrade: {
-        }
+        collTrade: {},
+        highlightIndex: -1
     },
     mutations: {
         set_trade_list(state, page) {
@@ -40,7 +40,7 @@ const collTrade = {
                     resolve(res.resCode);
                 });
             });
-        },
+        }
     }
 };
 

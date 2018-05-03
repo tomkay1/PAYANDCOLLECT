@@ -80,7 +80,7 @@
     export default {
         name: 'FinalCodeContent',
         props: [
-            'index', 'tradeInfo'
+            'index', 'tradeInfo', 'isShow'
         ],
         components: {
             SyncStatusLoading: syncStatusLoading
@@ -93,6 +93,14 @@
                 'total': state => state.collTrade.totalRow,
                 'collTrade': state => state.collTrade.collTrade,
             }),
+            highlightIndex: {
+                get: function () {
+                    return this.$store.state.collTrade.highlightIndex
+                },
+                set: function (newValue) {
+                    this.$store.state.collTrade.highlightIndex = newValue
+                }
+            },
             resCode: function () {
                 return isBlank(this.tradeInfo.resCode) ? '暂无' : this.tradeInfo.resCode;
             },
@@ -140,17 +148,17 @@
             syncStatus() {
                 this.syncStatusLoadingShow = true;
                 setTimeout(() => {
-                    this.syncStatusLoadingShow=false;
-                }, 5000);
-                
-                let axiosIns=this.createAxios();
+                    this.syncStatusLoadingShow = false;
+                }, 10000);
+                let axiosIns = this.createAxios();
                 axiosIns.post('/coll/trade/syncOrderStatus', this.tradeInfo).then((res) => {
-                    console.log(res);
+                    this.highlightIndex = this.index;
+                    this.isShow[this.index]=false;
                     Vue.set(this.tradeList, this.index, res.data);
                     this.syncStatusLoadingShow = false;
                 });
             },
-            createAxios(){
+            createAxios() {
                 let axiosIns = axios.create({});
                 if (env === 'development') {
                     axiosIns.defaults.baseURL = '/api';
@@ -175,7 +183,7 @@
         data() {
             return {
                 transfer: true,
-                syncStatusLoadingShow: false
+                syncStatusLoadingShow: false,
             }
         }
     }
