@@ -1,12 +1,14 @@
 <template>
-    <Tabs>
-        <TabPane label="委托状态管理">
-            <entrustStatusPaneContent></entrustStatusPaneContent>
-        </TabPane>
-        <TabPane label="交易流水">
-            <entrustTradePaneContent></entrustTradePaneContent>
-        </TabPane>
-    </Tabs>
+    <Card>
+        <Tabs>
+            <TabPane label="委托状态管理">
+                <entrustStatusPaneContent></entrustStatusPaneContent>
+            </TabPane>
+            <TabPane label="交易流水">
+                <entrustTradePaneContent></entrustTradePaneContent>
+            </TabPane>
+        </Tabs>
+    </Card>
 </template>
 
 <script>

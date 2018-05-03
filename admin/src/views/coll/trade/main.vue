@@ -1,6 +1,12 @@
 <template>
     <div>
-        <tradeContent ref="tc"></tradeContent>
+        <Card>
+            <Tabs>
+                <TabPane label="交易列表">
+                    <tradeContent ref="tc"></tradeContent>
+                </TabPane>
+            </Tabs>
+        </Card>
         <!-- <Tabs>
             <TabPane label="交易管理">
                 <tradeContent ref="tc"></tradeContent>

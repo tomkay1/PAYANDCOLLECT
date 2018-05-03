@@ -2,29 +2,27 @@
     <div>
         <Row>
             <Col span="24">
-            <Card>
-                <Row>
-                    <Col span="8">
-                    <Button type="primary" icon="person-add" @click="add">建立委托</Button>
-                    <!-- <Button type="primary" icon="person-add" @click="terminate">解除委托</Button> -->
-                    <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
-                    </Col>
-                    <Col span="8" offset="8" align="right">
-                    <Input v-model="searchKey" placeholder="请输入..." style="width: 200px" />
-                    <span @click="search" style="margin: 0 10px;">
-                        <Button type="primary" icon="search">搜索</Button>
-                    </span>
-                    </Col>
-                </Row>
-                <Row class="margin-top-10">
-                    <Table border :data="entrustList" :columns="tableColums" stripe></Table>
-                </Row>
-                <div style="margin: 10px;overflow: hidden">
-                    <div style="float: right;">
-                        <Page :page-size="pageSize" :total="total" :current="pageNumber" @on-change="search" show-total show-elevator></Page>
-                    </div>
+            <Row>
+                <Col span="8">
+                <Button type="primary" icon="person-add" @click="add">建立委托</Button>
+                <!-- <Button type="primary" icon="person-add" @click="terminate">解除委托</Button> -->
+                <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
+                </Col>
+                <Col span="8" offset="8" align="right">
+                <Input v-model="searchKey" placeholder="请输入..." style="width: 200px" />
+                <span @click="search" style="margin: 0 10px;">
+                    <Button type="primary" icon="search">搜索</Button>
+                </span>
+                </Col>
+            </Row>
+            <Row class="margin-top-10">
+                <Table border :data="entrustList" :columns="tableColums" stripe></Table>
+            </Row>
+            <div style="margin: 10px;overflow: hidden">
+                <div style="float: right;">
+                    <Page :page-size="pageSize" :total="total" :current="pageNumber" @on-change="search" show-total show-elevator></Page>
                 </div>
-            </Card>
+            </div>
             </Col>
         </Row>
         <addForm ref="aem" :pageSize="pageSize"></addForm>

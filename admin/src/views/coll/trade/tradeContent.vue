@@ -2,37 +2,35 @@
     <div>
         <Row>
             <Col span="24">
-            <Card>
+            <div>
                 <div>
-                    <div>
-                        <Row>
-                            <Col span="6" align="left">
-                            <Button type="primary" icon="person-add" @click="initiate">发起交易</Button>
-                            <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
-                            </Col>
-                            <Col span="18" align="right">
-                            <Select v-model="finalCode" style="width: 120px; text-align: center;" placeholder="最终处理结果">
-                                <Option v-for="item in finalCodeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                            </Select>
-                            <DatePicker type="date" placeholder="开始日期" style="width: 200px" v-model="bTime" format="yyyy-MM-dd" :transfer="true" :clearable="false"></DatePicker>
-                            <DatePicker type="date" placeholder="结束日期" style="width: 200px" v-model="eTime" format="yyyy-MM-dd" :transfer="true" :clearable="false"></DatePicker>
-                            <Input v-model="searchKey" placeholder="请输入..." style="width: 200px" />
-                            <span @click="search" style="margin: 0 10px;">
-                                <Button type="primary" icon="search">搜索</Button>
-                            </span>
-                            </Col>
-                        </Row>
-                    </div>
-                    <Row class="margin-top-10">
-                        <Table :border="false" :data="tradeList" :columns="tableColums" stripe></Table>
+                    <Row>
+                        <Col span="6" align="left">
+                        <Button type="primary" icon="person-add" @click="initiate">发起交易</Button>
+                        <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
+                        </Col>
+                        <Col span="18" align="right">
+                        <Select v-model="finalCode" style="width: 120px; text-align: center;" placeholder="最终处理结果">
+                            <Option v-for="item in finalCodeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                        </Select>
+                        <DatePicker type="date" placeholder="开始日期" style="width: 200px" v-model="bTime" format="yyyy-MM-dd" :transfer="true" :clearable="false"></DatePicker>
+                        <DatePicker type="date" placeholder="结束日期" style="width: 200px" v-model="eTime" format="yyyy-MM-dd" :transfer="true" :clearable="false"></DatePicker>
+                        <Input v-model="searchKey" placeholder="请输入..." style="width: 200px" />
+                        <span @click="search" style="margin: 0 10px;">
+                            <Button type="primary" icon="search">搜索</Button>
+                        </span>
+                        </Col>
                     </Row>
-                    <div style="margin: 10px;overflow: hidden">
-                        <div style="float: right;">
-                            <Page :total="total" :current="pageNumber" :page-size="pageSize" @on-change="search" show-total show-elevator></Page>
-                        </div>
+                </div>
+                <Row class="margin-top-10">
+                    <Table :border="false" :data="tradeList" :columns="tableColums" :row-class-name="rowClassName" stripe></Table>
+                </Row>
+                <div style="margin: 10px;overflow: hidden">
+                    <div style="float: right;">
+                        <Page :total="total" :current="pageNumber" :page-size="pageSize" @on-change="search" show-total show-elevator></Page>
                     </div>
                 </div>
-            </Card>
+            </div>
             </Col>
         </Row>
         <addForm ref="aem" :pageSize="pageSize" :finalCode="finalCode" :bTime="bTime" :eTime="eTime" :searchKey="searchKey"></addForm>
@@ -54,7 +52,15 @@
                 'pageNumber': state => state.collTrade.pageNumber,
                 'total': state => state.collTrade.totalRow,
                 'collTrade': state => state.collTrade.collTrade,
-            })
+            }),
+            highlightIndex: {
+                get: function () {
+                    return this.$store.state.collTrade.highlightIndex
+                },
+                set: function (newValue) {
+                    this.$store.state.collTrade.highlightIndex = newValue
+                }
+            },
         },
         methods: {
             search(pn) {
@@ -66,6 +72,8 @@
                     pn: pn,
                     ps: this.pageSize
                 }
+                this.isShow = {};
+                this.highlightIndex = -1;
                 this.$store.dispatch('trade_list', param)
             },
             refresh() {
@@ -76,11 +84,20 @@
                     search: this.searchKey,
                     ps: this.pageSize
                 }
+                this.isShow = {};
+                this.highlightIndex = -1;
                 this.$store.dispatch('trade_list', param)
             },
             initiate() {
                 this.$refs.aem.open();
             },
+            rowClassName(row, index) {
+                if (this.highlightIndex === index) {
+                    return 'highlight';
+                } else {
+                    return '';
+                }
+            }
         },
         components: {
             addForm: addTradeModal,
@@ -94,10 +111,12 @@
                 search: this.searchKey,
                 ps: this.pageSize
             }
+            this.isShow = {};
             this.$store.dispatch('trade_list', param)
         },
         data() {
             return {
+                isShow: {},
                 finalCode: '',
                 bTime: new Date(),
                 eTime: new Date(),
@@ -122,41 +141,41 @@
                     },
                 ],
                 tableColums: [
-                    {
-                        title: '详情',
-                        key: 'action',
-                        width: 60,
-                        align: 'center',
-                        fixed: 'right',
-                        render: (h, params) => {
-                            const row = params.row;
-                            return h('div', {
-                                style: {
-                                    'padding-left': '0px',
-                                    'padding-right': '0px',
-                                }
-                            }, [
-                                    h('a', {
-                                        style: {
-                                            display: 'inline-block',
-                                            width: '100%',
-                                        },
-                                        on: {
-                                            click: () => {
-                                                // this.remove(params.index)
-                                            }
-                                        }
-                                    }, [
-                                            h('Icon', {
-                                                props: {
-                                                    type: 'chevron-right',
-                                                    size: 18
-                                                }
-                                            })
-                                        ]),
-                                ]);
-                        }
-                    },
+                    // {
+                    //     title: '详情',
+                    //     key: 'action',
+                    //     width: 60,
+                    //     align: 'center',
+                    //     fixed: 'right',
+                    //     render: (h, params) => {
+                    //         const row = params.row;
+                    //         return h('div', {
+                    //             style: {
+                    //                 'padding-left': '0px',
+                    //                 'padding-right': '0px',
+                    //             }
+                    //         }, [
+                    //                 h('a', {
+                    //                     style: {
+                    //                         display: 'inline-block',
+                    //                         width: '100%',
+                    //                     },
+                    //                     on: {
+                    //                         click: () => {
+                    //                             // this.remove(params.index)
+                    //                         }
+                    //                     }
+                    //                 }, [
+                    //                         h('Icon', {
+                    //                             props: {
+                    //                                 type: 'chevron-right',
+                    //                                 size: 18
+                    //                             }
+                    //                         })
+                    //                     ]),
+                    //             ]);
+                    //     }
+                    // },
                     {
                         title: '交易时间',
                         key: 'tradeTime',
@@ -219,12 +238,16 @@
                                     placement: 'bottom',
                                     width: '100%'
                                 },
+                                on: {
+                                    'on-popper-show': () => {
+                                        Vue.set(this.isShow, params.index, true);
+                                    },
+                                    'on-popper-hide': () => {
+                                        Vue.set(this.isShow, params.index, false);
+                                    }
+                                }
                             }, [
                                     h('div', {
-                                        class: ['expand-expanded']
-
-
-                                        ,
                                         style: {
                                             'min-width': '80px',
                                             color: color,
@@ -234,24 +257,32 @@
                                     }, [
                                             h('span', {
                                                 style: {
-                                                    'margin-right': '4px',
+                                                    'margin-right': '6px',
                                                 }
                                             }, finalStatus),
-                                            h('Icon', {
-                                                props: {
-                                                    type: 'chevron-right',
+                                            h('div', {
+                                                class: {
+                                                    'cell-td-expand': true,
+                                                    'cell-td-expand-expanded': this.isShow[params.index]
                                                 },
                                                 style: {
-
+                                                    'display': 'inline-block'
                                                 }
-                                            }),
+                                            }, [
+                                                    h('Icon', {
+                                                        props: {
+                                                            type: 'chevron-right',
+                                                        }
+                                                    })
+                                                ]),
                                         ]
                                     ),
                                     h(FinalCodeContent, {
                                         slot: 'content',
                                         props: {
                                             index: params.index,
-                                            tradeInfo: row
+                                            tradeInfo: row,
+                                            isShow: this.isShow
                                         },
                                         style: {
                                             padding: '0px'
@@ -262,7 +293,6 @@
                         align: 'center',
                         minWidth: 120,
                     },
-
                     {
                         title: '客户姓名',
                         key: 'custName',
@@ -304,4 +334,5 @@
 </script>
 <style lang="less">
     @import '../../../styles/common.less';
+    @import './tc.less';
 </style>
