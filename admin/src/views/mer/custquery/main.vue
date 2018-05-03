@@ -8,14 +8,14 @@
                     客户列表
                 </p>
                 <Row>
-                    <Col span="24" >
+                    <Col span="24" align="right">
 
                     <!--<Tooltip content="支持模糊查找" placement="top-end">-->
                         <Input v-model="searchKey" placeholder="输入客户姓名/手机号" style="width: 200px"/>
                     <!--</Tooltip>-->
 
                     <Input v-model="searchKey1" v-if="isOper" placeholder="商户编号" style="width: 200px"/>
-                    <span @click="search" style="margin: 0 10px;">
+                    <span @click="search" >
                         <Button type="primary" icon="search">搜索</Button></span>
                     </Col>
                 </Row>
@@ -24,7 +24,7 @@
                 </Row>
                 <Row class="margin-top-10">
                     <Col span="24" align="right">
-                    <Page :total="total" :current="pageNumber"  :page-size="pageSize" @on-change="search" show-total ></Page>
+                    <Page :total="total" :current="pageNumber"  :page-size="pageSize" @on-change="search" show-total show-elevator></Page>
                     </Col>
                 </Row>
             </Card>
@@ -289,4 +289,5 @@
         margin: 5px 0px;
         padding: 5px 5px;
     }
+    .ivu-page-options-elevator input{padding-bottom: 2px}
 </style>

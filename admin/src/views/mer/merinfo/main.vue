@@ -13,7 +13,7 @@
                     </Col>
                     <Col span="8" offset="8" align="right">
                     <Input v-model="searchKey" placeholder="输入商户编号/名称/负责人名称" style="width: 200px"/>
-                    <span @click="search" style="margin: 0 10px;">
+                    <span @click="search" >
                         <Button type="primary" icon="search">搜索</Button></span>
                     </Col>
                 </Row>
@@ -22,7 +22,7 @@
                 </Row>
                 <Row class="margin-top-10">
                     <Col span="24" align="right">
-                    <Page :total="total" :current="pageNumber"  :page-size="pageSize" @on-change="search" show-total ></Page>
+                    <Page  :total="total" :current="pageNumber"  :page-size="pageSize" @on-change="search" show-total show-elevator ></Page>
                     </Col>
                 </Row>
             </Card>
@@ -746,4 +746,5 @@
         font-size: 12px;
         line-height: 30px;
     }
+    .ivu-page-options-elevator input{padding-bottom: 2px}
 </style>
