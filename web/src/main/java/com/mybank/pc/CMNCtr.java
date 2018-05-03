@@ -7,8 +7,9 @@ import com.jfinal.kit.LogKit;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.upload.UploadFile;
-import com.lowagie.text.Document;
-import com.lowagie.text.PageSize;
+import com.lowagie.text.*;
+import com.lowagie.text.Font;
+import com.lowagie.text.rtf.RtfWriter2;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.core.CoreException;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
@@ -16,12 +17,12 @@ import com.mybank.pc.kits.AppKit;
 import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.QiNiuKit;
 import com.mybank.pc.kits._StrKit;
+import com.mybank.pc.merchant.info.MerchantInfoSrv;
 import com.qiniu.common.QiniuException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
+import java.io.*;
 import java.util.Date;
 
 /**
@@ -40,7 +41,7 @@ import java.util.Date;
  */
 public class CMNCtr extends CoreController {
 
-
+    private MerchantInfoSrv merchantInfoSrv =enhance(MerchantInfoSrv.class);
     /**
      * 图片的格式为base64Str上传图片到图片服务器默认七牛，返回图片显示的url
      */
@@ -181,91 +182,25 @@ public class CMNCtr extends CoreController {
 //        qrCodeRender.render();
         renderQrCode(path,300,300);
     }
+
+
+
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
     public void act06(){
-        File f = new File("/Users/xufei/Desktop/demo.doc");
-        Document document = new Document(PageSize.A4);
-//        try {
-//            RtfWriter2.getInstance(document, new FileOutputStream(f));
-//            document.open();
-//
-//
-//            //设置合同头
-//
-//            Paragraph ph = new Paragraph();
-//            Font fo  = new Font();
-//
-//            Paragraph p = new Paragraph("出口合同",
-//                    new Font(Font.NORMAL, 18, Font.BOLDITALIC, new Color(0, 0, 0)) );
-//            p.setAlignment(1);
-//            document.add(p);
-//            ph.setFont(fo);
-//
-//            // 设置中文字体
-//            // BaseFont bfFont =
-//            // BaseFont.createFont("STSongStd-Light","UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
-//            // Font chinaFont = new Font();
-//            /*
-//             * 创建有三列的表格
-//             */
-//            Table table = new Table(4);
-//            document.add(new Paragraph("生成表格"));
-//            table.setBorderWidth(1);
-//            table.setBorderColor(Color.BLACK);
-//            table.setPadding(0);
-//            table.setSpacing(0);
-//
-//            /*
-//             * 添加表头的元素
-//             */
-//            Cell cell = new Cell("表头");//单元格
-//            cell.setHeader(true);
-//            cell.setColspan(3);//设置表格为三列
-//            cell.setRowspan(3);//设置表格为三行
-//            table.addCell(cell);
-//            table.endHeaders();// 表头结束
-//
-//            // 表格的主体
-//            cell = new Cell("Example cell 2");
-//            cell.setRowspan(2);//当前单元格占两行,纵向跨度
-//            table.addCell(cell);
-//            table.addCell("1,1");
-//            table.addCell("1,2");
-//            table.addCell("1,3");
-//            table.addCell("1,4");
-//            table.addCell("1,5");
-//            table.addCell(new Paragraph("用java生成的表格1"));
-//            table.addCell(new Paragraph("用java生成的表格2"));
-//            table.addCell(new Paragraph("用java生成的表格3"));
-//            table.addCell(new Paragraph("用java生成的表格4"));
-//            document.add(new Paragraph("用java生成word文件"));
-//            document.add(table);
-//            document.close();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (DocumentException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-
-    //读取本地图片输入流
+        File docFile = new File("C:\\Users\\Fly\\Desktop\\demo.doc");
+        merchantInfoSrv.createAgreeDoc(null,docFile);
+        //读取本地图片输入流
         InputStream fis = null;
         OutputStream out = null;
-
         try {
-            fis = IoUtil.toStream(f);
-
-
-            //设置文件MIME类型
-            getResponse().setContentType("application/octet-stream");
-            //设置Content-Disposition
-            getResponse().setHeader("Content-Disposition", "attachment;filename=123");
-            out = getResponse().getOutputStream();
+            fis = IoUtil.toStream(docFile);
+            HttpServletResponse response = getResponse();
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment;filename="+ new String("委托代扣授权书.doc".getBytes("UTF-8"),"ISO8859-1"));
+            response.setHeader("Content-Length",  String.valueOf(docFile.length()));//设置内容长度
+            out = response.getOutputStream();
             IoUtil.copy(fis, out);
             out.flush();
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -288,6 +223,7 @@ public class CMNCtr extends CoreController {
         }
 
     }
+
 
 
 }

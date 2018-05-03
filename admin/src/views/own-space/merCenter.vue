@@ -71,7 +71,7 @@
                 </i-col>
                     <i-col span="10" align="center">
 
-                        <Button type="success" @click="downloadDoc">下载代扣授权书</Button>
+                        <a :href="downUrl"><Button type="primary" >下载代扣授权书</Button></a>
                        <button></button>
                     </i-col>
                 </Row>
@@ -102,7 +102,6 @@ export default {
     },
     methods: {
         downloadDoc() {
-            this.downUrl = consts.devLocation + "/cmn/act06";
                 this.$axios.post(this.downUrl)
 
             },
@@ -116,6 +115,7 @@ export default {
             this.urlCardF = consts.devLocation + "/cmn/act04?tt="+now+"&picid=" + this.merInfo.cardF;
             this.urlCardZ = consts.devLocation + "/cmn/act04?tt="+now+"&picid=" + this.merInfo.cardZ;
             this.urlEWImg = consts.devLocation + "/cmn/act05?tt="+now+"&merNo=" + this.merInfo.merchantNo;
+            this.downUrl = consts.devLocation + "/cmn/act06";
         });
     }
 };
