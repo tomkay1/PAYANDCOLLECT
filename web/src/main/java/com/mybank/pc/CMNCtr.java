@@ -186,7 +186,9 @@ public class CMNCtr extends CoreController {
 
     @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
     public void act06(){
-        File docFile = new File("C:\\Users\\Fly\\Desktop\\demo.doc");
+        String path = PathKit.getWebRootPath()+ CacheKit.get(Consts.CACHE_NAMES.paramCache.name(),"ePath");
+        String docName ="auth_"+DateKit.getNowUTC()+".doc";
+        File docFile = new File(path+docName);
         merchantInfoSrv.createAgreeDoc(null,docFile);
         //读取本地图片输入流
         InputStream fis = null;
