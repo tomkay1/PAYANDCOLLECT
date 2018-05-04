@@ -27,15 +27,14 @@
                             </Input>
                         </FormItem>
                         <FormItem prop="checkCode">
-                            <Input  v-model="form.checkCode" placeholder="请输入验证码">
+                            <Input  v-model="form.checkCode" placeholder="请输入验证码" style="">
                             <span slot="prepend">
                                     <Icon :size="14" type="flash"></Icon>
                                 </span>
                             </Input>
+                            <img :src="getCaptchUrl" @click="createCaptchUrl" style="height: 26px;margin-top: -28px; margin-left: 195px; z-index: 9999;position: absolute;">
                         </FormItem>
-                        <FormItem >
-                            <img :src="getCaptchUrl" @click="createCaptchUrl">
-                        </FormItem>
+
                         <FormItem>
                             <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>

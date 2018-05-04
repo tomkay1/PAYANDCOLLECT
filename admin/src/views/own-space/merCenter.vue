@@ -71,7 +71,7 @@
                 </i-col>
                     <i-col span="10" align="center">
 
-                        <a :href="downUrl"><Button type="primary" >下载代扣授权书</Button></a>
+                        <a :href="downUrl"><Button type="primary" style="margin-top: 20px">下载代扣授权书</Button></a>
                        <button></button>
                     </i-col>
                 </Row>

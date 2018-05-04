@@ -52,6 +52,13 @@
                 </div>
 
         </div>
+        <div class="form-group">
+            <div class="file-container"  style="display:inline-block;position:relative;overflow: hidden;vertical-align:middle">
+                <button class="btn btn-primary " type="button" style="height: 44px; width: 240px;margin-left: 30px"><span class="glyphicon glyphicon-camera" aria-hidden="true"></span> 选择代扣授权书照片<span id="authImgTxt"></span></button>
+                <input type="file" name="authImg" accept="image/*" capture="camera"  onchange="$('#authImgTxt').html('（已上传）')" style="position:absolute;top:0;left:0;font-size:34px; opacity:0">
+            </div>
+
+        </div>
         <div class="form-group" align="center">
             <label></label>
             <input type="checkbox" name="is"> <a href="/mer01/custAgree?merNo=#(merchantInfo.merchantNo)" >已阅读并同意《迈伴客用户使用协议》</a>
@@ -140,6 +147,14 @@
                     validators: {
                         notEmpty: {
                             message: '手持身份证照片不能为空'
+                        },
+
+                    }
+                },
+                authImg: {
+                    validators: {
+                        notEmpty: {
+                            message: '代扣授权书照片不能为空'
                         },
 
                     }

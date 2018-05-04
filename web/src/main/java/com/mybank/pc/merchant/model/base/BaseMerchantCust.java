@@ -73,12 +73,21 @@ public abstract class BaseMerchantCust<M extends BaseMerchantCust<M>> extends Mo
 		return getStr("cardImgZ");
 	}
 
+
 	public void setSelfImg(java.lang.String selfImg) {
 		set("selfImg", selfImg);
 	}
-	
+
 	public java.lang.String getSelfImg() {
 		return getStr("selfImg");
+	}
+
+	public void setAuthImg(java.lang.String authImg) {
+		set("authImg", authImg);
+	}
+
+	public java.lang.String getAuthImg() {
+		return getStr("authImg");
 	}
 
 	public void setCat(java.util.Date cat) {

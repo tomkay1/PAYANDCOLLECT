@@ -108,6 +108,14 @@
                 <div class="span-lc"><img v-if="merCustInfoModal" width="300" :src="imgUrl+merCust.cardImgZ"/></div>
                 </Col>
             </Row>
+            <Row>
+                <Col span="8" align="right">
+                <div class="span-lb">代扣授权书照片：</div>
+                </Col>
+                <Col span="16">
+                <div class="span-lc"><img v-if="merCustInfoModal" width="300" :src="imgUrl+merCust.authImg"/></div>
+                </Col>
+            </Row>
             <div slot="footer">
                 <Button type="error" @click="merCustInfoModal=false">关闭</Button>
             </div>

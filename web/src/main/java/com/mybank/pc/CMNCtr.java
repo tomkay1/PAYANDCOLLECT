@@ -7,9 +7,6 @@ import com.jfinal.kit.LogKit;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.upload.UploadFile;
-import com.lowagie.text.*;
-import com.lowagie.text.Font;
-import com.lowagie.text.rtf.RtfWriter2;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.core.CoreException;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
@@ -21,8 +18,10 @@ import com.mybank.pc.merchant.info.MerchantInfoSrv;
 import com.qiniu.common.QiniuException;
 
 import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 
 /**
@@ -196,7 +195,7 @@ public class CMNCtr extends CoreController {
             fis = IoUtil.toStream(docFile);
             HttpServletResponse response = getResponse();
             response.setContentType("application/octet-stream");
-            response.setHeader("Content-Disposition", "attachment;filename="+ new String("委托代扣授权书.doc".getBytes("UTF-8"),"ISO8859-1"));
+            response.setHeader("Content-Disposition", "attachment;filename="+ new String("委托代扣授权表.doc".getBytes("UTF-8"),"ISO8859-1"));
             response.setHeader("Content-Length",  String.valueOf(docFile.length()));//设置内容长度
             out = response.getOutputStream();
             IoUtil.copy(fis, out);
