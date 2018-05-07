@@ -12,24 +12,25 @@ public class UnionpayBatchCollectionBatchno extends BaseUnionpayBatchCollectionB
 	private static final long serialVersionUID = 1L;
 	public static final UnionpayBatchCollectionBatchno dao = new UnionpayBatchCollectionBatchno().dao();
 
-	public static String getNextBatchNoToString(String txnTime) {
-		int nextBatchNo = getNextBatchNo(txnTime);
+	public static String getNextBatchNoToString(String txnTime, String merId) {
+		int nextBatchNo = getNextBatchNo(txnTime, merId);
 		return String.format("%04d", nextBatchNo);
 	}
 
-	public static int getNextBatchNo(String txnTime) {
+	public static int getNextBatchNo(String txnTime, String merId) {
 		UnionpayBatchCollectionBatchno batchNo = null;
 		Kv kv = Kv.create();
-		kv.set("txnTime", txnTime);
+		kv.set("txnTime", txnTime).set("merId", merId);
 
-		batchNo = findBatchNoByTxnTime(kv);
+		batchNo = findBatchNo(kv);
 		if (batchNo == null) {
 			try {
 				batchNo = new UnionpayBatchCollectionBatchno();
 				batchNo.setTxnDate(txnTime.substring(0, 8));
 				batchNo.setBatchNo(0);
+				batchNo.setMerId(merId);
 				if (!batchNo.save()) {
-					batchNo = findBatchNoByTxnTime(kv);
+					batchNo = findBatchNo(kv);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -48,7 +49,7 @@ public class UnionpayBatchCollectionBatchno extends BaseUnionpayBatchCollectionB
 			if (updateBatchNo(kv)) {
 				return newBatchNo;
 			} else {
-				batchNo = findBatchNoByTxnTime(kv);
+				batchNo = findBatchNo(kv);
 				if (batchNo == null) {
 					throw new RuntimeException("获取批次号失败, [" + txnTime + "]的记录不存在");
 				}
@@ -58,18 +59,18 @@ public class UnionpayBatchCollectionBatchno extends BaseUnionpayBatchCollectionB
 		return -1;
 	}
 
-	public static boolean decrementBatchNo(String txnTime, String batchNoToString) {
+	public static boolean decrementBatchNo(String txnTime, String merId, String batchNoToString) {
 		Kv kv = Kv.create();
 		int ibatchNo = Integer.valueOf(batchNoToString);
-		kv.set("txnTime", txnTime).set("batchNo", ibatchNo).set("newBatchNo", ibatchNo - 1);
-		return updateBatchNo(kv) ? true : decrementBatchNo(txnTime);
+		kv.set("txnTime", txnTime).set("merId", merId).set("batchNo", ibatchNo).set("newBatchNo", ibatchNo - 1);
+		return updateBatchNo(kv) ? true : decrementBatchNo(txnTime, merId);
 	}
 
-	public static boolean decrementBatchNo(String txnTime) {
+	public static boolean decrementBatchNo(String txnTime, String merId) {
 		UnionpayBatchCollectionBatchno batchNo = null;
 		Kv kv = Kv.create();
-		kv.set("txnTime", txnTime);
-		batchNo = findBatchNoByTxnTime(kv);
+		kv.set("txnTime", txnTime).set("merId", merId);
+		batchNo = findBatchNo(kv);
 
 		if (batchNo == null) {
 			throw new RuntimeException("减少批次号失败, [" + txnTime + "]的记录不存在");
@@ -82,7 +83,7 @@ public class UnionpayBatchCollectionBatchno extends BaseUnionpayBatchCollectionB
 			if (updateBatchNo(kv)) {
 				return true;
 			} else {
-				batchNo = findBatchNoByTxnTime(kv);
+				batchNo = findBatchNo(kv);
 				if (batchNo == null) {
 					throw new RuntimeException("减少批次号失败, [" + txnTime + "]的记录不存在");
 				}
@@ -92,7 +93,7 @@ public class UnionpayBatchCollectionBatchno extends BaseUnionpayBatchCollectionB
 		return false;
 	}
 
-	private static UnionpayBatchCollectionBatchno findBatchNoByTxnTime(Kv kv) {
+	private static UnionpayBatchCollectionBatchno findBatchNo(Kv kv) {
 		SqlPara sqlPara = Db.getSqlPara("collection_batch.findBatchNo", kv);
 		return dao.findFirst(sqlPara);
 	}

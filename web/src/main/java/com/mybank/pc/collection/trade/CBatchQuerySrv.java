@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.jfinal.kit.JsonKit;
@@ -18,34 +19,46 @@ import com.mybank.pc.collection.model.UnionpayCollection;
 import com.mybank.pc.exception.BaseCollectionRuntimeException;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDKConstants;
+import com.mybank.pc.kits.unionpay.acp.file.collection.model.BatchCollectionRequest;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.BatchCollectionResponse;
+import com.mybank.pc.kits.unionpay.acp.file.collection.model.RequestContent;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.ResponseContent;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.ResponseHead;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
+
 public class CBatchQuerySrv {
 
-	public void batchQueryOne(Map<String, String> reqParam) {
-		batchQuery(Kv.create().set(reqParam), true);
-	}
-
 	public void batchQuery() {
-		batchQuery(Kv.create(), false);
+		Date now = new Date();
+		Kv kv = Kv.create();
+		String sysQueryId = UUID.randomUUID().toString();
+		kv.set("sysQueryId", sysQueryId).set("mat", now);
+
+		int count = UnionpayBatchCollection.updateNeedQueryBatchCollectionPrepare(kv);
+		batchQuery(count, sysQueryId);
 	}
 
-	private void batchQuery(Kv kv, boolean isOne) {
-		int count = 0;
-		List<UnionpayBatchCollection> ubcList = null;
+	public void batchQueryOne(Map<String, String> reqParam) {
 		Date now = new Date();
+		Kv kv = Kv.create().set(reqParam);
+		String sysQueryId = UUID.randomUUID().toString();
+		kv.set("sysQueryId", sysQueryId).set("mat", now);
+
+		int count = UnionpayBatchCollection.updateNeedQueryBatchCollectionPrepareOne(kv);
+		batchQuery(count, sysQueryId);
+	}
+
+	private void batchQuery(int count, String sysQueryId) {
+		if (count <= 0) {
+			return;
+		}
+		List<UnionpayBatchCollection> ubcList = null;
 		try {
-			String uuid = UUID.randomUUID().toString();
-			kv.set("sysQueryId", uuid).set("mat", now);
-			if (isOne) {
-				count = UnionpayBatchCollection.updateNeedQueryBatchCollectionPrepareOne(kv);
-			} else {
-				count = UnionpayBatchCollection.updateNeedQueryBatchCollectionPrepare(kv);
-			}
-			if (count > 0) {
-				ubcList = UnionpayBatchCollection.findNeedQueryBatchCollectionBySysQueryId(kv);
+			ubcList = UnionpayBatchCollection
+					.findNeedQueryBatchCollectionBySysQueryId(Kv.create().set("sysQueryId", sysQueryId));
+			if (CollectionUtils.isNotEmpty(ubcList)) {
 				for (UnionpayBatchCollection unionpayBatchCollection : ubcList) {
 					batchQuery(unionpayBatchCollection);
 				}
@@ -96,6 +109,8 @@ public class CBatchQuerySrv {
 	private boolean handlingBatchQueryResult(UnionpayBatchCollection unionpayBatchCollection) throws Exception {
 		boolean isSuccess = false;
 		try {
+			Integer queryCount = unionpayBatchCollection.getQueryResultCount();
+			queryCount = queryCount == null ? 0 : queryCount;
 			UnionpayBatchCollectionQuery unionpayBatchCollectionQuery = unionpayBatchCollection.getQuery();
 			unionpayBatchCollectionQuery.validateBatchQueryResp();
 
@@ -111,7 +126,7 @@ public class CBatchQuerySrv {
 			unionpayBatchCollection.setResult(JsonKit.toJson(rspData));
 
 			if (("00").equals(respCode)) {
-				// 成功 落地查询结果样例
+				// 成功 落地查询结果
 				String fileContent = rspData.get("fileContent");
 				String queryResult = AcpService.getFileContent(fileContent, SDKConstants.UTF_8_ENCODING);
 
@@ -141,12 +156,20 @@ public class CBatchQuerySrv {
 				isSuccess = true;
 				unionpayBatchCollection.setFinalCode("0");
 			} else {
+				if ("34".equals(respCode) && DateUtil.between(unionpayBatchCollection.getCat(), new Date(),
+						DateUnit.MINUTE, false) > 600) {// 批次（xxxx）不存在
+					BatchCollectionRequest batchCollectionRequest = new BatchCollectionRequest(
+							unionpayBatchCollection.getRequestFileContent());
+					List<RequestContent> requestContents = batchCollectionRequest.getContents();
+					for (RequestContent requestContent : requestContents) {
+						updateOrderStatusToFail(requestContent, unionpayBatchCollectionQuery);
+					}
+				}
 				// 其他应答码为失败请排查原因
 				isSuccess = false;
 			}
 
-			Integer queryCount = unionpayBatchCollection.getQueryResultCount();
-			unionpayBatchCollection.setQueryResultCount(queryCount == null ? 1 : queryCount + 1);
+			unionpayBatchCollection.setQueryResultCount(queryCount + 1);
 			unionpayBatchCollection.setNextAllowQueryDate();
 
 			Date now = new Date();
@@ -180,9 +203,13 @@ public class CBatchQuerySrv {
 			UnionpayCollection unionpayCollection = UnionpayCollection.dao.findFirst(sqlPara);
 			if (unionpayCollection != null) {
 				if ("00".equals(respCode)) {
-					unionpayCollection.setFinalCode("0");// 成功
+					// 成功
+					unionpayCollection.setFinalCode("0");
+				} else if ("03".equals(respCode) || "04".equals(respCode) || "05".equals(respCode)) {
+					// 订单处理中或交易状态未明
 				} else {
-					unionpayCollection.setFinalCode("2");// 失败
+					// 失败
+					unionpayCollection.setFinalCode("2");
 				}
 
 				unionpayCollection.setResultCode(respCode);
@@ -210,6 +237,39 @@ public class CBatchQuerySrv {
 					collectionTrade.update();
 				}
 
+			}
+		}
+	}
+
+	public void updateOrderStatusToFail(RequestContent requestContent,
+			UnionpayBatchCollectionQuery unionpayBatchCollectionQuery) {
+		String orderId = requestContent.getOrderId();
+		if (StringUtils.isNotBlank(orderId)) {
+			String respCode = unionpayBatchCollectionQuery.getRespCode();
+			String respMsg = unionpayBatchCollectionQuery.getRespMsg();
+
+			Date now = new Date();
+			Kv kv = Kv.create();
+			kv.set("orderId", orderId);
+			SqlPara sqlPara = Db.getSqlPara("collection_trade.findUnionpayCollection", kv);
+			UnionpayCollection unionpayCollection = UnionpayCollection.dao.findFirst(sqlPara);
+			if (unionpayCollection != null) {
+				unionpayCollection.setFinalCode("2");// 失败
+				unionpayCollection.setResultCode(respCode);
+				unionpayCollection.setResultMsg(respMsg);
+				unionpayCollection.setMat(now);
+				unionpayCollection.update();
+
+				sqlPara = Db.getSqlPara("collection_trade.findByTradeNo",
+						kv.set("tradeNo", unionpayCollection.getTradeNo()));
+				CollectionTrade collectionTrade = CollectionTrade.dao.findFirst(sqlPara);
+				if (collectionTrade != null) {
+					collectionTrade.setResultCode(respCode);
+					collectionTrade.setResultMsg(respMsg);
+					collectionTrade.setFinalCode("2");// 失败
+					collectionTrade.setMat(now);
+					collectionTrade.update();
+				}
 			}
 		}
 	}

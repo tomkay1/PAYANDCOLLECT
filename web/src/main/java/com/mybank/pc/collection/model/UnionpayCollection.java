@@ -13,6 +13,7 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseUnionpayCollection;
+import com.mybank.pc.exception.ValidateUnionpayRespException;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.kits.unionpay.acp.SDKConfig;
@@ -169,7 +170,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 		return realtimeRspData;
 	}
 
-	public boolean validateRealtimeResp() {
+	public boolean validateRealtimeResp() throws ValidateUnionpayRespException {
 		return SDK.validateResp(realtimeRspData, getMerId(), SDKConstants.UTF_8_ENCODING);
 	}
 
@@ -212,6 +213,24 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 		return this.query.queryResult();
 	}
 
+	/**
+	 * 重置批量交易状态为待发送
+	 */
+	public void resetBatchStatus() {
+		setBatchNo("");
+		setTxnTime("");
+		setStatus("0");
+	}
+
+	/**
+	 * 是否是批量交易订单
+	 * 
+	 * @return
+	 */
+	public boolean isBatchTradeOrder() {
+		return "21".equals(getTxnType());
+	}
+
 	public static boolean isFail(String resultCode) {
 		return StringUtils.isNotBlank(resultCode) && !("00".equals(resultCode) || "A6".equals(resultCode)
 				|| "03".equals(resultCode) || "04".equals(resultCode) || "05".equals(resultCode));
@@ -240,12 +259,6 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 	public static UnionpayCollection findByTradeNo(String tradeNo) {
 		SqlPara sqlPara = Db.getSqlPara("collection_trade.findUnionpayCollection", Kv.create().set("tradeNo", tradeNo));
 		return UnionpayCollection.dao.findFirst(sqlPara);
-	}
-
-	public void resetBatchStatus() {
-		setBatchNo("");
-		setTxnTime("");
-		setStatus("0");
 	}
 
 	public UnionpayCollectionQuery getQuery() {

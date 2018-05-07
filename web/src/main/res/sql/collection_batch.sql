@@ -33,13 +33,13 @@
 #end
 #sql("findBatchNo")
 	SELECT * FROM unionpay_batch_collection_batchno  WHERE 1=1
-		#if(txnTime)
-			AND txnDate = LEFT (#para(txnTime), 8)
-	   #end
+		AND txnDate = LEFT (#para(txnTime), 8)
+		AND merId = #para(merId)
 #end
 #sql("updateBatchNo")
 	UPDATE unionpay_batch_collection_batchno  SET batchNo = #para(newBatchNo) WHERE 1=1 
-		AND txnDate = LEFT (#para(txnTime), 8) 
+		AND txnDate = LEFT (#para(txnTime), 8)
+		AND merId = #para(merId)
 	    AND batchNo = #para(batchNo)
 #end
 #sql("updateToBeSentUnionpayCollectionBatchNo")
@@ -106,5 +106,18 @@
 	SELECT ubc.* FROM unionpay_batch_collection ubc WHERE
 		sysQueryId = #para(sysQueryId)
 #end
-
+#sql("findUnionpayBatchCollectionQuery")
+	SELECT * FROM unionpay_batch_collection_query  WHERE 1=1
+	    #if(txnTime)
+	    	AND txnTime = #para(txnTime)
+	    #end
+	    #if(batchNo)
+	    	AND batchNo = #para(batchNo)
+	    #end
+	    #if(merId)
+	    	AND merId = #para(merId)
+	    #end
+	    ORDER BY
+			cat DESC
+#end
 

@@ -1,9 +1,13 @@
 package com.mybank.pc.collection.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.jfinal.kit.JsonKit;
+import com.jfinal.kit.Kv;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseUnionpayBatchCollectionQuery;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
@@ -84,6 +88,12 @@ public class UnionpayBatchCollectionQuery extends BaseUnionpayBatchCollectionQue
 
 	public boolean validateBatchQueryResp() {
 		return SDK.validateResp(queryRspData, getMerId(), SDKConstants.UTF_8_ENCODING);
+	}
+
+	public static List<UnionpayBatchCollectionQuery> find(String txnTime, String batchNo, String merId) {
+		SqlPara sqlPara = Db.getSqlPara("collection_batch.findUnionpayBatchCollectionQuery",
+				Kv.create().set("txnTime", txnTime).set("batchNo", batchNo).set("merId", merId));
+		return UnionpayBatchCollectionQuery.dao.find(sqlPara);
 	}
 
 	public Map<String, String> getQueryReqData() {
