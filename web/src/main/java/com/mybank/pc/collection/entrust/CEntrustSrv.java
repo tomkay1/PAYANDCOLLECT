@@ -18,11 +18,13 @@ import com.mybank.pc.collection.model.CollectionEntrust;
 import com.mybank.pc.collection.model.UnionpayEntrust;
 import com.mybank.pc.exception.EntrustRuntimeException;
 import com.mybank.pc.exception.TxnKey;
+import com.mybank.pc.exception.ValidateEERException;
 import com.mybank.pc.interceptors.EntrustExceptionInterceptor;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.kits.unionpay.acp.SDKConfig;
 import com.mybank.pc.kits.unionpay.acp.SDKConstants;
+import com.mybank.pc.merchant.model.MerchantInfo;
 
 public class CEntrustSrv {
 
@@ -30,6 +32,8 @@ public class CEntrustSrv {
 		Kv[] result = new Kv[3];
 		try {
 			result[0] = this.establish(kv.set("merCode", SDK.MER_CODE_REALTIME_YS_2));
+		} catch (ValidateEERException e) {
+			result[0] = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
 		} catch (EntrustRuntimeException e) {
 			result[0] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
 		} catch (Exception e) {
@@ -38,6 +42,8 @@ public class CEntrustSrv {
 
 		try {
 			result[1] = this.establish(kv.set("merCode", SDK.MER_CODE_REALTIME_YS_4));
+		} catch (ValidateEERException e) {
+			result[1] = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
 		} catch (EntrustRuntimeException e) {
 			result[1] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
 		} catch (Exception e) {
@@ -46,6 +52,8 @@ public class CEntrustSrv {
 
 		try {
 			result[2] = this.establish(kv.set("merCode", SDK.MER_CODE_BATCH_CH));
+		} catch (ValidateEERException e) {
+			result[2] = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
 		} catch (EntrustRuntimeException e) {
 			result[2] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
 		} catch (Exception e) {
@@ -62,6 +70,8 @@ public class CEntrustSrv {
 		respKv.set("unionpayEntrust", unionpayEntrust);
 		boolean isSuccess = false;
 		try {
+			validateEstablishRequest(kv);
+
 			String merCode = kv.getStr("merCode");
 
 			String accNo = kv.getStr("accNo");
@@ -72,7 +82,7 @@ public class CEntrustSrv {
 			String cvn2 = kv.getStr("cvn2");
 			String expired = kv.getStr("expired");
 
-			int merchantID = kv.getInt("merchantID");
+			String merchantID = kv.getStr("merchantID");
 			String operID = kv.getStr("operID");
 
 			Date now = new Date();
@@ -92,7 +102,7 @@ public class CEntrustSrv {
 			unionpayEntrust.setTradeNo(new SimpleDateFormat("yyyyMMddHHmmssSSS").format(now) + certifId);
 			unionpayEntrust.setOrderId(orderId);
 			unionpayEntrust.setTxnTime(txnTime);
-			unionpayEntrust.setMerchantID(String.valueOf(merchantID));
+			unionpayEntrust.setMerchantID(merchantID);
 			unionpayEntrust.setCat(now);
 			unionpayEntrust.setMat(now);
 			unionpayEntrust.setOperID(operID);
@@ -124,12 +134,31 @@ public class CEntrustSrv {
 			isSuccess = handlingEstablishResult(entrustRspData, acpService, SDKConstants.UTF_8_ENCODING,
 					unionpayEntrust);
 			return respKv.set("isSuccess", isSuccess);
+		} catch (ValidateEERException e) {
+			throw e;
 		} catch (EntrustRuntimeException e) {
 			throw e;
 		} catch (Exception e) {
 			EntrustRuntimeException xe = new EntrustRuntimeException(e);
 			xe.setContext(unionpayEntrust);
 			throw xe;
+		}
+	}
+
+	public static void validateEstablishRequest(Kv kv) {
+		String merCode = kv.getStr("merCode");
+		String merchantID = kv.getStr("merchantID");
+
+		SDK sdk = SDK.getSDK(merCode);
+		if (sdk == null) {
+			throw new ValidateEERException("非法的系统商户号代码[" + merCode + "]");
+		}
+		if (StringUtils.isBlank(merchantID)) {
+			throw new ValidateEERException("商户ID不能为空");
+		}
+		MerchantInfo merchantInfo = MerchantInfo.dao.findById(merchantID = merchantID.trim());
+		if (merchantInfo == null || "1".equals(merchantInfo.getStatus()) || merchantInfo.getDat() != null) {
+			throw new ValidateEERException("商户[" + merchantID + "]" + "不存在或已停用/已删除");
 		}
 	}
 

@@ -854,4 +854,29 @@ public class SDKUtil {
 		return null == s || "".equals(s.trim());
 	}
 
+	/**
+	 * 清算日期settleDate加上年份
+	 * 
+	 * @param settleDate
+	 * @param txnTime
+	 * @return
+	 */
+	public static String procesSettleDate(String settleDate, String txnTime) {
+		String yyyy = null;
+		if (settleDate != null && settleDate.matches("((0\\d)|(1[012]))(([012]\\d)|(3[01]))")) {
+			int month = Integer.parseInt(settleDate.substring(0, 2));
+			int sytemMonth = Integer.parseInt(txnTime.substring(4, 6));
+			if (Math.abs(sytemMonth - month) < 2) {
+				yyyy = txnTime.substring(0, 4);
+			} else if (sytemMonth > month) {
+				yyyy = String.valueOf(Integer.parseInt(txnTime.substring(0, 4)) + 1);
+			} else {
+				yyyy = String.valueOf(Integer.parseInt(txnTime.substring(0, 4)) - 1);
+			}
+		} else {
+			throw new RuntimeException("settleDate格式不合法：" + settleDate);
+		}
+		return yyyy + settleDate;
+	}
+
 }

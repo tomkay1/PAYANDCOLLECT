@@ -34,7 +34,9 @@ import com.mybank.pc.exception.ValidateUnionpayRespException;
 import com.mybank.pc.interceptors.TradeExceptionInterceptor;
 import com.mybank.pc.kits.FeeKit;
 import com.mybank.pc.kits.unionpay.acp.SDK;
+import com.mybank.pc.kits.unionpay.acp.file.collection.model.BatchCollectionRequest;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.BatchCollectionResponse;
+import com.mybank.pc.kits.unionpay.acp.file.collection.model.RequestContent;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.ResponseContent;
 import com.mybank.pc.merchant.model.MerchantCust;
 import com.mybank.pc.merchant.model.MerchantInfo;
@@ -426,27 +428,46 @@ public class CTradeSrv {
 				// 批量订单
 				if (unionpayCollection.isBatchTradeOrder()) {
 					String batchId = unionpayCollection.getBatchId();
-					UnionpayBatchCollection unionpayBatchCollection = UnionpayBatchCollection.dao
-							.findById(unionpayCollection.getBatchId());
+					String merId = unionpayCollection.getMerId();
+					String batchNo = unionpayCollection.getBatchNo();
+					String txnTime = unionpayCollection.getTxnTime();
+
+					UnionpayBatchCollection unionpayBatchCollection = UnionpayBatchCollection
+							.findByIdOrBizColumn(batchId, merId, batchNo, txnTime);
 					if (unionpayBatchCollection == null) {
-						throw new RuntimeException("批量交易信息不存在[" + batchId + "]");
+						throw new RuntimeException("批量交易信息不存在[" + Kv.by("batchId", batchId).set("merId", merId)
+								.set("batchNo", batchNo).set("txnTime", txnTime) + "]");
 					}
+
 					List<UnionpayBatchCollectionQuery> queryHistory = unionpayBatchCollection.findQueryHistory();
 					if (CollectionUtils.isEmpty(queryHistory)) {
 						if (unionpayBatchCollection.allowQuery()) {
 							cBatchQuerySrv.batchQuery(unionpayBatchCollection);
 						}
 					} else {
+						String orderId = unionpayCollection.getOrderId();
 						UnionpayBatchCollectionQuery historyLastsQuery = queryHistory.get(0);
 						String respCode = historyLastsQuery.getRespCode();
 						if ("00".equals(respCode)) {// 查询成功
-							String orderId = unionpayCollection.getOrderId();
-							String fileContent = historyLastsQuery.getRespFileContent();
-							BatchCollectionResponse batchCollectionResponse = new BatchCollectionResponse(fileContent);
-							List<ResponseContent> responsesContents = batchCollectionResponse.getContents();
-							for (ResponseContent responseContent : responsesContents) {
-								if (orderId.equals(responseContent.getOrderId())) {
-									cBatchQuerySrv.updateOrderStatus(responseContent);
+							BatchCollectionResponse batchCollectionResponse = historyLastsQuery
+									.toBatchCollectionResponse();
+							if (batchCollectionResponse != null) {
+								List<ResponseContent> responsesContents = batchCollectionResponse.getContents();
+								for (ResponseContent responseContent : responsesContents) {
+									if (orderId.equals(responseContent.getOrderId())) {
+										cBatchQuerySrv.updateOrderStatus(responseContent);
+									}
+								}
+							}
+						} else if ("34".equals(respCode) && historyLastsQuery.isTimeout()) {// 交易超时
+							BatchCollectionRequest batchCollectionRequest = unionpayBatchCollection
+									.toBatchCollectionRequest();
+							if (batchCollectionRequest != null) {
+								List<RequestContent> requestContents = batchCollectionRequest.getContents();
+								for (RequestContent requestContent : requestContents) {
+									if (orderId.equals(requestContent.getOrderId())) {
+										cBatchQuerySrv.updateOrderStatusToFail(requestContent, historyLastsQuery);
+									}
 								}
 							}
 						} else if (unionpayBatchCollection.allowQuery()) {

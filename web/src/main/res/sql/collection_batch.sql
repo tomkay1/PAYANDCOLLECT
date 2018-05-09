@@ -16,8 +16,11 @@
 		#if(merId)
 	        AND merId = #para(merId)
 	    #end
-		#if(finalCode)
-	        AND finalCode = #para(finalCode)
+		#if(batchNo)
+	        AND batchNo = #para(batchNo)
+	    #end
+	    #if(txnTime)
+	        AND txnTime = #para(txnTime)
 	    #end
 		#if(finalCode)
 	        AND finalCode = #para(finalCode)
@@ -30,6 +33,38 @@
 	    #end
 		ORDER BY
 			mat DESC,cat DESC
+#end
+#sql("findUnionpayBatchCollection")
+	SELECT * FROM unionpay_batch_collection WHERE 1=1
+		#if(id)
+	        AND id = #para(id)
+	    #end
+		#if(txnType)
+	        AND txnType = #para(txnType)
+	    #end
+		#if(txnSubType)
+	        AND txnSubType = #para(txnSubType)
+	    #end
+		#if(merId)
+	        AND merId = #para(merId)
+	    #end
+		#if(batchNo)
+	        AND batchNo = #para(batchNo)
+	    #end
+	    #if(txnTime)
+	        AND txnTime = #para(txnTime)
+	    #end
+		#if(finalCode)
+	        AND finalCode = #para(finalCode)
+	    #end
+	    #if(bTime)
+	    	AND DATE(cat) >= #para(bTime)
+	    #end
+	    #if(eTime)
+	    	AND DATE(cat) <= #para(eTime)
+	    #end
+		ORDER BY
+			cat DESC
 #end
 #sql("findBatchNo")
 	SELECT * FROM unionpay_batch_collection_batchno  WHERE 1=1
@@ -44,7 +79,7 @@
 #end
 #sql("updateToBeSentUnionpayCollectionBatchNo")
 	UPDATE unionpay_collection  SET batchNo = #para(batchNo) , txnTime = #para(txnTime) , status = '1' , mat = #para(mat) WHERE 
-	    txnType = '21' AND txnSubType = '02' AND status = '0' 
+	    txnType = '21' AND txnSubType = '02' AND status = '0' AND finalCode = '1'
 	    #if(merId)
 	    	AND merId = #para(merId)
 	    #end

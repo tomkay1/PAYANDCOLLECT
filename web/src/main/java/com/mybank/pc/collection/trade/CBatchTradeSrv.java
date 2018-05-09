@@ -22,8 +22,10 @@ import com.mybank.pc.kits.unionpay.acp.SDK;
 public class CBatchTradeSrv {
 
 	public void sendBatchOrder() {
-		String merId = SDK.getSDK(SDK.MER_CODE_BATCH_CH).getMerId();
-		sendBatchOrderByMerId(merId);
+		String batch_ch_merId = SDK.getSDK(SDK.MER_CODE_BATCH_CH).getMerId();
+		sendBatchOrderByMerId(batch_ch_merId);
+		String test_merId = SDK.getSDK(SDK.MER_CODE_TEST).getMerId();
+		sendBatchOrderByMerId(test_merId);
 	}
 
 	public void sendBatchOrderByMerId(String merId) {
@@ -45,7 +47,7 @@ public class CBatchTradeSrv {
 			if ((count = UnionpayCollection.updateToBeSentUnionpayCollectionBatchNo(kv)) > 0) {
 				toBeSentOrder = UnionpayCollection.findToBeSentUnionpayCollectionByBatchNo(kv);
 				unionpayBatchCollection = UnionpayBatchCollection.buildUnionpayBatchCollection(now, txnTime,
-						nextBatchNo, toBeSentOrder);
+						nextBatchNo, merId, toBeSentOrder);
 				unionpayBatchCollection.assemblyBatchRequest();
 
 				if (isSaved = unionpayBatchCollection.save()) {

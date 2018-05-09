@@ -1,5 +1,6 @@
 package com.mybank.pc.collection.model;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,6 +31,13 @@ import cn.hutool.core.date.DateUtil;
  */
 public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<UnionpayBatchCollection> {
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 一般批量请求交易发起10分钟后，批量交易查询还是返回34，则可以认为批量请求交易失败<br>
+	 * 保险起见设置为60分钟
+	 * 
+	 */
+	public static final int TIMEOUT_MINUTE = 60;
 
 	public static final UnionpayBatchCollection dao = new UnionpayBatchCollection().dao();
 
@@ -135,7 +143,7 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 	}
 
 	public static UnionpayBatchCollection buildUnionpayBatchCollection(Date now, String txnTime, String batchNo,
-			List<UnionpayCollection> toBeSentOrder) {
+			String merId, List<UnionpayCollection> toBeSentOrder) {
 		// 银联调用相关参数
 		String txnType = "21"; // 交易类型
 		String txnSubType = "02"; // 交易子类型
@@ -144,7 +152,7 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 		String bizType = "000501";// 业务类型
 
 		// 平台调用相关参数
-		SDK sdk = SDK.getSDK(SDK.MER_CODE_BATCH_CH);
+		SDK sdk = SDK.getByMerId(merId);
 		String finalCode = "3";// 最终处理结果：0成功 1处理中 2失败 3待初始化
 		String status = "0";// 0 待查询 1 查询中
 
@@ -246,6 +254,24 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 		return accum;
 	}
 
+	public static UnionpayBatchCollection findByIdOrBizColumn(String id, String merId, String batchNo, String txnTime) {
+		UnionpayBatchCollection unionpayBatchCollection = dao.findById(id);
+		if (unionpayBatchCollection == null) {
+			unionpayBatchCollection = UnionpayBatchCollection.findUnionpayBatchCollectionOne(
+					Kv.by("merId", merId).set("batchNo", batchNo).set("txnTime", txnTime));
+		}
+		return unionpayBatchCollection;
+	}
+
+	public BatchCollectionRequest toBatchCollectionRequest() {
+		try {
+			return new BatchCollectionRequest(getRequestFileContent());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	public static int updateNeedQueryBatchCollectionPrepareOne(Kv kv) {
 		SqlPara sqlPara = Db.getSqlPara("collection_batch.updateNeedQueryBatchCollectionPrepareOne", kv);
 		return Db.update(sqlPara);
@@ -259,6 +285,16 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 	public static List<UnionpayBatchCollection> findNeedQueryBatchCollectionBySysQueryId(Kv kv) {
 		SqlPara sqlPara = Db.getSqlPara("collection_batch.findNeedQueryBatchCollectionBySysQueryId", kv);
 		return UnionpayBatchCollection.dao.find(sqlPara);
+	}
+
+	public static List<UnionpayBatchCollection> findUnionpayBatchCollection(Kv kv) {
+		SqlPara sqlPara = Db.getSqlPara("collection_batch.findUnionpayBatchCollection", kv);
+		return UnionpayBatchCollection.dao.find(sqlPara);
+	}
+
+	public static UnionpayBatchCollection findUnionpayBatchCollectionOne(Kv kv) {
+		SqlPara sqlPara = Db.getSqlPara("collection_batch.findUnionpayBatchCollection", kv);
+		return UnionpayBatchCollection.dao.findFirst(sqlPara);
 	}
 
 	public List<UnionpayBatchCollectionQuery> findQueryHistory() {

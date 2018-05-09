@@ -143,9 +143,11 @@ public class FeeKit {
 			fee = new BigDecimal(400);
 		} else if (SDK.getSDK(SDK.MER_CODE_REALTIME_YS_2).getMerId().equals(merId)) {
 			fee = new BigDecimal(200);
+		} else if (SDK.getSDK(SDK.MER_CODE_TEST).getMerId().equals(merId)) {
+			fee = new BigDecimal(0);
 		} else {
-			throw new ValidateCTRException(
-					"不支持的卡Bin[" + cardBin.getBankName() + " " + cardBin.getCardName() + " " + cardBin.getCBin() + "]");
+			throw new ValidateCTRException("获取银行手续费失败，不支持的卡Bin[" + cardBin.getBankName() + " " + cardBin.getCardName()
+					+ " " + cardBin.getCBin() + "]");
 		}
 
 		return fee;

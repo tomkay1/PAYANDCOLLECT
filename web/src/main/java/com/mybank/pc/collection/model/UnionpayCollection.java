@@ -50,6 +50,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 		SDKConfig sdkConfig = sdk.getSdkConfig();
 
 		setVersion(sdkConfig.getVersion());
+		setEncoding(SDKConstants.UTF_8_ENCODING);
 		setTxnSubType("00");
 		setAccType("01");// 账号类型
 		setAccessType("0");// 接入类型，商户接入固定填0，不需修改

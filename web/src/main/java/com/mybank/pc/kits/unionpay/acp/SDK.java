@@ -17,17 +17,21 @@ public class SDK {
 	public static String MER_CODE_REALTIME_YS_4 = "2";
 	/** 银盛实时商户 826410173920015 手续费 2元 */
 	public static String MER_CODE_REALTIME_YS_2 = "3";
+	/** 测试商户 777290058110097 */
+	public static String MER_CODE_TEST = "4";
 
 	public static SDK REALTIME_CH_SDK;
 	public static SDK REALTIME_YS_4_SDK;
 	public static SDK REALTIME_YS_2_SDK;
 	public static SDK BATCH_CH_SDK;
+	public static SDK TEST_SDK;
 
 	static {
 		REALTIME_CH_SDK = new SDK("acp_sdk_945230148160197.properties", "945230148160197", MER_CODE_REALTIME_CH);
 		REALTIME_YS_4_SDK = new SDK("acp_sdk_826410173920016.properties", "826410173920016", MER_CODE_REALTIME_YS_4);
 		REALTIME_YS_2_SDK = new SDK("acp_sdk_826410173920015.properties", "826410173920015", MER_CODE_REALTIME_YS_2);
 		BATCH_CH_SDK = new SDK("acp_sdk_945230148160204.properties", "945230148160204", MER_CODE_BATCH_CH);
+		TEST_SDK = new SDK("acp_sdk_test.properties", "777290058110097", MER_CODE_TEST);
 	}
 
 	private SDKConfig sdkConfig;
@@ -60,6 +64,9 @@ public class SDK {
 			if (MER_CODE_REALTIME_YS_2.equals(merCode)) {
 				return REALTIME_YS_2_SDK;
 			}
+			if (MER_CODE_TEST.equals(merCode)) {
+				return TEST_SDK;
+			}
 		}
 		return null;
 	}
@@ -77,11 +84,15 @@ public class SDK {
 		if (REALTIME_YS_2_SDK.getMerId().equals(merId)) {
 			return REALTIME_YS_2_SDK;
 		}
+		if (TEST_SDK.getMerId().equals(merId)) {
+			return TEST_SDK;
+		}
 		return null;
 	}
 
 	public static boolean validate(Map<String, String> reqParam, String encoding) {
-		return REALTIME_CH_SDK.getAcpService().validate(reqParam, encoding)
+		return TEST_SDK.getAcpService().validate(reqParam, encoding)
+				|| REALTIME_CH_SDK.getAcpService().validate(reqParam, encoding)
 				|| REALTIME_YS_2_SDK.getAcpService().validate(reqParam, encoding)
 				|| REALTIME_YS_4_SDK.getAcpService().validate(reqParam, encoding)
 				|| BATCH_CH_SDK.getAcpService().validate(reqParam, encoding);

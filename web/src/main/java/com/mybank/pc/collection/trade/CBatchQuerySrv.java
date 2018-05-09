@@ -25,9 +25,6 @@ import com.mybank.pc.kits.unionpay.acp.file.collection.model.RequestContent;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.ResponseContent;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.ResponseHead;
 
-import cn.hutool.core.date.DateUnit;
-import cn.hutool.core.date.DateUtil;
-
 public class CBatchQuerySrv {
 
 	public void batchQuery() {
@@ -125,8 +122,8 @@ public class CBatchQuerySrv {
 			unionpayBatchCollection.setResultMsg(respMsg);
 			unionpayBatchCollection.setResult(JsonKit.toJson(rspData));
 
+			// 成功 落地查询结果
 			if (("00").equals(respCode)) {
-				// 成功 落地查询结果
 				String fileContent = rspData.get("fileContent");
 				String queryResult = AcpService.getFileContent(fileContent, SDKConstants.UTF_8_ENCODING);
 
@@ -156,17 +153,23 @@ public class CBatchQuerySrv {
 				isSuccess = true;
 				unionpayBatchCollection.setFinalCode("0");
 			} else {
-				if ("34".equals(respCode) && DateUtil.between(unionpayBatchCollection.getCat(), new Date(),
-						DateUnit.MINUTE, false) > 600) {// 批次（xxxx）不存在
-					BatchCollectionRequest batchCollectionRequest = new BatchCollectionRequest(
-							unionpayBatchCollection.getRequestFileContent());
-					List<RequestContent> requestContents = batchCollectionRequest.getContents();
-					for (RequestContent requestContent : requestContents) {
-						updateOrderStatusToFail(requestContent, unionpayBatchCollectionQuery);
-					}
-				}
 				// 其他应答码为失败请排查原因
 				isSuccess = false;
+
+				// 批次（xxxx）不存在
+				if ("34".equals(respCode)) {
+					if (unionpayBatchCollectionQuery.isTimeout()) {
+						BatchCollectionRequest batchCollectionRequest = unionpayBatchCollection
+								.toBatchCollectionRequest();
+						if (batchCollectionRequest != null) {
+							List<RequestContent> requestContents = batchCollectionRequest.getContents();
+							for (RequestContent requestContent : requestContents) {
+								updateOrderStatusToFail(requestContent, unionpayBatchCollectionQuery);
+							}
+						}
+					}
+				}
+
 			}
 
 			unionpayBatchCollection.setQueryResultCount(queryCount + 1);

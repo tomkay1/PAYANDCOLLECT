@@ -108,6 +108,10 @@ public class UnionpayCollectionQuery extends BaseUnionpayCollectionQuery<Unionpa
 			String cardTransData = queryRspData.get("cardTransData");
 			String issuerIdentifyMode = queryRspData.get("issuerIdentifyMode");
 
+			SDK sdk = SDK.getByMerId(getMerId());
+			AcpService acpService = sdk.getAcpService();
+			accNo = acpService.decryptData(accNo, SDKConstants.UTF_8_ENCODING);
+
 			setRespCode(respCode);
 			setRespMsg(respMsg);
 			setAcqInsCode(acqInsCode);
