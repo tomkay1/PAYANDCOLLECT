@@ -122,9 +122,11 @@ public class CTradeCtr extends CoreController {
 		try {
 			isSuccess = cCTradeSrvSrv.initiate(kv);
 		} catch (ValidateCTRException ve) {
+			ve.printStackTrace();
 			isSuccess = false;
 			errorMsg = "发起交易失败，" + ve.getMessage();
 		} catch (Exception e) {
+			e.printStackTrace();
 			isSuccess = false;
 			errorMsg = "发起交易失败，系统内部错误";
 		}

@@ -37,14 +37,18 @@ public class CEntrustInterface extends CoreController {
 		Kv resp = null;
 		String errorMsg = "";
 		try {
+			CEntrustSrv.validateEstablishRequest(reqParam);
 			resp = cEntrustSrv.establish(reqParam);
 		} catch (ValidateEERException e) {
+			e.printStackTrace();
 			resp = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
 			errorMsg = e.getMessage();
 		} catch (EntrustRuntimeException e) {
+			e.printStackTrace();
 			resp = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
 			errorMsg = e.getMessage();
 		} catch (Exception e) {
+			e.printStackTrace();
 			resp = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
 			errorMsg = "系统异常";
 		}

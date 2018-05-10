@@ -53,8 +53,10 @@ public class CTradeApiSrv {
 					isSuccess = isRealtime ? cTradeSrv.sendRealtimeOrder(unionpayCollection, collectionTrade) : true;
 				}
 			} catch (TradeRuntimeException e) {
+				e.printStackTrace();
 				throw e;
 			} catch (Exception e) {
+				e.printStackTrace();
 				TradeRuntimeException xe = new TradeRuntimeException(e);
 				xe.setCollectionTrade(collectionTrade);
 				xe.setUnionpayCollection(unionpayCollection);
@@ -64,6 +66,7 @@ public class CTradeApiSrv {
 			if (initiateRequest.containsKey("exception")) {
 				Exception e = (Exception) initiateRequest.get("exception");
 				if (e instanceof ValidateCTRException) {
+					e.printStackTrace();
 					throw (ValidateCTRException) e;
 				} else {
 					throw new TradeRuntimeException(e);

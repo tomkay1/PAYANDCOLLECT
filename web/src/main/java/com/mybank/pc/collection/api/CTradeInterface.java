@@ -49,9 +49,11 @@ public class CTradeInterface extends CoreController {
 				}
 			}
 		} catch (ValidateCTRException ve) {
+			ve.printStackTrace();
 			resp = Kv.create().set("isSuccess", false).set("unionpayCollection", null);
 			errorMsg = "发起交易失败，" + ve.getMessage();
 		} catch (Exception e) {
+			e.printStackTrace();
 			resp = Kv.create().set("isSuccess", false).set("unionpayCollection", null);
 			errorMsg = "发起交易失败，系统内部错误";
 		}
@@ -82,6 +84,7 @@ public class CTradeInterface extends CoreController {
 				errorMsg = "订单数据不存在[" + orderId + "]";
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			resp.set("isSuccess", false);
 			errorMsg = "查询失败，系统内部错误";
 		}

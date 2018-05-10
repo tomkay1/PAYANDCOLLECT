@@ -236,6 +236,7 @@
                                 props: {
                                     trigger: 'click',
                                     placement: 'bottom',
+                                    transfer: true,
                                     width: '100%'
                                 },
                                 on: {

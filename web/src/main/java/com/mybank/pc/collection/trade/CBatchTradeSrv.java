@@ -56,6 +56,7 @@ public class CBatchTradeSrv {
 				}
 			}
 		} catch (ValidateUnionpayRespException vure) {// 校验响应信息失败，需后续处理
+			vure.printStackTrace();
 			if (unionpayBatchCollection != null && isSaved) {
 				unionpayBatchCollection.setExceInfo(JsonKit.toJson(vure.getExceptionInfo()));
 				unionpayBatchCollection.update();
@@ -176,6 +177,7 @@ public class CBatchTradeSrv {
 
 			return isSuccess;
 		} catch (Exception e) {
+			e.printStackTrace();
 			isSuccess = false;
 			throw e;
 		}

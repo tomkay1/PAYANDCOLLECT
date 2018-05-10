@@ -33,30 +33,39 @@ public class CEntrustSrv {
 		try {
 			result[0] = this.establish(kv.set("merCode", SDK.MER_CODE_REALTIME_YS_2));
 		} catch (ValidateEERException e) {
+			e.printStackTrace();
 			result[0] = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
 		} catch (EntrustRuntimeException e) {
+			e.printStackTrace();
 			result[0] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
 		} catch (Exception e) {
+			e.printStackTrace();
 			result[0] = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
 		}
 
 		try {
 			result[1] = this.establish(kv.set("merCode", SDK.MER_CODE_REALTIME_YS_4));
 		} catch (ValidateEERException e) {
+			e.printStackTrace();
 			result[1] = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
 		} catch (EntrustRuntimeException e) {
+			e.printStackTrace();
 			result[1] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
 		} catch (Exception e) {
+			e.printStackTrace();
 			result[1] = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
 		}
 
 		try {
 			result[2] = this.establish(kv.set("merCode", SDK.MER_CODE_BATCH_CH));
 		} catch (ValidateEERException e) {
+			e.printStackTrace();
 			result[2] = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
 		} catch (EntrustRuntimeException e) {
+			e.printStackTrace();
 			result[2] = Kv.create().set("isSuccess", false).set("unionpayEntrust", e.getContext());
 		} catch (Exception e) {
+			e.printStackTrace();
 			result[2] = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
 		}
 		return result;
@@ -70,8 +79,6 @@ public class CEntrustSrv {
 		respKv.set("unionpayEntrust", unionpayEntrust);
 		boolean isSuccess = false;
 		try {
-			validateEstablishRequest(kv);
-
 			String merCode = kv.getStr("merCode");
 
 			String accNo = kv.getStr("accNo");
@@ -135,10 +142,13 @@ public class CEntrustSrv {
 					unionpayEntrust);
 			return respKv.set("isSuccess", isSuccess);
 		} catch (ValidateEERException e) {
+			e.printStackTrace();
 			throw e;
 		} catch (EntrustRuntimeException e) {
+			e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
+			e.printStackTrace();
 			EntrustRuntimeException xe = new EntrustRuntimeException(e);
 			xe.setContext(unionpayEntrust);
 			throw xe;

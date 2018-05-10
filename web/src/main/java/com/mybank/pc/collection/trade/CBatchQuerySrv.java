@@ -61,6 +61,7 @@ public class CBatchQuerySrv {
 				}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (ubcList != null) {
 				for (UnionpayBatchCollection unionpayBatchCollection : ubcList) {
 					try {
@@ -181,6 +182,7 @@ public class CBatchQuerySrv {
 
 			unionpayBatchCollection.setMat(now);
 		} catch (Exception e) {
+			e.printStackTrace();
 			isSuccess = false;
 			throw e;
 		}

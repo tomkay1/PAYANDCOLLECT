@@ -64,8 +64,10 @@ public class CTradeSrv {
 					isSuccess = isRealtime ? sendRealtimeOrder(unionpayCollection, collectionTrade) : true;
 				}
 			} catch (TradeRuntimeException e) {
+				e.printStackTrace();
 				throw e;
 			} catch (Exception e) {
+				e.printStackTrace();
 				TradeRuntimeException xe = new TradeRuntimeException(e);
 				xe.setCollectionTrade(collectionTrade);
 				xe.setUnionpayCollection(unionpayCollection);
@@ -275,6 +277,7 @@ public class CTradeSrv {
 		try {
 			return unionpayCollection.save() && collectionTrade.save();
 		} catch (Exception e) {
+			e.printStackTrace();
 			collectionTrade.setFinalCode("2");
 			unionpayCollection.setFinalCode("2");
 
@@ -292,8 +295,10 @@ public class CTradeSrv {
 			unionpayCollection.sendRealtimeOrder();
 			return handlingTradeResult(unionpayCollection, collectionTrade);
 		} catch (TradeRuntimeException e) {
+			e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
+			e.printStackTrace();
 			TradeRuntimeException xe = new TradeRuntimeException(e);
 			xe.setCollectionTrade(collectionTrade);
 			xe.setUnionpayCollection(unionpayCollection);
@@ -319,6 +324,7 @@ public class CTradeSrv {
 			try {
 				unionpayCollection.validateRealtimeResp();
 			} catch (ValidateUnionpayRespException vure) {
+				vure.printStackTrace();
 				if (vure.isInvalidRequestOrURI()) {
 					isSuccess = false;
 					collectionTrade.setFinalCode("2");
@@ -327,6 +333,7 @@ public class CTradeSrv {
 					throw vure;
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				throw e;
 			}
 
@@ -362,6 +369,7 @@ public class CTradeSrv {
 			collectionTrade.update();
 			return isSuccess;
 		} catch (Exception e) {
+			e.printStackTrace();
 			TradeRuntimeException xe = new TradeRuntimeException(e);
 			xe.setCollectionTrade(collectionTrade);
 			xe.setUnionpayCollection(unionpayCollection);
@@ -565,6 +573,7 @@ public class CTradeSrv {
 
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				if (unionpayCollection != null) {
 					unionpayCollection.update();
 				}
