@@ -4,6 +4,7 @@ import com.jfinal.aop.Clear;
 import com.jfinal.aop.Duang;
 import com.jfinal.core.ActionKey;
 import com.jfinal.kit.Kv;
+import com.jfinal.kit.LogKit;
 import com.mybank.pc.collection.entrust.CEntrustSrv;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.exception.EntrustRuntimeException;
@@ -32,6 +33,7 @@ public class CEntrustInterface extends CoreController {
 				.set("certifTp", certifTp).set("certifId", certifId).set("customerNm", customerNm)
 				.set("phoneNo", phoneNo).set("cvn2", cvn2).set("expired", expired);
 
+		LogKit.info("req-CEntrustInterface-establish[" + reqParam + "]");
 		Kv resp = null;
 		String errorMsg = "";
 		try {
@@ -48,6 +50,7 @@ public class CEntrustInterface extends CoreController {
 		}
 		resp.set("errorMsg", errorMsg);
 
+		LogKit.info("resp-CEntrustInterface-establish[" + resp + "]");
 		renderJson(resp);
 	}
 

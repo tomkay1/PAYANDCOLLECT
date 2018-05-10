@@ -495,12 +495,12 @@ public class CTradeSrv {
 						String origRespCode = lastsQuery.getOrigRespCode();
 						String origRespMsg = lastsQuery.getOrigRespMsg();
 						String resp = lastsQuery.getResp();
-						String queryId = query.getQueryId();
-						String settleAmt = query.getSettleAmt();
-						String settleCurrencyCode = query.getSettleCurrencyCode();
-						String settleDate = query.getSettleDate();
-						String traceNo = query.getTraceNo();
-						String traceTime = query.getTraceTime();
+						String queryId = lastsQuery.getQueryId();
+						String settleAmt = lastsQuery.getSettleAmt();
+						String settleCurrencyCode = lastsQuery.getSettleCurrencyCode();
+						String settleDate = lastsQuery.getSettleDate();
+						String traceNo = lastsQuery.getTraceNo();
+						String traceTime = lastsQuery.getTraceTime();
 
 						boolean isFail = false;
 						boolean origRespCodeIsNotBlank = StringUtils.isNotBlank(origRespCode);

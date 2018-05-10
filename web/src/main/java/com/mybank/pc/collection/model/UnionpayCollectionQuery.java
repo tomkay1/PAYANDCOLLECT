@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.jfinal.kit.JsonKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.SqlPara;
@@ -108,9 +110,11 @@ public class UnionpayCollectionQuery extends BaseUnionpayCollectionQuery<Unionpa
 			String cardTransData = queryRspData.get("cardTransData");
 			String issuerIdentifyMode = queryRspData.get("issuerIdentifyMode");
 
-			SDK sdk = SDK.getByMerId(getMerId());
-			AcpService acpService = sdk.getAcpService();
-			accNo = acpService.decryptData(accNo, SDKConstants.UTF_8_ENCODING);
+			if (StringUtils.isNotBlank(accNo)) {
+				SDK sdk = SDK.getByMerId(getMerId());
+				AcpService acpService = sdk.getAcpService();
+				accNo = acpService.decryptData(accNo, SDKConstants.UTF_8_ENCODING);
+			}
 
 			setRespCode(respCode);
 			setRespMsg(respMsg);

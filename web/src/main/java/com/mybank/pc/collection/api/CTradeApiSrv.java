@@ -70,6 +70,7 @@ public class CTradeApiSrv {
 				}
 			}
 		}
+
 		return result.set("isSuccess", isSuccess).set("unionpayCollection", unionpayCollection);
 	}
 

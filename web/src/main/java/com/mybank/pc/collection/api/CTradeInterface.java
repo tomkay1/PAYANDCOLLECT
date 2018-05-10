@@ -4,6 +4,7 @@ import com.jfinal.aop.Clear;
 import com.jfinal.aop.Duang;
 import com.jfinal.core.ActionKey;
 import com.jfinal.kit.Kv;
+import com.jfinal.kit.LogKit;
 import com.mybank.pc.collection.model.UnionpayCollection;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.exception.ValidateCTRException;
@@ -36,6 +37,7 @@ public class CTradeInterface extends CoreController {
 				.set("certifTp", certifTp).set("certifId", certifId).set("customerNm", customerNm)
 				.set("phoneNo", phoneNo).set("cvn2", cvn2).set("expired", expired);
 
+		LogKit.info("req-CTradeInterface-initiate[" + reqParam + "]");
 		Kv resp = null;
 		String errorMsg = "";
 		try {
@@ -56,6 +58,7 @@ public class CTradeInterface extends CoreController {
 
 		resp.set("errorMsg", errorMsg);
 
+		LogKit.info("resp-CTradeInterface-initiate[" + reqParam + "]");
 		renderJson(resp);
 	}
 
@@ -65,6 +68,7 @@ public class CTradeInterface extends CoreController {
 		if (orderId != null) {
 			orderId = orderId.trim();
 		}
+		LogKit.info("req-CTradeInterface-query[" + orderId + "]");
 
 		Kv resp = Kv.create();
 		UnionpayCollection unionpayCollection = null;
@@ -83,6 +87,7 @@ public class CTradeInterface extends CoreController {
 		}
 		resp.set("unionpayCollection", unionpayCollection).set("errorMsg", errorMsg);
 
+		LogKit.info("resp-CTradeInterface-query[" + resp + "]");
 		renderJson(resp);
 	}
 
