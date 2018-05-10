@@ -152,7 +152,7 @@ public class CTradeApiSrv {
 			}
 
 			CardBin cardBin = FeeKit.getCardBin(accNo = accNo.trim());
-			if (cardBin == null || !"0".equals(cardBin.getCardType())) {
+			if (cardBin == null) {
 				throw new ValidateCTRException("不支持的卡类型!!");
 			}
 			boolean isRealtimeBuss = "1".equals(bussType) ? true : false;
