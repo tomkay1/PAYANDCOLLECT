@@ -51,6 +51,22 @@
                     <FormItem label="预存手续费余额"  >
                         {{merInfo.feeAmount}}
                     </FormItem>
+                    <FormItem label="清算银行卡号"  >
+                        {{merInfo.bankNo}}
+                    </FormItem>
+                    <FormItem label="清算银行卡户名"  >
+                        {{merInfo.bankAccountName}}
+                    </FormItem>
+                    <FormItem label="清算银行卡预留手机号"  >
+                        {{merInfo.bankPhone}}
+                    </FormItem>
+                    <FormItem label="清算银行卡开户行全名"  >
+                        {{merInfo.bankName}}
+                    </FormItem>
+                    <FormItem label="清算银行卡开户行行号"  >
+                        {{merInfo.bankCode}}
+                    </FormItem>
+
                     <FormItem label="手持身份证照片"  >
 
                         <img :src="urlCard"  width="500">

@@ -66,6 +66,23 @@
                 <FormItem label="预存手续费余额" prop="feeAmount">
                     <Input v-model="merInfo.feeAmount" placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
+                <FormItem label="清算银行卡号" prop="bankNo">
+                    <Input v-model="merInfo.bankNo" placeholder="请输入..." style="width: 300px"/>
+                </FormItem>
+                <FormItem label="清算银行卡户名" prop="bankAccountName">
+                    <Input v-model="merInfo.bankAccountName" placeholder="请输入..." style="width: 300px"/>
+                </FormItem>
+                <FormItem label="清算银行卡预留手机号" prop="bankPhone">
+                    <Input v-model="merInfo.bankPhone" placeholder="请输入..." style="width: 300px"/>
+                </FormItem>
+                <FormItem label="清算银行卡开户行全名" prop="bankName">
+                    <Input v-model="merInfo.bankName" placeholder="请输入..." style="width: 300px"/>
+                </FormItem>
+                <FormItem label="清算银行卡开户行行号" prop="bankCode">
+                    <Input v-model="merInfo.bankCode" placeholder="请输入..." style="width: 300px"/>
+                </FormItem>
+
+
                 <FormItem label="手持身份证照片" prop="cardImg">
                     <!--<Input v-model="merInfo.cardImg" placeholder="请输入..." style="width: 300px"/>-->
 
@@ -592,6 +609,16 @@
                         {required: true, message: '联系地址不能为空', trigger: 'blur'},
                         {type: 'string', max: 200, message: '联系地址长度不能超过20', trigger: 'blur'}
                     ],
+
+                    bankNo: [
+                        {required: true, message: '清算银行卡号不能为空', trigger: 'blur'},
+                    ],
+
+                    bankAccountName: [
+                        {required: true, message: '清算银行卡户名不能为空', trigger: 'blur'},
+                    ],
+
+
                     cardImg: [
                         {required: true, message: '手持身份证照片不能为空', trigger: 'blur'}
                     ],
