@@ -1,5 +1,6 @@
 package com.mybank.pc.merchant.cust;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -17,6 +18,7 @@ import com.jfinal.upload.UploadFile;
 import com.mybank.pc.CMNSrv;
 import com.mybank.pc.Consts;
 import com.mybank.pc.collection.entrust.CEntrustSrv;
+import com.mybank.pc.collection.model.UnionpayEntrust;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.kits.ResKit;
@@ -30,6 +32,7 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -122,9 +125,9 @@ public class MerchantCustCtr extends CoreController {
 
         try {
             //此处一定优先处理上传文件，后处理其它参数
-            UploadFile cardImgZ = getFile("cardImgZ", "", 20 * 1024 * 1000);
-            UploadFile selfImg = getFile("selfImg", "", 20 * 1024 * 1000);
-            UploadFile authImg = getFile("authImg", "", 20 * 1024 * 1000);
+            UploadFile cardImgZ = getFile("cardImgZ", "", 50 * 1024 * 1000);
+            UploadFile selfImg = getFile("selfImg", "", 50 * 1024 * 1000);
+            UploadFile authImg = getFile("authImg", "", 50 * 1024 * 1000);
             File cardImgZFile = cardImgZ.getFile();
             File selfImgFile = selfImg.getFile();
             File authImgFile = authImg.getFile();
@@ -150,7 +153,7 @@ public class MerchantCustCtr extends CoreController {
             }
             MerchantInfo mf = MerchantInfo.dao.findFirst("select * from merchant_info mi where mi.merchantNo=? and mi.dat is null ", merNo);
 
-            /*if (ObjectUtil.isNull(mf)) {
+            if (ObjectUtil.isNull(mf)) {
                 //商户编号输入错误，商户不存在
                 setAttr("resCode", "error");
                 setAttr("resMsg", "商户不存在！");
@@ -196,7 +199,7 @@ public class MerchantCustCtr extends CoreController {
                     render("/WEB-INF/template/www/cust-res.html");
                     return;
                 }
-            }*/
+            }
 
 
             //保存图片
