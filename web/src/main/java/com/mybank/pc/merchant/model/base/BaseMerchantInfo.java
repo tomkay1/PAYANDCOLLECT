@@ -208,5 +208,13 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 		return getStr("bankPhone");
 	}
 
+	public void setMaxTradeAmount(java.math.BigDecimal maxTradeAmount) {
+		set("maxTradeAmount", maxTradeAmount);
+	}
+
+	public java.math.BigDecimal getMaxTradeAmount() {
+		return get("maxTradeAmount");
+	}
+
 
 }
