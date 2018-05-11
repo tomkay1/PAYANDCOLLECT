@@ -168,5 +168,45 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public java.lang.String getOperID() {
 		return getStr("operID");
 	}
+	public void setBankNo(java.lang.String bankNo) {
+		set("bankNo", bankNo);
+	}
+
+	public java.lang.String getBankNo() {
+		return getStr("bankNo");
+	}
+
+	public void setBankAccountName(java.lang.String bankAccountName) {
+		set("bankAccountName", bankAccountName);
+	}
+
+	public java.lang.String getBankAccountName() {
+		return getStr("bankAccountName");
+	}
+
+	public void setBankName(java.lang.String bankName) {
+		set("bankName", bankName);
+	}
+
+	public java.lang.String getBankName() {
+		return getStr("bankName");
+	}
+
+	public void setBankCode(java.lang.String bankCode) {
+		set("bankCode", bankCode);
+	}
+
+	public java.lang.String getBankCode() {
+		return getStr("bankCode");
+	}
+
+	public void setBankPhone(java.lang.String bankPhone) {
+		set("bankPhone", bankPhone);
+	}
+
+	public java.lang.String getBankPhone() {
+		return getStr("bankPhone");
+	}
+
 
 }
