@@ -131,9 +131,9 @@ public class MerchantCustCtr extends CoreController {
             File cardImgZFile = cardImgZ.getFile();
             File selfImgFile = selfImg.getFile();
             File authImgFile = authImg.getFile();
-            System.out.println("上传文件1大小：" + cardImgZFile.length());
-            System.out.println("上传文件2大小：" + selfImgFile.length());
-            System.out.println("上传文件3大小：" + authImgFile.length());
+            LogKit.info("上传文件1大小：" + cardImgZFile.length());
+            LogKit.info("上传文件2大小：" + selfImgFile.length());
+            LogKit.info("上传文件3大小：" + authImgFile.length());
 
             String merNo = getPara("merNo");
             String custName = getPara("custName");
