@@ -1,10 +1,7 @@
 <template>
     <div>
-    <Tabs type="card">
-
-
-        <TabPane label="出账处理" style="min-height: 400px">
             <Card>
+                <p slot="title" ><Icon type="help-buoy"></Icon>出账处理</p>
                 <Row>
                     <Col span="20"  align="right">
                     <Select v-model="chargeOff" style="width:200px" :clearable="true">
@@ -40,8 +37,7 @@
                     </div>
                 </div>
             </Card>
-        </TabPane>
-    </Tabs>
+
     <Modal
             v-model="debitModal"
             @on-visible-change="vChange"
@@ -169,52 +165,90 @@
                     {
                         title: '清分流水号',
                         key: 'clearNo',
+                        width: 100
                     },
 
                     {
                         title: '清分日期',
                         key: 'clearTimeTxt',
+                        width: 100
                     },
                     {
                         title: '交易笔数',
                         key: 'tradeCount',
+                        width: 100
                     },
                     {
                         title: '交易金额',
                         key: 'amountSum',
+                        width: 100
                     },
 
                     {
                         title: '交易手续费金额',
                         key: 'amountFeeSum',
+                        width: 100
                     },
                     {
                         title: '银行代收手续费金额',
                         key: 'bankFee',
+                        width: 100
                     },
                     {
                         title: '利润',
                         key: 'profit',
+                        width: 100
                     },
                     {
                         title: '预存抵扣手续费金额',
                         key: 'accountFee',
+                        width: 100
                     },
                     {
                         title: '交易抵扣手续费金额',
                         key: 'tradeFee',
+                        width: 100
                     },
                     {
                         title: '出账金额',
                         key: 'amountOff',
+                        width: 100
+                    },
+                    {
+                        title: '收款卡号',
+                        key: 'bankNo',
+                        width:150
+                    },
+                    {
+                        title: '户名',
+                        key: 'bankAccountName',
+                        width: 100
+                    },
+                    {
+                        title: '预留手机号',
+                        key: 'bankPhone',
+                        width:100
+                    },
+
+                    {
+                        title: '开户行',
+                        key: 'bankName',
+                        width:200
+                    },
+                    {
+                        title: '行号',
+                        key: 'bankCode',
+                        width: 100
                     },
                     {
                         title: '出账时间',
                         key: 'chargeAtTxt',
+                        width: 100
                     },
                     {
                         title: '出账单据流水号',
                         key: 'chargeOffTradeNo',
+                        width: 100,
                     },
 
                     {

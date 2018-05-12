@@ -87,6 +87,7 @@ export const appRouter = [
         component: Main,
         children: [
             { path: 'cla', title: '清分查询', isCheck: 'yes', name: 'collectionClear_cla', component: resolve => { require(['@/views/collection-clear/clearList_admin.vue'], resolve); } },
+            // { path: 'clc', title: '清分审批', isCheck: 'yes', name: 'collectionClear_clc', component: resolve => { require(['@/views/collection-clear/clearList_check.vue'], resolve); } },
             { path: 'clm', title: '商户清分查询', isCheck: 'yes', name: 'collectionClear_clm', component: resolve => { require(['@/views/collection-clear/clearList_mer.vue'], resolve); } },
             { path: 'debit', title: '出账处理', isCheck: 'yes', name: 'collectionClear_debit', component: resolve => { require(['@/views/collection-clear/debit.vue'], resolve); } },
         ]

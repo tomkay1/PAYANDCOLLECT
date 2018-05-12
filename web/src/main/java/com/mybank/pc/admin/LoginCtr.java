@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.jfinal.aop.Clear;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.StrKit;
@@ -92,7 +93,7 @@ public class LoginCtr extends CoreController {
                     CookieKit.put(this, Consts.USER_ACCESS_TOKEN, user.getId().toString(), 60 * 60 * 24 * 14);
                 else
                     CookieKit.put(this, Consts.USER_ACCESS_TOKEN, user.getId().toString(), Consts.COOKIE_TIMEOUT);
-                renderSuccessJSON("登录成功", JSON.toJSONString(data));
+                renderSuccessJSON("登录成功", JSON.toJSONString(data, SerializerFeature.DisableCircularReferenceDetect));
                 return;
             } else {
                 renderFailJSON("该用户被禁用", "");

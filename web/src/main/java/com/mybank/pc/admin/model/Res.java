@@ -6,8 +6,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.jfinal.kit.LogKit;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.base.BaseRes;
+import com.mybank.pc.kits._SqlKit;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -77,8 +79,6 @@ public class Res extends BaseRes<Res> {
 	}
 
 	public List<Res> getChildren() {
-		System.out.printf("resId="+getId());
-		System.out.printf("roleId="+get("roleId"));
 		List<Res> list = dao.findByCache(Consts.CACHE_NAMES.userReses.name(), "getResChildren_" + get("roleId")+"_"+getId(),
 				"select r.*,rr.roleId as roleId from s_res r left join s_role_res rr on r.id=rr.resId where r.pId=? and rr.roleId=? order by r.seq", getId(),get("roleId"));
 		return list;
@@ -86,18 +86,17 @@ public class Res extends BaseRes<Res> {
 
 	public List<Res> findResesByUserId(BigInteger userId) {
 		List<Role> roleList = Role.dao.findRolesByUserId(userId);
-		int i = 0;
-		String p = null;
+		List<Integer> ids=new ArrayList<>();
 		for (Role r : roleList) {
-			if (p == null)
-				p = r.getId().toString();
-			else
-				p = p + "," + r.getId().toString();
+			ids.add(r.getId().intValue());
 		}
+		StringBuilder stringBuilder=new StringBuilder();
+		_SqlKit.joinIds(ids,stringBuilder);
+
+
 
 		List<Res> list = Res.dao.findByCache(Consts.CACHE_NAMES.userReses.name(), "findResesByUserId_"+userId,
-				"select r.*,rr.roleId as roleId from s_res r left join s_role_res rr on r.id=rr.resId  where rr.roleId in (?) and r.pid=0 order by r.seq",
-				p);
+				"select r.*,rr.roleId as roleId from s_res r left join s_role_res rr on r.id=rr.resId  where rr.roleId in "+stringBuilder.toString()+" and r.pid=0 order by r.seq");
 
 		return list;
 	}
@@ -105,18 +104,16 @@ public class Res extends BaseRes<Res> {
 	public List<Res> findSecResesByUserId(BigInteger userId, long rId) {
 
 		List<Role> roleList = Role.dao.findRolesByUserId(userId);
-		int i = 0;
-		String p = null;
+
+		List<Integer> ids=new ArrayList<>();
 		for (Role r : roleList) {
-			if (p == null)
-				p = r.getId().toString();
-			else
-				p = p + "," + r.getId().toString();
+			ids.add(r.getId().intValue());
 		}
+		StringBuilder stringBuilder=new StringBuilder();
+		_SqlKit.joinIds(ids,stringBuilder);
 
 		List<Res> list = Res.dao.findByCache(Consts.CACHE_NAMES.userReses.name(), userId + "" + rId,
-				"select r.* from s_res r left join s_role_res rr on r.id=rr.resId  where rr.roleId in (?) and r.pid=? order by r.seq",
-				p, rId);
+				"select r.* from s_res r left join s_role_res rr on r.id=rr.resId  where rr.roleId in "+stringBuilder.toString()+" and r.pid=? order by r.seq", rId);
 		return list;
 	}
 

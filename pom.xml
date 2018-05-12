@@ -41,6 +41,21 @@
         <zxing4javase.version>3.3.2</zxing4javase.version>
 
     </properties>
+    <profiles>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <package.environment>prod</package.environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <package.environment>dev</package.environment>
+                <activeByDefault>true</activeByDefault>
+            </properties>
+        </profile>
+    </profiles>
 
     <!--集中声明依赖-->
     <dependencyManagement>
@@ -218,25 +233,42 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <!--<warSourceExcludes>*/lib/jsp-api-2.2.jar</warSourceExcludes>-->
+                    <warName>mb-pac</warName>
+                    <webResources>
+                        <!--动态指定文件-->
+                        <resource>
+                            <directory>src/main/res/${package.environment}</directory>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <filtering>true</filtering>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
         </plugins>
 
         <!--此标签用于声明插件版本以便统一管理-->
-        <pluginManagement>
-            <plugins>
-                <!-- 配置Tomcat插件 -->
-                <plugin>
-                    <groupId>org.apache.tomcat.maven</groupId>
-                    <artifactId>tomcat7-maven-plugin</artifactId>
-                    <version>2.2</version>
-                    <configuration>
-                        <!--配置端口号-->
-                        <port>80</port>
-                        <!--配置访问路径，此处配置为根目录，即http://localhost/-->
-                        <path>/</path>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+        <!--<pluginManagement>-->
+            <!--<plugins>-->
+                <!--&lt;!&ndash; 配置Tomcat插件 &ndash;&gt;-->
+                <!--<plugin>-->
+                    <!--<groupId>org.apache.tomcat.maven</groupId>-->
+                    <!--<artifactId>tomcat7-maven-plugin</artifactId>-->
+                    <!--<version>2.2</version>-->
+                    <!--<configuration>-->
+                        <!--&lt;!&ndash;配置端口号&ndash;&gt;-->
+                        <!--<port>80</port>-->
+                        <!--&lt;!&ndash;配置访问路径，此处配置为根目录，即http://localhost/&ndash;&gt;-->
+                        <!--<path>/</path>-->
+                    <!--</configuration>-->
+                <!--</plugin>-->
+            <!--</plugins>-->
+        <!--</pluginManagement>-->
         <resources>
             <resource>
                 <directory>src/main/java</directory>
@@ -246,6 +278,10 @@
             </resource>
             <resource>
                 <directory>src/main/res</directory>
+                <excludes>
+                    <exclude>dev/*</exclude>
+                    <exclude>prod/*</exclude>
+                </excludes>
             </resource>
         </resources>
     </build>

@@ -16,6 +16,25 @@ public class CollectionClear extends BaseCollectionClear<CollectionClear> {
 		return getStr("merName");
 	}
 
+	public String getBankNo(){
+		return getStr("bankNo");
+	}
+	public String getBankPhone(){
+		return getStr("bankPhone");
+	}
+	public String getBankAccountName(){
+		return getStr("bankAccountName");
+	}
+
+	public String getBankName(){
+		return getStr("bankName");
+	}
+	public String getBankCode(){
+		return getStr("bankCode");
+	}
+
+
+
 	public String getProfit(){
 		return getBigDecimal("profit")==null?"0":getBigDecimal("profit").toString();
 	}

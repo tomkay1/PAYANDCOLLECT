@@ -21,7 +21,10 @@ from collection_trade ct WHERE ct.finalCode='0' and ct.tradeTime<? AND ct.mercha
 #end
 
 #sql("findPage")
-SELECT *,(cc.amountFeeSum-cc.bankFee) as profit  ,(select merchantName from merchant_info where id=cc.merID) as merName FROM collection_clear cc WHERE 1=1
+SELECT *,(cc.amountFeeSum-cc.bankFee) as profit  ,(select merchantName from merchant_info where id=cc.merID) as merName
+  ,(select bankNo from merchant_info where id=cc.merID) as bankNo,(select bankAccountName from merchant_info where id=cc.merID) as bankAccountName,(select bankName from merchant_info where id=cc.merID) as bankName
+  ,(select bankCode from merchant_info where id=cc.merID) as bankCode,(select bankPhone from merchant_info where id=cc.merID) as bankPhone
+FROM collection_clear cc WHERE 1=1
     #for(x : cond)
        AND #(x.key) #para(x.value)
     #end
@@ -56,7 +59,7 @@ FROM collection_clear cc WHERE 1=1
 #for(x : cond)
  AND  #(x.key) #para(x.value)
 #end
-GROUP BY merID
+##GROUP BY merID
 
 #end
 

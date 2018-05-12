@@ -4,16 +4,16 @@ package com.mybank.pc.kits;
 
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.extra.mail.Mail;
+import com.jfplugin.mail.MailKit;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Random;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,8 +62,8 @@ public class _StrKit {
 
 
     public static void main(String[] args) throws IOException {
-        byte[] key_array= Base64.decode("+yttlyEjxH44zn/ACScxLg==", Charset.forName("UTF-8"));
-        System.out.println(SecureUtil.aes(key_array).decryptStr("f5ddc6d07606017c336df70c02a47172"));
+//        byte[] key_array= Base64.decode("+yttlyEjxH44zn/ACScxLg==", Charset.forName("UTF-8"));
+//        System.out.println(SecureUtil.aes(key_array).decryptStr("f5ddc6d07606017c336df70c02a47172"));
 //        System.out.println(System.getProperty("java.io.tmpdir"));
 //        Date lastWeek=DateUtil.lastWeek();
 //        Date beginWeek=DateUtil.beginOfWeek(lastWeek);
@@ -72,6 +72,8 @@ public class _StrKit {
 //
 //        System.out.println(beginWeek);
 //        System.out.println(endWeek);
+
+
 
     }
 

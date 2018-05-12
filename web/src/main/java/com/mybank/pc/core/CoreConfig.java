@@ -192,7 +192,7 @@ public class CoreConfig extends JFinalConfig {
 		arp.getEngine().addSharedMethod(new StrUtil());
 		arp.setBaseSqlTemplatePath(PathKit.getRootClassPath() + "/sql");
 		arp.addSqlTemplate("all.sql");
-		arp.setShowSql(true);
+		arp.setShowSql(ResKit.getConfigBoolean("devMode")?true:false);
 		plugins.add(arp);
 		// 开启eheache缓存
 		plugins.add(new EhCachePlugin());

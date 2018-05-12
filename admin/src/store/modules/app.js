@@ -42,7 +42,8 @@ const app = {
             let ma = Cookies.get('menuArray');
             let menuList = [];
             if(ma!=undefined)ma= eval ("(" + ma+ ")")
-            // console.info(ma)
+
+            console.info(ma)
             appRouter.forEach((item, index) => {
                     if(ma&&Util.oneOf(item.path,ma)) {
                         if (item.children.length === 1) {
