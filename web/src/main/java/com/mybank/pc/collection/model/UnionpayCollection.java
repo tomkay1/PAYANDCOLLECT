@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.jsoup.helper.StringUtil;
 
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
@@ -253,8 +254,23 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 	}
 
 	public static UnionpayCollection findByOrderId(String orderId) {
-		SqlPara sqlPara = Db.getSqlPara("collection_trade.findUnionpayCollection", Kv.create().set("orderId", orderId));
-		return UnionpayCollection.dao.findFirst(sqlPara);
+		if (StringUtil.isBlank(orderId)) {
+			return null;
+		} else {
+			SqlPara sqlPara = Db.getSqlPara("collection_trade.findUnionpayCollection",
+					Kv.create().set("orderId", orderId));
+			return UnionpayCollection.dao.findFirst(sqlPara);
+		}
+	}
+
+	public static UnionpayCollection findByOrderIdAndMerchantID(String orderId, String merchantID) {
+		if (StringUtil.isBlank(orderId) || StringUtils.isBlank(merchantID)) {
+			return null;
+		} else {
+			SqlPara sqlPara = Db.getSqlPara("collection_trade.findUnionpayCollection",
+					Kv.create().set("orderId", orderId));
+			return UnionpayCollection.dao.findFirst(sqlPara);
+		}
 	}
 
 	public static UnionpayCollection findByTradeNo(String tradeNo) {

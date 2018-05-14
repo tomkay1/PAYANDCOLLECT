@@ -438,7 +438,7 @@ public class CClearCtr extends CoreController {
         String fileFolder="qfmx/"+DateKit.dateToStr(new Date(),DateKit.yyyy_MM_dd)+"/";
         File file=FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() +fileFolder);
         if(!file.exists())file.mkdirs();
-        String fileName = fileFolder+(currUser()!=null?currUser().getLoginname():"")+DateUtil.current(true) + ".xls";
+        String fileName = fileFolder+(currUser()!=null?currUser().getLoginname():"")+DateUtil.current(true) + "_"+excelTitle+".xls";
         file = FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() + fileName);
         try {
             OutputStream out = new FileOutputStream(file);

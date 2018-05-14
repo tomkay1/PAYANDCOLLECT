@@ -75,7 +75,7 @@
 
                         </Tab-pane>
                         <Tab-pane label="报表邮件设置" icon="email">
-                            <FormItem label="">
+                            <FormItem label="清分邮件发送目标">
                                 <Input v-model="param.clearEmailUser" placeholder="请输入..." style="width: 500px"></Input>
                             </FormItem>
                         </Tab-pane>

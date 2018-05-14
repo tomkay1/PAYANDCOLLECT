@@ -13,7 +13,6 @@ import com.jfinal.kit.Kv;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.CardBin;
-import com.mybank.pc.collection.entrust.CEntrustSrv;
 import com.mybank.pc.collection.model.CollectionEntrust;
 import com.mybank.pc.collection.model.CollectionTrade;
 import com.mybank.pc.collection.model.UnionpayCollection;
@@ -28,7 +27,7 @@ import com.mybank.pc.merchant.model.MerchantInfo;
 @Clear(AdminIAuthInterceptor.class)
 public class CTradeApiSrv {
 
-	private CEntrustSrv cEntrustSrv = Duang.duang(CEntrustSrv.class);
+	private CEntrustApiSrv cEntrustApiSrv = Duang.duang(CEntrustApiSrv.class);
 	private CTradeSrv cTradeSrv = Duang.duang(CTradeSrv.class);
 
 	public Kv initiate(Kv reqParam) {
@@ -145,13 +144,24 @@ public class CTradeApiSrv {
 					throw new ValidateCTRException("交易金额不得小于[" + numMiniAmt + "]");
 				}
 			}
-
 			if (StringUtils.isBlank(merchantID)) {
 				throw new ValidateCTRException("商户ID不能为空");
 			}
 			MerchantInfo merchantInfo = MerchantInfo.dao.findById(merchantID = merchantID.trim());
 			if (merchantInfo == null || "1".equals(merchantInfo.getStatus()) || merchantInfo.getDat() != null) {
 				throw new ValidateCTRException("商户[" + merchantID + "]" + "不存在或已停用/已删除");
+			}
+			BigDecimal maxTradeAmount = merchantInfo.getMaxTradeAmount();
+			if (maxTradeAmount != null) {
+				long numMaxAmt = -1;
+				try {
+					numMaxAmt = maxTradeAmount.multiply(new BigDecimal(100)).longValue();
+					if (numTxnAmt > numMaxAmt) {
+						throw new RuntimeException();
+					}
+				} catch (Exception e) {
+					throw new ValidateCTRException("交易金额不得大于于[" + numMaxAmt + "]");
+				}
 			}
 
 			CardBin cardBin = FeeKit.getCardBin(accNo = accNo.trim());
@@ -194,11 +204,13 @@ public class CTradeApiSrv {
 					Kv entrustReqParam = Kv.by("merCode", merCode).set("merchantID", merchantID).set("accNo", accNo)
 							.set("certifTp", certifTp).set("certifId", certifId).set("customerNm", customerNm)
 							.set("phoneNo", phoneNo).set("cvn2", cvn2).set("expired", expired);
-					Kv resp = cEntrustSrv.establish(entrustReqParam);
+					Kv resp = cEntrustApiSrv.establish(entrustReqParam);
 					collectionEntrust = (CollectionEntrust) resp.get("unionpayEntrust");
 				} catch (Exception e) {
 					throw new ValidateCTRException("建立委托失败");
 				}
+			} else if (collectionEntrust != null && "0".equals(collectionEntrust.getStatus())) {
+				cEntrustApiSrv.addMerchantCust(merchantID, accNo, certifId, customerNm, phoneNo);
 			}
 			if (collectionEntrust == null || !"0".equals(collectionEntrust.getStatus())) {
 				throw new ValidateCTRException("客户委托信息不存在或未处于已委托状态");

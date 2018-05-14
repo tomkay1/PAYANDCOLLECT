@@ -4,12 +4,14 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jfinal.aop.Before;
+import com.jfinal.aop.Duang;
 import com.jfinal.kit.LogKit;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.jfinal.plugin.activerecord.tx.Tx;
+import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.render.RenderManager;
 import com.jfplugin.mail.MailKit;
 import com.mybank.pc.Consts;
@@ -19,6 +21,7 @@ import com.mybank.pc.collection.model.CollectionTrade;
 import com.mybank.pc.core.CoreException;
 import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.ResKit;
+import com.mybank.pc.merchant.info.MerchantInfoSrv;
 import com.mybank.pc.merchant.model.MerchantInfo;
 
 import java.lang.reflect.Array;
@@ -31,7 +34,13 @@ public class CClearSrv  {
      * 交易数据统计 按商户分组
      *
      * @return
+     *
+     *
+     *
      */
+
+
+    private MerchantInfoSrv merchantInfoSrv= Duang.duang(MerchantInfoSrv.class.getSimpleName(),MerchantInfoSrv.class);
     public List<TradeModel> collectionTradeByMerchant(Date time) {
         String sql = Db.getSql("collection_clear.collectTradeByMerchant");
         List<Record> list = Db.find(sql, time);
@@ -110,14 +119,15 @@ public class CClearSrv  {
             merchantInfo = MerchantInfo.dao.findById(tradeModel.getmId());
             //预存账户不足的情况
             if (merchantInfo.getFeeAmount().compareTo(tradeModel.getTradeFee()) <= 0) {
-                amountFee = merchantInfo.getFeeAmount();
-                merchantInfo.setFeeAmount(Consts.ZERO);//商户预存账户余额
-                collectionClear.setTradeFee(tradeModel.getTradeFee().subtract(amountFee));//从交易中扣除手续费金额 交易手续费-预存抵扣
-                merchantInfo.update();//更新商户预存手续费当前金额
-                collectionClear.setAmountOff(tradeModel.getTradeAmount().subtract(tradeModel.getTradeFee()).add(amountFee));//设置出账金额  交易金额-交易手续费+预存抵扣
+                //amountFee = merchantInfo.getFeeAmount();
+                //merchantInfo.setFeeAmount(Consts.ZERO);//商户预存账户余额
+                collectionClear.setTradeFee(tradeModel.getTradeFee());//从交易中扣除手续费金额 交易手续费
+                //merchantInfo.update();//更新商户预存手续费当前金额
+                collectionClear.setAmountOff(tradeModel.getTradeAmount().subtract(tradeModel.getTradeFee()));//设置出账金额  交易金额-交易手续费
             } else {
                 merchantInfo.setFeeAmount(merchantInfo.getFeeAmount().subtract(tradeModel.getTradeFee()));
                 merchantInfo.update();
+                merchantInfoSrv.removeCacheMerchantInfo(merchantInfo.getId());
                 collectionClear.setAccountFee(tradeModel.getTradeFee());
                 collectionClear.setTradeFee(Consts.ZERO);
                 collectionClear.setAmountOff(tradeModel.getTradeAmount());
