@@ -24,7 +24,7 @@ public class MerchantInfoSrv {
     public MerchantInfo getMerchantInfoByUserID(Integer userID){
         MerchantUser merchantUser = MerchantUser.dao.findFirst("select * from merchant_user mu where mu.userID=? ",userID);
         if(merchantUser!=null){
-            return MerchantInfo.dao.findFirstByCache("merInfo","getMerchantInfoByUserID_"+userID,"select * from merchant_info mi where mi.ID=?",merchantUser.getMerchantID());
+            return MerchantInfo.dao.findFirstByCache("merInfo","getMerchantInfoByMerID_"+merchantUser.getMerchantID(),"select * from merchant_info mi where mi.ID=?",merchantUser.getMerchantID());
         }else{
             return null;
         }
@@ -34,7 +34,7 @@ public class MerchantInfoSrv {
       List<MerchantUser> list=  MerchantUser.dao.find("select * from merchant_user mu where mu.merchantID=? ",merID);
       if(!CollectionUtil.isEmpty(list)){
           for(MerchantUser mu :list){
-              CacheKit.remove("merInfo","getMerchantInfoByUserID_"+mu.getUserID());
+              CacheKit.remove("merInfo","getMerchantInfoByMerID_"+mu.getMerchantID());
           }
       }
     }
