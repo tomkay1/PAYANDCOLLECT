@@ -1,6 +1,5 @@
 package com.mybank.pc.merchant.info;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.lowagie.text.*;
@@ -13,8 +12,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.List;
 
 public class MerchantInfoSrv {
     public synchronized String  getMerchantNo(String merType){
@@ -31,12 +28,7 @@ public class MerchantInfoSrv {
 
     }
     public void removeCacheMerchantInfo(Integer merID){
-      List<MerchantUser> list=  MerchantUser.dao.find("select * from merchant_user mu where mu.merchantID=? ",merID);
-      if(!CollectionUtil.isEmpty(list)){
-          for(MerchantUser mu :list){
-              CacheKit.remove("merInfo","getMerchantInfoByMerID_"+mu.getMerchantID());
-          }
-      }
+        CacheKit.remove("merInfo","getMerchantInfoByMerID_"+merID);
     }
 
     public void createAgreeDoc(MerchantInfo mi ,File docFile){
