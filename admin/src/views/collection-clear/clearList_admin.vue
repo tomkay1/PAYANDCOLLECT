@@ -223,16 +223,16 @@
                         key: 'bankAccountName',
                         width: 100
                     },
-                    {
-                        title: '预留手机号',
-                        key: 'bankPhone',
-                        width:100
-                    },
 
                     {
                         title: '开户行',
                         key: 'bankName',
                         width:200
+                    },
+                    {
+                        title: '预留手机号',
+                        key: 'bankPhone',
+                        width:100
                     },
                     {
                         title: '行号',
