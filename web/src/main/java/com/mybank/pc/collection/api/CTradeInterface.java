@@ -1,5 +1,8 @@
 package com.mybank.pc.collection.api;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.jfinal.aop.Clear;
 import com.jfinal.aop.Duang;
 import com.jfinal.core.ActionKey;
@@ -9,6 +12,7 @@ import com.mybank.pc.collection.model.UnionpayCollection;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.exception.ValidateCTRException;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
+import com.mybank.pc.kits.RSAKit;
 
 @Clear(AdminIAuthInterceptor.class)
 public class CTradeInterface extends CoreController {
@@ -17,81 +21,142 @@ public class CTradeInterface extends CoreController {
 
 	@ActionKey("/coll/api/trade/initiate")
 	public void initiate() {
-		String merCode = getPara("merCode");
-		String merchantID = getPara("merchantID");
-		String bussType = getPara("bussType");
-		String orderId = getPara("orderId");
-		String txnAmt = getPara("txnAmt");
-		String txnSubType = getPara("txnSubType");
+		String req = getPara("req");
+		LogKit.info("req-CTradeInterface-initiate-reqparam[" + req + "]");
 
-		String accNo = getPara("accNo");
-		String certifTp = getPara("certifTp");
-		String certifId = getPara("certifId");
-		String customerNm = getPara("customerNm");
-		String phoneNo = getPara("phoneNo");
-		String cvn2 = getPara("cvn2");
-		String expired = getPara("expired");
-
-		Kv reqParam = Kv.by("merCode", merCode).set("merchantID", merchantID).set("bussType", bussType)
-				.set("orderId", orderId).set("txnAmt", txnAmt).set("txnSubType", txnSubType).set("accNo", accNo)
-				.set("certifTp", certifTp).set("certifId", certifId).set("customerNm", customerNm)
-				.set("phoneNo", phoneNo).set("cvn2", cvn2).set("expired", expired);
-
-		LogKit.info("req-CTradeInterface-initiate[" + reqParam + "]");
-		Kv resp = null;
+		Kv resp = Kv.create();
 		String errorMsg = "";
+		Kv reqParam = null;
+		boolean isValidateReq = false;
 		try {
-			resp = cTradeApiSrv.initiate(reqParam);
-			if (!resp.getBoolean("isSuccess")) {
-				UnionpayCollection unionpayCollection = (UnionpayCollection) resp.get("unionpayCollection");
-				if (unionpayCollection != null) {
-					errorMsg = unionpayCollection.getRespMsg();
-				}
-			}
-		} catch (ValidateCTRException ve) {
-			ve.printStackTrace();
-			resp = Kv.create().set("isSuccess", false).set("unionpayCollection", null);
-			errorMsg = "发起交易失败，" + ve.getMessage();
+			String decryptReq = RSAKit.decrypt(req, CollAPIRSAKey.COLL_API.getPrivateKey());
+			JSONObject reqJson = JSON.parseObject(decryptReq);
+
+			String merCode = reqJson.getString("merCode");
+			String merchantID = reqJson.getString("merchantID");
+			String bussType = reqJson.getString("bussType");
+			String orderId = reqJson.getString("orderId");
+			String txnAmt = reqJson.getString("txnAmt");
+			String txnSubType = reqJson.getString("txnSubType");
+
+			String accNo = reqJson.getString("accNo");
+			String certifTp = reqJson.getString("certifTp");
+			String certifId = reqJson.getString("certifId");
+			String customerNm = reqJson.getString("customerNm");
+			String phoneNo = reqJson.getString("phoneNo");
+			String cvn2 = reqJson.getString("cvn2");
+			String expired = reqJson.getString("expired");
+
+			reqParam = Kv.by("merCode", merCode).set("merchantID", merchantID).set("bussType", bussType)
+					.set("orderId", orderId).set("txnAmt", txnAmt).set("txnSubType", txnSubType).set("accNo", accNo)
+					.set("certifTp", certifTp).set("certifId", certifId).set("customerNm", customerNm)
+					.set("phoneNo", phoneNo).set("cvn2", cvn2).set("expired", expired);
+
+			LogKit.info("req-CTradeInterface-initiate[" + reqParam + "]");
+			isValidateReq = true;
 		} catch (Exception e) {
 			e.printStackTrace();
-			resp = Kv.create().set("isSuccess", false).set("unionpayCollection", null);
-			errorMsg = "发起交易失败，系统内部错误";
+			reqParam = null;
+			isValidateReq = false;
+		}
+
+		if (isValidateReq) {
+			try {
+				resp = cTradeApiSrv.initiate(reqParam);
+				if (!resp.getBoolean("isSuccess")) {
+					UnionpayCollection unionpayCollection = (UnionpayCollection) resp.get("unionpayCollection");
+					if (unionpayCollection != null) {
+						errorMsg = unionpayCollection.getRespMsg();
+					}
+				}
+			} catch (ValidateCTRException ve) {
+				ve.printStackTrace();
+				resp = Kv.create().set("isSuccess", false).set("unionpayCollection", null);
+				errorMsg = "发起交易失败，" + ve.getMessage();
+			} catch (Exception e) {
+				e.printStackTrace();
+				resp = Kv.create().set("isSuccess", false).set("unionpayCollection", null);
+				errorMsg = "发起交易失败，系统内部错误";
+			}
+		} else {
+			resp.set("isSuccess", false).set("unionpayCollection", null);
+			errorMsg = "请求数据非法";
 		}
 
 		resp.set("errorMsg", errorMsg);
+		LogKit.info("resp-CTradeInterface-initiate-respcontent[" + resp + "]");
 
-		LogKit.info("resp-CTradeInterface-initiate[" + reqParam + "]");
-		renderJson(resp);
+		try {
+			String respJson = JSON.toJSONString(resp, SerializerFeature.DisableCircularReferenceDetect);
+			String encryptRespJson = RSAKit.encrypt(respJson,
+					RSAKit.getPublicKey(CollAPIRSAKey.COLL_CLIENT.getPublicKey()));
+			LogKit.info("resp-CTradeInterface-initiate[" + encryptRespJson + "]");
+			renderJson(encryptRespJson);
+		} catch (Exception e) {
+			e.printStackTrace();
+			renderJson("系统异常!!!");
+		}
 	}
 
 	@ActionKey("/coll/api/trade/q")
 	public void query() {
-		String orderId = getPara("orderId");
-		if (orderId != null) {
-			orderId = orderId.trim();
-		}
-		LogKit.info("req-CTradeInterface-query[" + orderId + "]");
+		String req = getPara("req");
+		LogKit.info("req-CTradeInterface-query-reqparam[" + req + "]");
 
 		Kv resp = Kv.create();
-		UnionpayCollection unionpayCollection = null;
 		String errorMsg = "";
+		boolean isValidateReq = false;
+		boolean isSuccess = false;
+		String orderId = null;
+		String merchantID = null;
 		try {
-			unionpayCollection = UnionpayCollection.findByOrderId(orderId);
-			if (unionpayCollection != null) {
-				resp.set("isSuccess", true);
-			} else {
-				resp.set("isSuccess", false);
-				errorMsg = "订单数据不存在[" + orderId + "]";
+			String decryptReq = RSAKit.decrypt(req, CollAPIRSAKey.COLL_API.getPrivateKey());
+			JSONObject reqJson = JSON.parseObject(decryptReq);
+
+			orderId = reqJson.getString("orderId");
+			merchantID = reqJson.getString("merchantID");
+			if (orderId != null && merchantID != null) {
+				isValidateReq = true;
 			}
+
+			LogKit.info("req-CTradeInterface-query[" + orderId + "]");
 		} catch (Exception e) {
 			e.printStackTrace();
-			resp.set("isSuccess", false);
-			errorMsg = "查询失败，系统内部错误";
+			isValidateReq = false;
 		}
-		resp.set("unionpayCollection", unionpayCollection).set("errorMsg", errorMsg);
 
-		LogKit.info("resp-CTradeInterface-query[" + resp + "]");
-		renderJson(resp);
+		UnionpayCollection unionpayCollection = null;
+		if (isValidateReq) {
+			try {
+				unionpayCollection = UnionpayCollection.findByOrderIdAndMerchantID(orderId, merchantID);
+				if (unionpayCollection != null) {
+					isSuccess = true;
+				} else {
+					isSuccess = false;
+					errorMsg = "订单数据不存在[" + orderId + "]";
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				isSuccess = false;
+				errorMsg = "查询失败，系统内部错误";
+			}
+		} else {
+			errorMsg = "请求数据非法";
+		}
+
+		resp.set("isSuccess", isSuccess).set("unionpayCollection", unionpayCollection).set("errorMsg", errorMsg);
+		LogKit.info("resp-CTradeInterface-query-respcontent[" + resp + "]");
+
+		try {
+			String respJson = JSON.toJSONString(resp, SerializerFeature.DisableCircularReferenceDetect);
+			String encryptRespJson = RSAKit.encrypt(respJson,
+					RSAKit.getPublicKey(CollAPIRSAKey.COLL_CLIENT.getPublicKey()));
+			LogKit.info("resp-CTradeInterface-query[" + encryptRespJson + "]");
+			renderJson(encryptRespJson);
+		} catch (Exception e) {
+			e.printStackTrace();
+			renderJson("系统异常!!!");
+		}
 	}
 
 }

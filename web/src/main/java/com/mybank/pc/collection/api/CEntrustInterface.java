@@ -1,61 +1,95 @@
 package com.mybank.pc.collection.api;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.jfinal.aop.Clear;
 import com.jfinal.aop.Duang;
 import com.jfinal.core.ActionKey;
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.LogKit;
-import com.mybank.pc.collection.entrust.CEntrustSrv;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.exception.EntrustRuntimeException;
 import com.mybank.pc.exception.ValidateEERException;
-import com.mybank.pc.interceptors.AdminIAuthInterceptor;
+import com.mybank.pc.kits.RSAKit;
 
-@Clear(AdminIAuthInterceptor.class)
+@Clear
 public class CEntrustInterface extends CoreController {
 
-	private CEntrustSrv cEntrustSrv = Duang.duang(CEntrustSrv.class);
+	private CEntrustApiSrv cEntrustApiSrv = Duang.duang(CEntrustApiSrv.class);
 
 	@ActionKey("/coll/api/entrust/establish")
 	public void establish() {
-		String merCode = getPara("merCode");
-		String merchantID = getPara("merchantID");
+		String req = getPara("req");
+		LogKit.info("req-CEntrustInterface-establish-reqparam[" + req + "]");
 
-		String accNo = getPara("accNo");
-		String certifTp = getPara("certifTp");
-		String certifId = getPara("certifId");
-		String customerNm = getPara("customerNm");
-		String phoneNo = getPara("phoneNo");
-		String cvn2 = getPara("cvn2");
-		String expired = getPara("expired");
-
-		Kv reqParam = Kv.by("merCode", merCode).set("merchantID", merchantID).set("accNo", accNo)
-				.set("certifTp", certifTp).set("certifId", certifId).set("customerNm", customerNm)
-				.set("phoneNo", phoneNo).set("cvn2", cvn2).set("expired", expired);
-
-		LogKit.info("req-CEntrustInterface-establish[" + reqParam + "]");
-		Kv resp = null;
+		Kv resp = Kv.create();
 		String errorMsg = "";
+		Kv reqParam = null;
+		boolean isValidateReq = false;
 		try {
-			CEntrustSrv.validateEstablishRequest(reqParam);
-			resp = cEntrustSrv.establish(reqParam);
+			String decryptReq = RSAKit.decrypt(req, CollAPIRSAKey.COLL_API.getPrivateKey());
+			JSONObject reqJson = JSON.parseObject(decryptReq);
+
+			String merCode = reqJson.getString("merCode");
+			String merchantID = reqJson.getString("merchantID");
+
+			String accNo = reqJson.getString("accNo");
+			String certifTp = reqJson.getString("certifTp");
+			String certifId = reqJson.getString("certifId");
+			String customerNm = reqJson.getString("customerNm");
+			String phoneNo = reqJson.getString("phoneNo");
+			String cvn2 = reqJson.getString("cvn2");
+			String expired = reqJson.getString("expired");
+
+			reqParam = Kv.by("merCode", merCode).set("merchantID", merchantID).set("accNo", accNo)
+					.set("certifTp", certifTp).set("certifId", certifId).set("customerNm", customerNm)
+					.set("phoneNo", phoneNo).set("cvn2", cvn2).set("expired", expired);
+
+			LogKit.info("req-CEntrustInterface-establish[" + reqParam + "]");
+			CEntrustApiSrv.validateEstablishRequest(reqParam);
+			isValidateReq = true;
 		} catch (ValidateEERException e) {
 			e.printStackTrace();
-			resp = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
+			resp = resp.set("isSuccess", false).set("unionpayEntrust", null);
 			errorMsg = e.getMessage();
-		} catch (EntrustRuntimeException e) {
-			e.printStackTrace();
-			resp = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
-			errorMsg = e.getMessage();
+			isValidateReq = false;
 		} catch (Exception e) {
 			e.printStackTrace();
-			resp = Kv.create().set("isSuccess", false).set("unionpayEntrust", null);
-			errorMsg = "系统异常";
+			reqParam = null;
+			isValidateReq = false;
 		}
-		resp.set("errorMsg", errorMsg);
 
-		LogKit.info("resp-CEntrustInterface-establish[" + resp + "]");
-		renderJson(resp);
+		if (isValidateReq) {
+			try {
+				resp = cEntrustApiSrv.establish(reqParam);
+			} catch (EntrustRuntimeException e) {
+				e.printStackTrace();
+				resp = resp.set("isSuccess", false).set("unionpayEntrust", null);
+				errorMsg = e.getMessage();
+			} catch (Exception e) {
+				e.printStackTrace();
+				resp = resp.set("isSuccess", false).set("unionpayEntrust", null);
+				errorMsg = "系统异常";
+			}
+		} else {
+			resp.set("isSuccess", false).set("unionpayEntrust", null);
+			errorMsg = "请求数据非法";
+		}
+
+		resp.set("errorMsg", errorMsg);
+		LogKit.info("resp-CEntrustInterface-establish-respcontent[" + resp + "]");
+
+		try {
+			String respJson = JSON.toJSONString(resp, SerializerFeature.DisableCircularReferenceDetect);
+			String encryptRespJson = RSAKit.encrypt(respJson,
+					RSAKit.getPublicKey(CollAPIRSAKey.COLL_CLIENT.getPublicKey()));
+			LogKit.info("resp-CEntrustInterface-establish[" + encryptRespJson + "]");
+			renderJson(encryptRespJson);
+		} catch (Exception e) {
+			e.printStackTrace();
+			renderJson("系统异常!!!");
+		}
 	}
 
 }
