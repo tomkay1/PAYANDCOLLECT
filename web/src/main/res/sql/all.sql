@@ -13,3 +13,6 @@
 #namespace("collection_batch")
   #include("collection_batch.sql")
 #end
+#namespace("collection_api")
+  #include("collection_api.sql")
+#end

@@ -3,10 +3,10 @@
         <Row>
             <Col span="24">
             <Row>
-                <Col span="8">
+                <Col span="6">
                 <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
                 </Col>
-                <Col span="16" align="right">
+                <Col span="18" align="right">
                 <Select v-model="txnType" style="width: 120px; text-align: center;">
                     <Option v-for="item in txnTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                 </Select>
