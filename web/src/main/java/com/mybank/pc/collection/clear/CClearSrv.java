@@ -1,5 +1,8 @@
 package com.mybank.pc.collection.clear;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.LogKit;
 import com.jfinal.kit.PathKit;
@@ -15,8 +18,10 @@ import com.mybank.pc.collection.model.CollectionCleartotle;
 import com.mybank.pc.collection.model.CollectionTrade;
 import com.mybank.pc.core.CoreException;
 import com.mybank.pc.kits.DateKit;
+import com.mybank.pc.kits.ResKit;
 import com.mybank.pc.merchant.model.MerchantInfo;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -100,6 +105,7 @@ public class CClearSrv  {
             collectionClear.setAmountFeeSum(tradeModel.getTradeFee());
             collectionClear.setBankFee(tradeModel.getTradeBankFee());
             collectionClear.setChargeOff(Consts.YORN_STR.no.getVal());
+            collectionClear.setChargeCheck(Consts.YORN_STR.no.getVal());
             collectionClear.setClearTime(new Date());
             merchantInfo = MerchantInfo.dao.findById(tradeModel.getmId());
             //预存账户不足的情况
@@ -142,23 +148,39 @@ public class CClearSrv  {
         for (CollectionClear collectionClear1 : collectionClears) {
             collectionClear1.setCleartotleID(collectionCleartotle.getId());
             collectionClear1.save();
-            updateTradeClearStatus(collectionClear1.getMerID(), collectionClear1.getId(), date);
+            updateTradeClearStatus(collectionClear1.getMerID(), collectionClear1.getId(), now);
 
         }
 
-        LogKit.info("发送清分邮件开始===================================");
-        Map<String,Object> map=new HashMap<>();
-        for(CollectionClear cc : collectionClears){
-            map.put("merName",cc.getMerName());
-            map.put("clearData",DateKit.dateToStr(cc.getClearTime(),DateKit.yyyy_MM_dd));
-            map.put("tradeCount",cc.getTradeCount());
-            map.put("amountSum",cc.getAmountSum());
-            map.put("amountFeeSum",cc.getAmountFeeSum());
-            map.put("amountOff",cc.getAmountOff());
-            merchantInfo=MerchantInfo.dao.findById(cc.getMerID());
-            MailKit.send(merchantInfo.getEmail(),null,(String)map.get("clearData")+"清分数据", RenderManager.me().getEngine().getTemplate("/WEB-INF/template/common/mail.html").renderToString(map));
-        }
-        LogKit.info("发送清分邮件结束====================================");
+            LogKit.info("发送清分邮件开始===================================");
+            List<String> errEmail=new ArrayList<>();
+            Map<String, Object> map = new HashMap<>();
+            for (CollectionClear cc : collectionClears) {
+                map.put("merName", cc.getMerName());
+                map.put("clearDate", DateKit.dateToStr(cc.getClearTime(), DateKit.yyyy_MM_dd));
+                map.put("tradeCount", cc.getTradeCount());
+                map.put("amountSum", cc.getAmountSum());
+                map.put("amountFeeSum", cc.getAmountFeeSum());
+                map.put("amountOff", cc.getAmountOff());
+                merchantInfo = MerchantInfo.dao.findById(cc.getMerID());
+                map.put("feeAmount",merchantInfo.getFeeAmount());
+                try {
+                    MailKit.send(merchantInfo.getEmail(), null, (String) map.get("clearDate") + "清分数据", RenderManager.me().getEngine().getTemplate("/WEB-INF/template/common/mail.html").renderToString(map));
+                }catch (Exception e){
+                    errEmail.add(merchantInfo.getMerchantNo()+"_"+merchantInfo.getMerchantName()+"_"+merchantInfo.getEmail()+"，无法发送邮件，请联系商户修改邮箱地址");
+                    LogKit.error("发送清分邮件失败："+e.getMessage());
+                }
+            }
+            LogKit.info("发送清分邮件结束====================================");
+            try {
+                if (!errEmail.isEmpty()) {
+                    String msg=CollUtil.join(errEmail,"&nbsp;");
+                    MailKit.send(ResKit.getMsg("admin.email"),null,"发送邮件失败列表",msg);
+                }
+            }catch (Exception e){
+                LogKit.error("向管理员发送邮件失败数据失败");
+            }
+
 
 
         LogKit.info("每日清分处理结束，一共处理了:" + collectionClears.size() + "个商户的清分数据");

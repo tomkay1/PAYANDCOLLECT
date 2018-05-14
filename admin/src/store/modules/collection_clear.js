@@ -123,6 +123,13 @@ const collectionClear = {
             });
         },
 
+        cc_check_list: function ({commit, state}, param) {
+            let self=this;
+            this._vm.$axios.post('/cc/list', param).then((res) => {
+                commit('set_cc_list', res)
+            });
+        },
+
 
     }
 }

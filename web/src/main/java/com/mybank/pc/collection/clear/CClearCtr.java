@@ -389,7 +389,7 @@ public class CClearCtr extends CoreController {
         ExcelWriter writer = ExcelUtil.getWriter();
         List<Map> excelList=new ArrayList<>();
         collectionClearToExcelData(list,excelList);
-        writer.merge(13,excelTitle);
+        writer.merge(18,excelTitle);
         Map<String, String> alias = new HashMap<>();
         alias.put("clearNo", "清分流水号");
         alias.put("merNo", "商户编号");
@@ -401,8 +401,13 @@ public class CClearCtr extends CoreController {
         alias.put("tradeFee", "手续费抵扣金额（交易金额）");
         alias.put("bankFee", "银行代收手续费");
         alias.put("amountOff","实际出账金额");
-        alias.put("profit","利润");
         alias.put("clearTime","清分时间");
+        alias.put("profit","利润");
+        alias.put("bankNo","收款卡号");
+        alias.put("bankAccountName","户名");
+        alias.put("bankName","开户行");
+        alias.put("bankPhone","预留手机号");
+        alias.put("bankCode","行号");
         alias.put("chargeAt","出账汇款时间");
         alias.put("chargeOffTradeNo","汇款凭证单号");
         writer.setHeaderAlias(alias);
@@ -411,6 +416,8 @@ public class CClearCtr extends CoreController {
         CollectionClear collectionClear =CollectionClear.dao.findFirst( sqlPara);
         int r=list.size()+2;
         writer.writeCellValue(0,r,"合计:");
+        writer.writeCellValue(1,r,"");
+        writer.writeCellValue(2,r,"");
         writer.writeCellValue(3,r,collectionClear.getTradeCount().toString());
         writer.writeCellValue(4,r,collectionClear.getAmountSum().toString());
         writer.writeCellValue(5,r,collectionClear.getAmountFeeSum().toString());
@@ -419,6 +426,14 @@ public class CClearCtr extends CoreController {
         writer.writeCellValue(8,r,collectionClear.getBankFee().toString());
         writer.writeCellValue(9,r,collectionClear.getAmountOff().toString());
         writer.writeCellValue(10,r,collectionClear.getProfit().toString());
+        writer.writeCellValue(11,r,"");
+        writer.writeCellValue(12,r,"");
+        writer.writeCellValue(13,r,"");
+        writer.writeCellValue(14,r,"");
+        writer.writeCellValue(15,r,"");
+        writer.writeCellValue(16,r,"");
+        writer.writeCellValue(17,r,"");
+        writer.writeCellValue(18,r,"");
 
         String fileFolder="qfmx/"+DateKit.dateToStr(new Date(),DateKit.yyyy_MM_dd)+"/";
         File file=FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() +fileFolder);
@@ -499,12 +514,19 @@ public class CClearCtr extends CoreController {
         CollectionClear collectionClear =CollectionClear.dao.findFirst( sqlPara);
         int r=list.size()+2;
         writer.writeCellValue(0,r,"合计:");
+        writer.writeCellValue(1,r,"");
+        writer.writeCellValue(2,r,"");
         writer.writeCellValue(3,r,collectionClear.getTradeCount().toString());
         writer.writeCellValue(4,r,collectionClear.getAmountSum().toString());
         writer.writeCellValue(5,r,collectionClear.getAmountFeeSum().toString());
         writer.writeCellValue(6,r,collectionClear.getAccountFee().toString());
         writer.writeCellValue(7,r,collectionClear.getTradeFee().toString());
         writer.writeCellValue(8,r,collectionClear.getAmountOff().toString());
+        writer.writeCellValue(9,r,"");
+        writer.writeCellValue(10,r,"");
+        writer.writeCellValue(11,r,"");
+
+
 
         String fileFolder="qfmx/"+DateKit.dateToStr(new Date(),DateKit.yyyy_MM_dd)+"/";
         File file=FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() +fileFolder);
@@ -551,6 +573,11 @@ public class CClearCtr extends CoreController {
             map.put("amountOff",collectionClear.getAmountOff()!=null?collectionClear.getAmountOff().toString():"0");
             map.put("profit",collectionClear.getProfit());//利润
             map.put("clearTime",DateKit.dateToStr(collectionClear.getClearTime(),DateKit.format4Login));
+            map.put("bankNo",collectionClear.getBankNo());
+            map.put("bankAccountName",collectionClear.getBankAccountName());
+            map.put("bankName",collectionClear.getBankName());
+            map.put("bankPhone",collectionClear.getBankPhone());
+            map.put("bankCode",collectionClear.getBankCode());
             map.put("chargeAt",DateKit.dateToStr(collectionClear.getChargeAt(),DateKit.format4Login));
             map.put("chargeOffTradeNo",collectionClear.getChargeOffTradeNo());
 

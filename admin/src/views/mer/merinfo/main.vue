@@ -66,6 +66,9 @@
                 <FormItem label="预存手续费余额" prop="feeAmount">
                     <Input v-model="merInfo.feeAmount" placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
+                <FormItem label="最大代扣金额" prop="maxTradeAmount">
+                    <Input v-model="merInfo.maxTradeAmount" placeholder="请输入..." style="width: 300px"/>
+                </FormItem>
                 <FormItem label="清算银行卡号" prop="bankNo">
                     <Input v-model="merInfo.bankNo" placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
@@ -617,7 +620,14 @@
                     bankAccountName: [
                         {required: true, message: '清算银行卡户名不能为空', trigger: 'blur'},
                     ],
-
+                    maxTradeAmount: [
+                        {
+                            type: 'string',
+                            message: '最大代扣金额无效',
+                            pattern: /^\d+$/,
+                            trigger: 'blur'
+                        }
+                    ],
 
                     cardImg: [
                         {required: true, message: '手持身份证照片不能为空', trigger: 'blur'}

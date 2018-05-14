@@ -50,6 +50,7 @@
 <script>
 import Cookies from 'js-cookie';
 import consts from '../libs/consts'
+
 export default {
     data () {
         return {

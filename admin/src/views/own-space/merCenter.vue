@@ -51,6 +51,9 @@
                     <FormItem label="预存手续费余额"  >
                         {{merInfo.feeAmount}}
                     </FormItem>
+                    <FormItem label="最大代扣金额"  >
+                        {{merInfo.maxTradeAmount}}
+                    </FormItem>
                     <FormItem label="清算银行卡号"  >
                         {{merInfo.bankNo}}
                     </FormItem>

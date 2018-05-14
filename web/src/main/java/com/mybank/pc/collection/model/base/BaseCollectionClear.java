@@ -169,4 +169,20 @@ public abstract class BaseCollectionClear<M extends BaseCollectionClear<M>> exte
 		return get("chargeAt");
 	}
 
+	public void setChargeCheck(java.lang.String chargeCheck) {
+		set("chargeCheck", chargeCheck);
+	}
+
+	public java.lang.String getChargeCheck() {
+		return getStr("chargeCheck");
+	}
+
+	public void setChargeCheckBak(java.lang.String chargeCheckBak) {
+		set("chargeCheckBak", chargeCheckBak);
+	}
+
+	public java.lang.String getChargeCheckBak() {
+		return getStr("chargeCheckBak");
+	}
+
 }

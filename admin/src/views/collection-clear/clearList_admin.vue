@@ -1,9 +1,39 @@
 <template>
-    <Tabs type="card">
 
-        <TabPane label="清分汇总查询" style="min-height: 400px">
 
             <Card>
+                <Tabs >
+                    <TabPane label="清分详细查询" icon="help-buoy">
+                        <Row>
+                            <Col span="24"  align="right">
+                            <Select v-model="chargeOff" style="width:200px" :clearable="true">
+                                <Option v-for="item in chargetOffData" :value="item.value" :key="item.value">{{ item.label }}
+                                </Option>
+                            </Select>
+                            <Input v-model="merNO" placeholder="商户号" style="width: 200px"></Input>
+                            <DatePicker type="date" placeholder="查询开始日期" style="width: 200px" v-model="bTime_cc"
+                                        format="yyyy-MM-dd" :clearable="false"></DatePicker>
+                            <DatePicker type="date" placeholder="查询结束日期" style="width: 200px" v-model="eTime_cc"
+                                        format="yyyy-MM-dd" :clearable="false"></DatePicker>
+                            <span @click="search_cc" style="margin: 0 10px;">
+                        <Button type="primary" icon="search">查询</Button>
+                    </span>
+                            <span @click="export_cc" style="margin: 0 10px;">
+                        <Button type="primary" icon="archive">导出</Button>
+                    </span>
+                            </Col>
+                        </Row>
+                        <Row class="margin-top-10">
+                            <Table :context="self" :data="ccList" :columns="tableColums_cc" :row-class-name="rowClassName_cc"  border></Table>
+                        </Row>
+                        <div style="margin: 10px;overflow: hidden">
+                            <div style="float: right;">
+                                <Page :total="total_cc" :current="pageNumber_cc" :page-size="pageSize_cc" @on-change="search_cc" show-total
+                                      show-elevator></Page>
+                            </div>
+                        </div>
+                    </TabPane>
+                    <TabPane label="清分汇总查询" icon="help-buoy" style="min-height: 400px">
                 <Row>
                     <Col span="24"  align="right">
                     <DatePicker type="date" placeholder="查询开始日期" style="width: 200px" v-model="bTime"
@@ -29,60 +59,27 @@
                               show-elevator></Page>
                     </div>
                 </div>
+               </TabPane>
+
+                    <TabPane label="手动清分处理" icon="help-buoy" v-if="enableHmClear()">
+                        <Row>
+                            <Col span="8" offset="8">
+                            <Form :label-width="80" inline>
+                                <FormItem>
+                                    <DatePicker type="date" placeholder="请选择清分日期" style="width: 200px"
+                                                v-model="clearDate"></DatePicker>
+
+                                </FormItem>
+                                <FormItem>
+                                    <Button type="primary" @click="hmClear">提交</Button>
+                                </FormItem>
+                            </Form>
+                            </Col>
+                        </Row>
+                    </TabPane>
+                </Tabs>
             </Card>
 
-        </TabPane>
-        <TabPane label="清分详细查询">
-            <Card>
-                <Row>
-                    <Col span="24"  align="right">
-                    <Select v-model="chargeOff" style="width:200px" :clearable="true">
-                        <Option v-for="item in chargetOffData" :value="item.value" :key="item.value">{{ item.label }}
-                        </Option>
-                    </Select>
-                    <Input v-model="merNO" placeholder="商户号" style="width: 200px"></Input>
-                    <DatePicker type="date" placeholder="查询开始日期" style="width: 200px" v-model="bTime_cc"
-                                format="yyyy-MM-dd" :clearable="false"></DatePicker>
-                    <DatePicker type="date" placeholder="查询结束日期" style="width: 200px" v-model="eTime_cc"
-                                format="yyyy-MM-dd" :clearable="false"></DatePicker>
-                    <span @click="search_cc" style="margin: 0 10px;">
-                        <Button type="primary" icon="search">查询</Button>
-                    </span>
-                    <span @click="export_cc" style="margin: 0 10px;">
-                        <Button type="primary" icon="archive">导出</Button>
-                    </span>
-                    </Col>
-                </Row>
-                <Row class="margin-top-10">
-                    <Table :context="self" :data="ccList" :columns="tableColums_cc" :row-class-name="rowClassName_cc"  border></Table>
-                </Row>
-                <div style="margin: 10px;overflow: hidden">
-                    <div style="float: right;">
-                        <Page :total="total_cc" :current="pageNumber_cc" :page-size="pageSize_cc" @on-change="search_cc" show-total
-                              show-elevator></Page>
-                    </div>
-                </div>
-            </Card>
-        </TabPane>
-        <TabPane label="手动清分处理">
-            <Card>
-                <Row>
-                    <Col span="8" offset="8">
-                    <Form :label-width="80" inline>
-                        <FormItem>
-                            <DatePicker type="date" placeholder="请选择清分日期" style="width: 200px"
-                                        v-model="clearDate"></DatePicker>
-
-                        </FormItem>
-                        <FormItem>
-                            <Button type="primary" @click="hmClear">提交</Button>
-                        </FormItem>
-                    </Form>
-                    </Col>
-                </Row>
-            </Card>
-        </TabPane>
-    </Tabs>
 </template>
 
 <script>
@@ -90,6 +87,8 @@
     import dateKit from '../../libs/date'
     import Input from "iview/src/components/input/input";
     import consts from '../../libs/consts'
+    import Cookies from 'js-cookie';
+    import kit from '../../libs/kit';
 
     export default {
         computed: {
@@ -166,51 +165,91 @@
                     {
                         title: '清分流水号',
                         key: 'clearNo',
+                        width: 150
                     },
 
                     {
                         title: '清分日期',
                         key: 'clearTimeTxt',
+                        width: 100
                     },
                     {
                         title: '交易笔数',
                         key: 'tradeCount',
+                        width: 100
                     },
                     {
                         title: '交易金额',
                         key: 'amountSum',
+                        width: 100
                     },
                     {
                         title: '交易手续费金额',
                         key: 'amountFeeSum',
+                        width: 100
                     },
                     {
                         title: '银行代收手续费金额',
                         key: 'bankFee',
+                        width: 100
                     },
                     {
                         title: '利润',
                         key: 'profit',
+                        width: 100
                     },
                     {
                         title: '预存抵扣手续费金额',
                         key: 'accountFee',
+                        width: 100
                     },
                     {
                         title: '交易抵扣手续费金额',
                         key: 'tradeFee',
+                        width: 100
                     },
                     {
                         title: '出账金额',
                         key: 'amountOff',
+                        width: 100
+                    },
+                    {
+                        title: '收款卡号',
+                        key: 'bankNo',
+                        width:150
+                    },
+                    {
+                        title: '户名',
+                        key: 'bankAccountName',
+                        width: 100
+                    },
+                    {
+                        title: '预留手机号',
+                        key: 'bankPhone',
+                        width:100
+                    },
+
+                    {
+                        title: '开户行',
+                        key: 'bankName',
+                        width:200
+                    },
+                    {
+                        title: '行号',
+                        key: 'bankCode',
+                        width: 100
                     },
                     {
                         title: '出账时间',
                         key: 'chargeAtTxt',
+                        width: 100,
+                        fixed: 'right',
                     },
                     {
                         title: '出账单据流水号',
                         key: 'chargeOffTradeNo',
+                        width: 100,
+                        fixed: 'right',
                     },
 
 
@@ -300,17 +339,26 @@
                 });
             },
             rowClassName (row, index) {
-                if (index === this.cctList.length-1) {
-                    return 'demo-table-error-row';
-                }
+                // if (index === this.cctList.length-1) {
+                //     return 'demo-table-error-row';
+                // }
                 return '';
             },
             rowClassName_cc (row, index) {
-                if (index === this.ccList.length-1) {
-                    return 'demo-table-error-row';
-                }
+                // if (index === this.ccList.length-1) {
+                //     return 'demo-table-error-row';
+                // }
                 return '';
             },
+            enableHmClear(){
+
+                let ma = Cookies.get('serviceArray');
+                if(ma!=undefined)ma= eval ("(" + ma+ ")")
+                return kit.arrayContains(ma,'/cclear/hmClear');
+
+
+            }
+
 
         },
         components: {Input},

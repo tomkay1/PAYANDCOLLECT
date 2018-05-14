@@ -106,6 +106,7 @@ public class CMNCtr extends CoreController {
     /**
      * 下载根据excel 路径 下载excel
      */
+    @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
     public void act02() {
         String ePath = getPara("ePath");
         File file = FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() + ePath);

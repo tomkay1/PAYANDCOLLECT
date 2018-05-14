@@ -1,7 +1,7 @@
 <template>
-    <Tabs type="card">
-        <TabPane label="清分明细查询" style="min-height: 400px">
+
             <Card>
+                <p slot="title"><Icon type="help-buoy"></Icon>清分结果查询</p>
                 <Row>
                     <Col span="24"  align="right">
                     <Select v-model="chargeOff" style="width:200px" :clearable="true">
@@ -30,8 +30,7 @@
                     </div>
                 </div>
             </Card>
-        </TabPane>
-    </Tabs>
+
 </template>
 
 <script>
@@ -159,7 +158,7 @@
         },
         components: {Input},
         mounted() {
-
+            this.$store.commit('set_cc_list',[])
         }
 
     }
