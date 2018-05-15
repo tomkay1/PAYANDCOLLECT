@@ -9,7 +9,7 @@
 
 
     <cache name="paramCache"
-           maxEntriesLocalHeap="5000"
+           maxEntriesLocalHeap="500"
            eternal="true"
            overflowToDisk="true"
            diskPersistent="true"
@@ -17,7 +17,7 @@
             />
 
     <cache name="taxonomy"
-           maxEntriesLocalHeap="5000"
+           maxEntriesLocalHeap="2000"
            eternal="true"
            overflowToDisk="true"
            diskPersistent="true"
@@ -101,6 +101,12 @@
            overflowToDisk="true"
            memoryStoreEvictionPolicy="FIFO"
     />
-
+    <cache name="mail"
+           maxEntriesLocalHeap="2000"
+           eternal="true"
+           overflowToDisk="true"
+           diskPersistent="true"
+           memoryStoreEvictionPolicy="FIFO"
+    />
 
 </ehcache>

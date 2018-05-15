@@ -16,3 +16,6 @@
 #namespace("collection_api")
   #include("collection_api.sql")
 #end
+#namespace("merchantFeeAmountRecord")
+  #include("merchant_fee_amount_record.sql")
+#end

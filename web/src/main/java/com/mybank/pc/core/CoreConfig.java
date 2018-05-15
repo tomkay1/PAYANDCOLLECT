@@ -197,10 +197,10 @@ public class CoreConfig extends JFinalConfig {
 		// 开启eheache缓存
 		plugins.add(new EhCachePlugin());
 		// 计划任务插件,开发模式默认关闭，如果需要测试自行打开，防止其他自动发起的对外界系统调用进行回掉
-		if(!ResKit.getConfigBoolean("devMode")) {
+//		if(!ResKit.getConfigBoolean("devMode")) {
 			Cron4jPlugin cron4jPlugin = new Cron4jPlugin("task.properties", "cron4j");
 			plugins.add(cron4jPlugin);
-		}
+//		}
 		MongoJFinalPlugin jFinalPlugin = new MongoJFinalPlugin();
 		jFinalPlugin.add(ResKit.getConfig("mongodb.ip"), ResKit.getConfigInt("mongodb.port"));
 		jFinalPlugin.setDatabase(ResKit.getConfig("mongodb.db"));

@@ -3,7 +3,7 @@
   (select merchantNo from merchant_info where id=ct.merchantID) as mNo,
   count(ct.id) as tradeCount,sum(ct.amount) as amount,sum(ct.merFee) as fee,
   sum(ct.bankFee) as bankFee
-   from collection_trade ct WHERE ct.finalCode='0' and ct.tradeTime<?
+   from collection_trade ct  WHERE ct.finalCode='0' and ct.tradeTime<? and ct.custName!='全渠道'
    AND ct.clearStatus!='0' AND ct.dat is NULL GROUP BY ct.merchantID
 #end
 #sql("collectAllTrade")

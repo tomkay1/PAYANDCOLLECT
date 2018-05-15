@@ -1,12 +1,10 @@
 package com.mybank.pc.collection.clear;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Duang;
 import com.jfinal.kit.LogKit;
-import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.SqlPara;
@@ -22,9 +20,10 @@ import com.mybank.pc.core.CoreException;
 import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.ResKit;
 import com.mybank.pc.merchant.info.MerchantInfoSrv;
+import com.mybank.pc.merchant.model.MerchantFeeAmountRecord;
 import com.mybank.pc.merchant.model.MerchantInfo;
+import net.sf.ehcache.Cache;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -92,6 +91,8 @@ public class CClearSrv  {
         BigDecimal amountFee = Consts.ZERO;//预存账户中扣除的手续费
         BigDecimal realFee = Consts.ZERO;
         CollectionClear collectionClear = null;
+        Map<String,MerchantFeeAmountRecord> tmp=new HashMap<>();
+        MerchantFeeAmountRecord merchantFeeAmountRecord=null;
         CollectionCleartotle collectionCleartotle = new CollectionCleartotle();
         MerchantInfo merchantInfo = null;
         CollectionTrade collectionTrade = null;
@@ -105,14 +106,14 @@ public class CClearSrv  {
             allAmount = allAmount.add(tradeModel.getTradeAmount());
             allBankFee = allBankFee.add(tradeModel.getTradeBankFee());
             collectionClear.setCat(new Date());
-            collectionClear.setBankFee(tradeModel.getTradeBankFee());
+            collectionClear.setBankFee(tradeModel.getTradeBankFee()!=null?tradeModel.getTradeBankFee().setScale(2,BigDecimal.ROUND_HALF_UP):tradeModel.getTradeBankFee());
             collectionClear.setMerNO(tradeModel.getmNo());
             collectionClear.setMerID(tradeModel.getmId());
             collectionClear.setClearNo(System.currentTimeMillis() + "");
             collectionClear.setTradeCount(tradeModel.getTradeCount());
-            collectionClear.setAmountSum(tradeModel.getTradeAmount());
-            collectionClear.setAmountFeeSum(tradeModel.getTradeFee());
-            collectionClear.setBankFee(tradeModel.getTradeBankFee());
+            collectionClear.setAmountSum(tradeModel.getTradeAmount()!=null?tradeModel.getTradeAmount().setScale(2,BigDecimal.ROUND_HALF_UP):tradeModel.getTradeAmount());
+            collectionClear.setAmountFeeSum(tradeModel.getTradeFee()!=null?tradeModel.getTradeFee().setScale(2,BigDecimal.ROUND_HALF_UP):tradeModel.getTradeFee());
+            collectionClear.setBankFee(tradeModel.getTradeBankFee()!=null?tradeModel.getTradeBankFee().setScale(2,BigDecimal.ROUND_HALF_UP):tradeModel.getTradeBankFee());
             collectionClear.setChargeOff(Consts.YORN_STR.no.getVal());
             collectionClear.setChargeCheck(Consts.YORN_STR.no.getVal());
             collectionClear.setClearTime(new Date());
@@ -123,14 +124,32 @@ public class CClearSrv  {
                 //merchantInfo.setFeeAmount(Consts.ZERO);//商户预存账户余额
                 collectionClear.setTradeFee(tradeModel.getTradeFee());//从交易中扣除手续费金额 交易手续费
                 //merchantInfo.update();//更新商户预存手续费当前金额
-                collectionClear.setAmountOff(tradeModel.getTradeAmount().subtract(tradeModel.getTradeFee()));//设置出账金额  交易金额-交易手续费
+                collectionClear.setAmountOff(tradeModel.getTradeAmount().subtract(tradeModel.getTradeFee()).setScale(2,BigDecimal.ROUND_HALF_UP));//设置出账金额  交易金额-交易手续费
+
+                merchantFeeAmountRecord=new MerchantFeeAmountRecord();//记录商户预存余额的变化流水
+                merchantFeeAmountRecord.setBAmount(merchantInfo.getFeeAmount());
+                merchantFeeAmountRecord.setAAmount(merchantInfo.getFeeAmount());
+                merchantFeeAmountRecord.setAmount(Consts.ZERO);
             } else {
-                merchantInfo.setFeeAmount(merchantInfo.getFeeAmount().subtract(tradeModel.getTradeFee()));
+                merchantFeeAmountRecord=new MerchantFeeAmountRecord();//记录商户预存余额的变化流水
+                merchantFeeAmountRecord.setBAmount(merchantInfo.getFeeAmount());
+                merchantInfo.setFeeAmount(merchantInfo.getFeeAmount().subtract(tradeModel.getTradeFee()).setScale(2,BigDecimal.ROUND_HALF_UP));
+                merchantFeeAmountRecord.setAAmount(merchantInfo.getFeeAmount());
+                merchantFeeAmountRecord.setAmount(tradeModel.getTradeFee());
+                merchantFeeAmountRecord.setCAt(new Date());
+                merchantFeeAmountRecord.setMerId(merchantInfo.getId());
+                merchantFeeAmountRecord.setMerName(merchantInfo.getMerchantName());
+                merchantFeeAmountRecord.setType(Consts.FEEAMOUNT_TYPE.pay.getVal());
+                merchantFeeAmountRecord.setMerNo(merchantInfo.getMerchantNo());
+                merchantFeeAmountRecord.setOperName(Consts.APP_TOKEN);
+                merchantFeeAmountRecord.save();
+                tmp.put(merchantInfo.getMerchantNo(),merchantFeeAmountRecord);
                 merchantInfo.update();
                 merchantInfoSrv.removeCacheMerchantInfo(merchantInfo.getId());
                 collectionClear.setAccountFee(tradeModel.getTradeFee());
                 collectionClear.setTradeFee(Consts.ZERO);
                 collectionClear.setAmountOff(tradeModel.getTradeAmount());
+                collectionClear.setMfarId(merchantFeeAmountRecord.getId());
             }
             allAccountFee = allAccountFee.add(collectionClear.getAccountFee()!=null?collectionClear.getAccountFee():Consts.ZERO);
             allTradeFee = allTradeFee.add(collectionClear.getTradeFee()!=null?collectionClear.getTradeFee():Consts.ZERO);
@@ -143,15 +162,15 @@ public class CClearSrv  {
 
         //生成清分汇总数据
 
-        collectionCleartotle.setAccountFee(allAccountFee);
-        collectionCleartotle.setAmountFeeSum(allFee);
-        collectionCleartotle.setAmountOff(allAmountOff);
-        collectionCleartotle.setAmountSum(allAmount);
-        collectionCleartotle.setBankFee(allBankFee);
+        collectionCleartotle.setAccountFee(allAccountFee!=null?allAccountFee.setScale(2,BigDecimal.ROUND_HALF_UP):allAccountFee);
+        collectionCleartotle.setAmountFeeSum(allFee!=null?allFee.setScale(2,BigDecimal.ROUND_HALF_UP):allFee);
+        collectionCleartotle.setAmountOff(allAmountOff!=null?allAmountOff.setScale(2,BigDecimal.ROUND_HALF_UP):allAmountOff);
+        collectionCleartotle.setAmountSum(allAmount!=null?allAmount.setScale(2,BigDecimal.ROUND_HALF_UP):allAmount);
+        collectionCleartotle.setBankFee(allBankFee!=null?allBankFee.setScale(2,BigDecimal.ROUND_HALF_UP):allBankFee);
         collectionCleartotle.setCat(new Date());
         collectionCleartotle.setCleartotleTime(new Date());
         collectionCleartotle.setTradeCount(allCount);
-        collectionCleartotle.setTradeFee(allTradeFee);
+        collectionCleartotle.setTradeFee(allTradeFee!=null?allTradeFee.setScale(2,BigDecimal.ROUND_HALF_UP):allTradeFee);
         collectionCleartotle.save();
         LogKit.info("准备增加当日商户清分汇总数据");
 
@@ -159,40 +178,7 @@ public class CClearSrv  {
             collectionClear1.setCleartotleID(collectionCleartotle.getId());
             collectionClear1.save();
             updateTradeClearStatus(collectionClear1.getMerID(), collectionClear1.getId(), now);
-
         }
-
-            LogKit.info("发送清分邮件开始===================================");
-            List<String> errEmail=new ArrayList<>();
-            Map<String, Object> map = new HashMap<>();
-            for (CollectionClear cc : collectionClears) {
-                map.put("merName", cc.getMerName());
-                map.put("clearDate", DateKit.dateToStr(cc.getClearTime(), DateKit.yyyy_MM_dd));
-                map.put("tradeCount", cc.getTradeCount());
-                map.put("amountSum", cc.getAmountSum());
-                map.put("amountFeeSum", cc.getAmountFeeSum());
-                map.put("amountOff", cc.getAmountOff());
-                merchantInfo = MerchantInfo.dao.findById(cc.getMerID());
-                map.put("feeAmount",merchantInfo.getFeeAmount());
-                try {
-                    MailKit.send(merchantInfo.getEmail(), null, (String) map.get("clearDate") + "清分数据", RenderManager.me().getEngine().getTemplate("/WEB-INF/template/common/mail.html").renderToString(map));
-                }catch (Exception e){
-                    errEmail.add(merchantInfo.getMerchantNo()+"_"+merchantInfo.getMerchantName()+"_"+merchantInfo.getEmail()+"，无法发送邮件，请联系商户修改邮箱地址");
-                    LogKit.error("发送清分邮件失败："+e.getMessage());
-                }
-            }
-            LogKit.info("发送清分邮件结束====================================");
-            try {
-                if (!errEmail.isEmpty()) {
-                    String msg=CollUtil.join(errEmail,"&nbsp;");
-                    MailKit.send(ResKit.getMsg("admin.email"),null,"发送邮件失败列表",msg);
-                }
-            }catch (Exception e){
-                LogKit.error("向管理员发送邮件失败数据失败");
-            }
-
-
-
         LogKit.info("每日清分处理结束，一共处理了:" + collectionClears.size() + "个商户的清分数据");
     }
 
@@ -229,6 +215,91 @@ public class CClearSrv  {
             collectionTrade.setClearStatus(Consts.YORN_STR.yes.getVal());
             collectionTrade.update();
         }
+    }
+
+
+    public void sendClearEmail(Date date){
+        LogKit.info("清分邮件发送处理开始");
+        if (date==null)date=new Date();
+        String date_str=DateKit.dateToStr(date,DateKit.yyyy_MM_dd);
+        LogKit.info("开始查询待发送邮件的清分数据");
+        String sql="select * from collection_clear cc where cc.dat is null and DATE_FORMAT(clearTime,'%Y-%m-%d')=?";
+        List<CollectionClear> list=CollectionClear.dao.find(sql,date_str);
+        Map<String, Object> map = new HashMap<>();
+        List<Map> emailList=new ArrayList<>();
+        MerchantInfo merchantInfo=null;
+        MerchantFeeAmountRecord merchantFeeAmountRecord=null;
+        for (CollectionClear cc : list) {
+            merchantInfo = MerchantInfo.dao.findById(cc.getMerID());
+            map.put("merNo",cc.getMerNO());
+            map.put("bankNo",merchantInfo.getBankNo());
+            map.put("bankPhone",merchantInfo.getBankPhone());
+            map.put("bankAccountName",merchantInfo.getBankAccountName());
+            map.put("bankName",merchantInfo.getBankName());
+            map.put("bankCode",merchantInfo.getBankCode());
+            map.put("merName", merchantInfo.getMerchantName());
+            map.put("clearDate", DateKit.dateToStr(cc.getClearTime(), DateKit.yyyy_MM_dd));
+            map.put("tradeCount", cc.getTradeCount());
+            map.put("amountSum", cc.getAmountSum());
+            map.put("amountFeeSum", cc.getAmountFeeSum());
+            map.put("amountOff", cc.getAmountOff());
+            map.put("feeAmount",merchantInfo.getFeeAmount());
+            map.put("email",merchantInfo.getEmail());
+            if(cc.getMfarId()!=null)
+                merchantFeeAmountRecord=MerchantFeeAmountRecord.dao.findFirst("select * from merchant_fee_amount_record where id=?",cc.getMfarId());
+            else{
+                merchantFeeAmountRecord=new MerchantFeeAmountRecord();
+                merchantFeeAmountRecord.setBAmount(merchantInfo.getFeeAmount());
+                merchantFeeAmountRecord.setAAmount(merchantInfo.getFeeAmount());
+                merchantFeeAmountRecord.setAmount(Consts.ZERO);
+            }
+            map.put("mfar",merchantFeeAmountRecord);
+            emailList.add(map);
+        }
+
+        List<String> errEmail = new ArrayList<>();
+        String c=null;
+        LogKit.info("开始为每个商户发送清分邮件，一共有" + emailList.size() + "个商户等待发送邮件");
+        for (Map em : emailList) {
+            try {
+                c= RenderManager.me().getEngine().getTemplate("/WEB-INF/template/mail/mer_clear.html").renderToString(em);
+                MailKit.send((String)em.get("email"), null, (String) em.get("clearDate") + "清分数据",c);
+            } catch (Exception e) {
+
+                LogKit.error("发送清分邮件失败：" + e.getMessage());
+                errEmail.add(em.get("merNo").toString() + "_" + em.get("merName").toString() + "_" + em.get("email").toString() + "，无法发送邮件，请联系商户修改邮箱地址");
+            }
+        }
+        LogKit.info("每个商户发送清分邮件处理完成，有" + errEmail.size() + "个商户邮件发送失败");
+
+        LogKit.info("开始为系统操作员发送清分邮件");
+        String operMails=CacheKit.get(Consts.CACHE_NAMES.paramCache.name(),"clearEmailUser");
+        if(StrUtil.isNotBlank(operMails)&&!emailList.isEmpty()){
+            String[] strings=operMails.split(";");
+            Map data=new HashMap();
+            data.put("list",emailList);
+            data.put("title", date_str);
+            for (String s:strings){
+                c=RenderManager.me().getEngine().getTemplate("/WEB-INF/template/mail/mers_clear.html").renderToString(data);
+                MailKit.send(s,null,date_str+"清分数据",c);
+            }
+        }else {
+            LogKit.error("系统清分操作员email未设置");
+        }
+        LogKit.info("系统操作员发送清分邮件处理结束");
+
+        try {
+            if (!errEmail.isEmpty()) {
+                LogKit.info("商户清分email失败告知邮件发送处理");
+                c = CollUtil.join(errEmail, "&nbsp;");
+                MailKit.send(ResKit.getMsg("admin.email"), null, "发送邮件失败列表", c);
+            }
+        } catch (Exception e) {
+            LogKit.error("向管理员发送邮件失败数据失败");
+        }
+
+        LogKit.info("清分邮件发送处理结束");
+
     }
 
 
@@ -299,6 +370,10 @@ public class CClearSrv  {
         public void setmId(Integer mId) {
             this.mId = mId;
         }
+
+
+
+
 
 
         @Override

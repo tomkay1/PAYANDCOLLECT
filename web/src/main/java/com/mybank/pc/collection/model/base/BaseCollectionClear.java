@@ -185,4 +185,12 @@ public abstract class BaseCollectionClear<M extends BaseCollectionClear<M>> exte
 		return getStr("chargeCheckBak");
 	}
 
+
+	public Integer getMfarId() {
+		return super.getInt("mfarId");
+	}
+
+	public void setMfarId(Integer mfarId){
+		set("mfarId",mfarId);
+	}
 }

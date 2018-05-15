@@ -642,5 +642,21 @@ public class CClearCtr extends CoreController {
         }
     }
 
+    /**
+     * 清分邮件发送处理
+     *
+     *
+     */
+    public void sendClearEmail(){
+        String date=getPara("date");
+        if(StrUtil.isNotBlank(date)){
+            cClearSrv.sendClearEmail(DateKit.strToDate(date,DateKit.yyyy_MM_dd));
+        }else{
+           renderFailJSON("清分日期不能未空");
+           return;
+        }
+        renderSuccessJSON("清分邮件发送成功");
+    }
+
 
 }

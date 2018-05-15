@@ -7,6 +7,7 @@
           <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/main/webapp/WEB-INF/web.xml" />
         </descriptors>
         <webroots>
+          <root url="file://$MODULE_DIR$/src/main/res/dev" relative="WEB-INF/classes" />
           <root url="file://$MODULE_DIR$/src/main/webapp" relative="/" />
         </webroots>
       </configuration>
@@ -23,9 +24,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="swagger-1.0" level="project" />
-    <orderEntry type="library" name="Maven: com.google.zxing:javase:3.3.2" level="project" />
-    <orderEntry type="library" name="Maven: com.beust:jcommander:1.72" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.github.jai-imageio:jai-imageio-core:1.3.1" level="project" />
+    <orderEntry type="library" name="Maven: com.qiniu:qiniu-java-sdk:7.2.11" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.12" level="project" />
     <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" name="Maven: com.jfinal:jfinal:3.3" level="project" />
@@ -41,7 +40,7 @@
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.12" level="project" />
     <orderEntry type="library" name="Maven: com.belerweb:pinyin4j:2.5.0" level="project" />
     <orderEntry type="library" name="Maven: net.sf.ehcache:ehcache-core:2.6.11" level="project" />
-    <orderEntry type="library" name="Maven: com.qiniu:qiniu-java-sdk:7.2.11" level="project" />
+    <orderEntry type="library" name="Maven: com.qiniu:qiniu-java-sdk:7.2.12" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.9.1" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.13.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.2" level="project" />
@@ -76,5 +75,15 @@
     <orderEntry type="library" name="Maven: com.google.zxing:javase:3.3.2" level="project" />
     <orderEntry type="library" name="Maven: com.beust:jcommander:1.72" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.github.jai-imageio:jai-imageio-core:1.3.1" level="project" />
+    <orderEntry type="library" name="Maven: cn.fsdev:jfinal-mail-plugin:3.0" level="project" />
+    <orderEntry type="library" name="Maven: javax.mail:mail:1.4.4" level="project" />
+    <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
+    <orderEntry type="library" name="Maven: com.lowagie:itext:2.1.7" level="project" />
+    <orderEntry type="library" name="Maven: bouncycastle:bcmail-jdk14:138" level="project" />
+    <orderEntry type="library" name="Maven: bouncycastle:bcprov-jdk14:138" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bctsp-jdk14:1.38" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk14:1.38" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcmail-jdk14:1.38" level="project" />
+    <orderEntry type="library" name="Maven: com.lowagie:itext-rtf:2.1.7" level="project" />
   </component>
 </module>

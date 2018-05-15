@@ -34,7 +34,26 @@ public interface Consts {
 
     String BLANK = "";
 
+    String APP_TOKEN="系统操作";
+
     BigDecimal ZERO = new BigDecimal(0);
+
+    enum FEEAMOUNT_TYPE{
+        renew("1"),pay("2");
+        String val;
+
+        private FEEAMOUNT_TYPE(String val){
+            this.val=val;
+        }
+
+        public String getLabel() {
+            return (val.equals("1")) ? "续存" : "手续费支出";
+        }
+
+        public String getVal() {
+            return val;
+        }
+    }
 
     enum YORN {
         yes(true), no(false);
@@ -140,7 +159,7 @@ public interface Consts {
     }
 
     enum CACHE_NAMES {
-        paramCache, ssq, userRoles, user, userReses, taxonomy, art, carouselsetting, login,cardBin,smsCode
+        paramCache, ssq, userRoles, user, userReses, taxonomy, art, carouselsetting, login,cardBin,smsCode,mail
     }
 
 }

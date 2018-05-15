@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DelTmpExcel implements Runnable {
+public class DelTmpExcelTask implements Runnable {
     @Override
     public void run() {
         File file= FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath());
