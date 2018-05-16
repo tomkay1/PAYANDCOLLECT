@@ -15,7 +15,7 @@ public class CollectionTest {
 	public static void establishTest() throws Exception {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("merCode", "4");
-		data.put("merchantID", "18");
+		data.put("merchantID", "20");
 
 		data.put("accNo", "6216261000000000018");
 		data.put("certifTp", "01");
@@ -29,8 +29,8 @@ public class CollectionTest {
 		reqData.put("req", RSAKit.encrypt(JSON.toJSONString(data), CollAPIRSAKey.COLL_API.getPublicKey()));
 		// reqData.put("req", "123456");
 
-		String host = "http://localhost:8082";
-		// String host = "https://pac.mybank.cc";
+		//String host = "http://localhost:8082";
+		String host = "https://pac.mybank.cc";
 		String result = HttpClient.send(host + "/coll/api/entrust/establish", reqData, HttpClient.UTF_8_ENCODING, 50000,
 				50000);
 		System.out.println(result);
@@ -47,10 +47,10 @@ public class CollectionTest {
 
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("merCode", "4");// 系统商户号代码 4:测试 1:春城批量
-		data.put("merchantID", "18");// 商户ID
-		data.put("bussType", "1");// 1加急 2批量
+		data.put("merchantID", "20");// 商户ID
+		data.put("bussType", "2");// 1加急 2批量
 		data.put("orderId", orderId);
-		data.put("txnAmt", "80890000000");
+		data.put("txnAmt", "8089700");
 
 		data.put("accNo", "6216261000000000018");
 		data.put("certifTp", "01");
@@ -63,8 +63,8 @@ public class CollectionTest {
 		Map<String, String> reqData = new HashMap<String, String>();
 		reqData.put("req", RSAKit.encrypt(JSON.toJSONString(data), CollAPIRSAKey.COLL_API.getPublicKey()));
 
-		String host = "http://localhost:8082";
-		// String host = "https://pac.mybank.cc";
+		//String host = "http://localhost:8082";
+		String host = "https://pac.mybank.cc";
 		String result = HttpClient.send(host + "/coll/api/trade/initiate", reqData, HttpClient.UTF_8_ENCODING, 50000,
 				50000);
 
@@ -79,14 +79,14 @@ public class CollectionTest {
 
 	public static void queryTest() throws Exception {
 		Map<String, String> data = new HashMap<String, String>();
-		data.put("orderId", "2341");
-		data.put("merchantID", "");
+		data.put("orderId", "20180512122202261");
+		data.put("merchantID", "20");
 
 		Map<String, String> reqData = new HashMap<String, String>();
 		reqData.put("req", RSAKit.encrypt(JSON.toJSONString(data), CollAPIRSAKey.COLL_API.getPublicKey()));
 
-		String host = "http://localhost:8082";
-		// String host = "https://pac.mybank.cc";
+		//String host = "http://localhost:8082";
+		 String host = "https://pac.mybank.cc";
 		String result = HttpClient.send(host + "/coll/api/trade/q", reqData, HttpClient.UTF_8_ENCODING, 50000, 50000);
 
 		System.out.println(result);

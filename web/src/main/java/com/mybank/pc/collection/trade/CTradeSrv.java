@@ -1,9 +1,16 @@
 package com.mybank.pc.collection.trade;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,10 +22,14 @@ import com.jfinal.aop.Duang;
 import com.jfinal.aop.Invocation;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
+import com.jfinal.kit.LogKit;
+import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.mybank.pc.Consts;
 import com.mybank.pc.admin.model.CardBin;
+import com.mybank.pc.admin.model.User;
+import com.mybank.pc.collection.model.CollectionClear;
 import com.mybank.pc.collection.model.CollectionEntrust;
 import com.mybank.pc.collection.model.CollectionTrade;
 import com.mybank.pc.collection.model.UnionpayBatchCollection;
@@ -32,6 +43,8 @@ import com.mybank.pc.exception.TxnKey;
 import com.mybank.pc.exception.ValidateCTRException;
 import com.mybank.pc.exception.ValidateUnionpayRespException;
 import com.mybank.pc.interceptors.TradeExceptionInterceptor;
+import com.mybank.pc.kits.AppKit;
+import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.FeeKit;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.BatchCollectionRequest;
@@ -40,6 +53,11 @@ import com.mybank.pc.kits.unionpay.acp.file.collection.model.RequestContent;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.ResponseContent;
 import com.mybank.pc.merchant.model.MerchantCust;
 import com.mybank.pc.merchant.model.MerchantInfo;
+
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 
 public class CTradeSrv {
 
@@ -554,7 +572,7 @@ public class CTradeSrv {
 								unionpayCollection.update();
 
 								if (collectionTrade != null) {
-									collectionTrade.setFinalCode("0");// 失败
+									collectionTrade.setFinalCode("2");// 失败
 									collectionTrade.setResultCode(origRespCode);
 									collectionTrade.setResultMsg(origRespMsg);
 									collectionTrade.setMat(now);
@@ -756,4 +774,186 @@ public class CTradeSrv {
 
 	}
 
+	public Kv exportTradeDetailExcel(Kv kv, boolean isAdmin, User currUser) {
+		List<CollectionTrade> tradeList = CollectionTrade.find(kv);
+		if (CollectionUtils.isEmpty(tradeList)) {
+			return Kv.by("errorMsg", "没有查询到要导出的数据");
+		}
+		String fileName = null;
+		try {
+			ExcelWriter writer = ExcelUtil.getWriter();
+			List<Map<String, String>> excelList = collectionTradeToExcelData(tradeList, isAdmin);
+			Map<String, String> alias = new HashMap<>();
+			alias.put("tradeNo", "交易流水号");
+			alias.put("merchantNo", "商户编号");
+			alias.put("merchantName", "商户名称");
+			alias.put("tradeTime", "交易时间");
+			alias.put("tradeType", "交易类型");
+			alias.put("bussType", "业务类型");
+			alias.put("custName", "客户姓名");
+			alias.put("cardID", "身份证号");
+			alias.put("mobileBank", "银行预留手机号");
+			alias.put("bankcardNo", "银行卡号");
+			alias.put("amount", "交易金额");
+			if (isAdmin) {
+				alias.put("bankFee", "银行代收手续费");
+			}
+			alias.put("merFee", "商户代收手续费");
+			alias.put("resCode", "响应码");
+			alias.put("resMsg", "响应信息");
+			alias.put("resultCode", "交易结果返回码");
+			alias.put("resultMsg", "交易结果信息");
+			alias.put("finalCode", "最终处理结果");
+			alias.put("clearStatus", "清分状态");
+			alias.put("clearDate", "清分时间");
+			alias.put("clearNo", "清分流水号");
+			alias.put("mat", "最后更新时间");
+			alias.put("operLoginname", "操作员");
+
+			String bTime = kv.getStr("bTime");
+			String eTime = kv.getStr("eTime");
+			String excelTitle = bTime + "-" + eTime + "代收交易详情";
+			writer.merge(alias.size() - 1, excelTitle);
+
+			writer.setHeaderAlias(alias);
+			writer.write(excelList);
+
+			List<String> totalAlias = new ArrayList<String>();
+			totalAlias.add("总笔数");
+			totalAlias.add("总金额");
+			totalAlias.add("成功笔数");
+			totalAlias.add("成功金额");
+			totalAlias.add("清分笔数");
+			if (isAdmin) {
+				totalAlias.add("银行代收手续费总额");
+			}
+			totalAlias.add("商户代收手续费总额");
+			writer.writeRow(totalAlias);
+			List<String> total = collectionTradeToExcelTotal(tradeList, isAdmin);
+			writer.writeRow(total);
+
+			String fileFolder = "dsjyxq/" + DateKit.dateToStr(new Date(), DateKit.yyyy_MM_dd) + "/";
+			File file = FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() + fileFolder);
+			if (!file.exists())
+				file.mkdirs();
+			fileName = fileFolder + (currUser != null ? currUser.getLoginname() : "") + DateUtil.current(true) + ".xls";
+			file = FileUtil.file(PathKit.getWebRootPath() + AppKit.getExcelPath() + fileName);
+
+			OutputStream out = new FileOutputStream(file);
+			writer.flush(out);
+			writer.close();
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			LogKit.error("文件导出失败=>" + e.getMessage());
+			return Kv.by("errorMsg", "文件导出失败");
+		}
+		return Kv.by("fileName", fileName);
+	}
+
+	private List<String> collectionTradeToExcelTotal(List<CollectionTrade> list, boolean isAdmin) {
+		List<String> accum = new ArrayList<String>();
+		int totalNum = 0;// 总笔数
+		BigDecimal totalAmount = new BigDecimal(0);// 总金额
+		int successNum = 0;// 成功笔数
+		BigDecimal successAmount = new BigDecimal(0);// 成功金额
+		int totalClearNum = 0;// 清分笔数
+		BigDecimal totalBankFee = new BigDecimal(0);// 银行代收手续费总额
+		BigDecimal totalMerFee = new BigDecimal(0);// 商户代收手续费总额
+		try {
+			if (CollectionUtils.isNotEmpty(list)) {
+				BigDecimal amount = null;
+				BigDecimal bankFee = null;
+				BigDecimal merFee = null;
+				for (CollectionTrade collectionTrade : list) {
+					amount = collectionTrade.getAmount();
+					bankFee = collectionTrade.getBankFee();
+					merFee = collectionTrade.getMerFee();
+
+					++totalNum;
+					if (amount != null) {
+						totalAmount = totalAmount.add(amount);
+					}
+					if ("0".equals(collectionTrade.getFinalCode())) {
+						++successNum;
+						if (amount != null) {
+							successAmount = successAmount.add(amount);
+						}
+					}
+					if ("0".equals(collectionTrade.getClearStatus())) {
+						++totalClearNum;
+					}
+					if (bankFee != null) {
+						totalBankFee = totalBankFee.add(bankFee);
+					}
+					if (merFee != null) {
+						totalMerFee = totalMerFee.add(merFee);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		accum.add(String.valueOf(totalNum));
+		accum.add(totalAmount.toPlainString());
+		accum.add(String.valueOf(successNum));
+		accum.add(successAmount.toPlainString());
+		accum.add(String.valueOf(totalClearNum));
+		if (isAdmin) {
+			accum.add(totalBankFee.toPlainString());
+		}
+		accum.add(totalMerFee.toPlainString());
+
+		return accum;
+	}
+
+	private List<Map<String, String>> collectionTradeToExcelData(List<CollectionTrade> list, boolean isAdmin) {
+		List<Map<String, String>> accum = new ArrayList<Map<String, String>>();
+		if (CollectionUtils.isEmpty(list)) {
+			return accum;
+		}
+		CollectionTrade.getOperInfo(list);
+		CollectionTrade.getCollectionClear(list);
+
+		Map<String, String> map = null;
+		MerchantInfo merchantInfo = null;
+		User oper = null;
+		CollectionClear collectionClear = null;
+		for (CollectionTrade collectionTrade : list) {
+			map = new LinkedHashMap<String, String>();
+			merchantInfo = collectionTrade.getMerchantInfo();
+			oper = collectionTrade.getOper();
+			collectionClear = collectionTrade.getCollectionClear();
+
+			map.put("tradeNo", collectionTrade.getTradeNo());
+			map.put("merchantNo", merchantInfo == null ? "" : merchantInfo.getMerchantNo());
+			map.put("merchantName", merchantInfo == null ? "" : merchantInfo.getMerchantName());
+			map.put("tradeTime", DateKit.dateToStr(collectionTrade.getTradeTime(), DateKit.STR_DATEFORMATE));
+			map.put("tradeType", collectionTrade.getTradeTypeTxt());
+			map.put("bussType", collectionTrade.getBussTypeTxt());
+			map.put("custName", collectionTrade.getCustName());
+			map.put("cardID", collectionTrade.getCardID());
+			map.put("mobileBank", collectionTrade.getMobileBank());
+			map.put("bankcardNo", collectionTrade.getBankcardNo());
+			map.put("amount", collectionTrade.getAmount().toPlainString());
+			if (isAdmin) {
+				map.put("bankFee", collectionTrade.getBankFee().toPlainString());
+			}
+			map.put("merFee", collectionTrade.getMerFee().toPlainString());
+			map.put("resCode", collectionTrade.getResCode());
+			map.put("resMsg", collectionTrade.getResMsg());
+			map.put("resultCode", collectionTrade.getResultCode());
+			map.put("resultMsg", collectionTrade.getResultMsg());
+			map.put("finalCode", collectionTrade.getFinalCodeTxt());
+			map.put("clearStatus", collectionTrade.getClearStatusTxt());
+			map.put("clearDate", DateKit.dateToStr(collectionTrade.getClearDate(), DateKit.STR_DATEFORMATE));
+			map.put("clearNo", collectionClear == null ? "" : collectionClear.getClearNo());
+			map.put("mat", DateKit.dateToStr(collectionTrade.getMat(), DateKit.STR_DATEFORMATE));
+			map.put("operLoginname", oper == null ? "" : oper.getLoginname());
+
+			accum.add(map);
+		}
+		return accum;
+	}
 }

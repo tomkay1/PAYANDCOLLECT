@@ -95,7 +95,7 @@
     export default {
         name: 'initiateTradeModal',
         props: [
-            'pageSize', 'finalCode', 'bTime', 'eTime', 'searchKey'
+            'pageSize', 'finalCode', 'bTime', 'eTime', 'searchKey','merSearchKey','clearStatus'
         ],
         computed: {
             disableConfirmButton: function(){
@@ -160,6 +160,8 @@
                         finalCode: this.finalCode,
                         'bTime': dateKit.formatDate(this.bTime, 'yyyy-MM-dd'),
                         'eTime': dateKit.formatDate(this.eTime, 'yyyy-MM-dd'),
+                        merSearchKey: this.merSearchKey,
+                        clearStatus: this.clearStatus,
                         search: this.searchKey,
                         ps: this.pageSize
                     }

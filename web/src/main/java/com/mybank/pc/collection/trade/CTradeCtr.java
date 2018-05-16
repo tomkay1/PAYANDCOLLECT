@@ -1,6 +1,7 @@
 package com.mybank.pc.collection.trade;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -11,6 +12,7 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.Consts;
+import com.mybank.pc.admin.model.User;
 import com.mybank.pc.collection.model.CollectionTrade;
 import com.mybank.pc.collection.model.UnionpayCollection;
 import com.mybank.pc.core.CoreController;
@@ -21,28 +23,86 @@ import com.mybank.pc.merchant.model.MerchantInfo;
 
 public class CTradeCtr extends CoreController {
 
+	private static final String ADMIN_LIST_POWER = "#p/coll/trade/admin/list";
+
 	private CTradeSrv cCTradeSrvSrv = Duang.duang(CTradeSrv.class);
 
 	@ActionKey("/coll/trade/list")
 	public void list() {
 		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
+		Set<String> resSet = getAttr(Consts.CURR_USER_RESES);
 		Page<CollectionTrade> page;
+		boolean isAdmin = false;
 
 		String finalCode = getPara("finalCode");
 		String bTime = getPara("bTime");
 		String eTime = getPara("eTime");
+		String merSearchKey = getPara("merSearchKey");
 		String serach = getPara("search");
-
-		Kv kv = Kv.create();
-		kv.set("search", serach).set("finalCode", finalCode).set("bTime", bTime).set("eTime", eTime);
-		if (merInfo != null) {
-			kv.set("merchantID", merInfo.getId());
+		String clearStatus = getPara("clearStatus");
+		if (resSet != null && resSet.contains(ADMIN_LIST_POWER)) {
+			isAdmin = true;
 		}
 
-		SqlPara sqlPara = Db.getSqlPara("collection_trade.findTradeListPage", kv);
-		page = CollectionTrade.dao.paginate(getPN(), getPS(), sqlPara);
+		if (!isAdmin && merInfo == null) {
+			page = new Page<CollectionTrade>(new ArrayList<CollectionTrade>(), getPN(), getPS(), 0, 0);
+		} else {
+			Kv kv = Kv.by("search", serach).set("finalCode", finalCode).set("bTime", bTime).set("eTime", eTime)
+					.set("clearStatus", clearStatus);
+			if (isAdmin) {
+				kv.set("merSearchKey", merSearchKey);
+			}
+			if (!isAdmin && merInfo != null) {
+				kv.set("merchantID", merInfo.getId());
+			}
+			page = CollectionTrade.findPage(getPN(), getPS(), kv);
+		}
 
-		renderJson(page);
+		renderJson(JSON.toJSONString(Kv.by("isAdmin", isAdmin).set("pageInfo", page),
+				SerializerFeature.DisableCircularReferenceDetect));
+	}
+
+	@ActionKey("/coll/trade/export/detail")
+	public void exportTradeDetail() {
+		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
+		User currUser = currUser();
+		Set<String> resSet = getAttr(Consts.CURR_USER_RESES);
+		boolean isAdmin = false;
+
+		String finalCode = getPara("finalCode");
+		String bTime = getPara("bTime");
+		String eTime = getPara("eTime");
+		String merSearchKey = getPara("merSearchKey");
+		String serach = getPara("search");
+		String clearStatus = getPara("clearStatus");
+		if (resSet != null && resSet.contains(ADMIN_LIST_POWER)) {
+			isAdmin = true;
+		}
+
+		if (!isAdmin && merInfo == null) {
+			renderFailJSON("没有查询到要导出的数据");
+		} else {
+			Kv kv = Kv.by("search", serach).set("finalCode", finalCode).set("bTime", bTime).set("eTime", eTime)
+					.set("clearStatus", clearStatus);
+			if (isAdmin) {
+				kv.set("merSearchKey", merSearchKey);
+			}
+			if (!isAdmin && merInfo != null) {
+				kv.set("merchantID", merInfo.getId());
+			}
+
+			try {
+				Kv result = cCTradeSrvSrv.exportTradeDetailExcel(kv, isAdmin, currUser);
+				if (result.containsKey("errorMsg")) {
+					renderFailJSON(result.getStr("errorMsg"));
+				} else {
+					renderSuccessJSON("文件导出成功", result.getStr("fileName"));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				renderFailJSON("文件导出失败");
+			}
+		}
 	}
 
 	@ActionKey("/coll/trade/getMerCustPage")

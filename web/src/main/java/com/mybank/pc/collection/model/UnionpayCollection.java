@@ -268,7 +268,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 			return null;
 		} else {
 			SqlPara sqlPara = Db.getSqlPara("collection_trade.findUnionpayCollection",
-					Kv.create().set("orderId", orderId));
+					Kv.create().set("orderId", orderId).set("merchantID", merchantID));
 			return UnionpayCollection.dao.findFirst(sqlPara);
 		}
 	}

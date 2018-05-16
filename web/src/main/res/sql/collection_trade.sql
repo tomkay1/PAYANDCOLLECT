@@ -1,7 +1,17 @@
-#sql("findTradeListPage")
+#sql("findTradeList")
 	SELECT * FROM collection_trade WHERE 1=1
 		#if(search)
 	        AND (instr(custName, #para(search) )>0 OR instr(cardID, #para(search) )>0 OR instr(mobileBank, #para(search) )>0 OR instr(bankcardNo, #para(search) )>0) 
+	    #end
+	    #if(merSearchKey)
+	        AND merchantID IN (
+				SELECT
+					id
+				FROM
+					merchant_info
+				WHERE
+					(instr(merchantNo, #para(merSearchKey) )>0 OR instr(merchantName, #para(merSearchKey) )>0 OR instr(perName, #para(merSearchKey) )>0) 
+			)
 	    #end
 		#if(merchantID)
 	        AND merchantID = #para(merchantID)
@@ -184,5 +194,6 @@
 	 		AND ct.merchantID =#para(merchantID)
 	 	#end
 	    AND date_format(ct.cat,'%Y%m%d') =#para(dayDate)
+	    AND finalCode = '0'
 #end
 
