@@ -123,7 +123,19 @@ const merInfo = {
             });
         },
 
+        add_merFeeAmount:function({commit,state},p){
+            let vm=this._vm;
+            return new Promise(function (resolve, reject) {
+                console.info(p.merIdFee);
+                vm.$axios.post('/mer00/addFeeAmount',{merFeeAmount:p.merFeeAmount,id:p.merIdFee}).then((res) => {
+                    if(res.resCode&&res.resCode=='success'){
+                        resolve(res.resCode);
+                    }
 
+
+                })
+            });
+        },
     }
 };
 

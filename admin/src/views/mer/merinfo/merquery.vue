@@ -8,10 +8,8 @@
                     商户列表
                 </p>
                 <Row>
-                    <Col span="8">
-                    <Button type="primary" icon="person-add" @click="add">新增商户</Button>
-                    </Col>
-                    <Col span="8" offset="8" align="right">
+
+                    <Col span="24"  align="right">
                     <Input v-model="searchKey" placeholder="输入商户编号/名称/负责人名称" style="width: 200px"/>
                     <span @click="search" >
                         <Button type="primary" icon="search">搜索</Button></span>
@@ -150,24 +148,6 @@
             </div>
         </Modal>
 
-        <Modal v-model="merFeeAddModal" @on-visible-change="vChange" :mask-closable="false">
-            <p slot="header">
-                <Icon type="information-circled"></Icon>
-                <span>{{merFeeAddTitle}} {{merFeeAmount.merName}}</span>
-            </p>
-            <Form ref="formFeeAmountValidate"  :label-width="150" v-model="merFeeAmount"  :rules="feeAmountValidate">
-
-                <FormItem label="手续费续存金额" prop="merFeeAmount">
-                    <Input v-model="merFeeAmount.merFeeAmount" placeholder="请输入..." style="width: 300px"/>
-                </FormItem>
-
-            </Form>
-            <div slot="footer">
-                <Button type="success" :loading="modalLoading" @click="addFeeAmount">保存</Button>
-                <Button type="error" @click="merFeeAddModal=false">关闭</Button>
-            </div>
-        </Modal>
-
         <Modal v-model="merFeeModal" @on-visible-change="vFeeChange" :mask-closable="false" width=700>
             <p slot="header">
                 <Icon type="information-circled"></Icon>
@@ -295,9 +275,7 @@
                 title: '您确定要删除吗？'
             },
             style: {
-                marginRight: '5px',
-                marginTop:'2px',
-                marginBottom:'2px',
+                marginRight: '5px'
             },
             on: {
                 'on-ok': () => {
@@ -318,9 +296,7 @@
                 size: 'small'
             },
             style: {
-                marginRight: '5px',
-                marginTop:'2px',
-                marginBottom:'2px',
+                marginRight: '5px'
             },
             on: {
                 click: () => {
@@ -338,9 +314,7 @@
                 title: '您确定要禁用吗？'
             },
             style: {
-                marginRight: '5px',
-                marginTop:'2px',
-                marginBottom:'2px',
+                marginRight: '5px'
             },
             on: {
                 'on-ok': () => {
@@ -363,9 +337,7 @@
                 title: '您确定要激活吗？'
             },
             style: {
-                marginRight: '5px',
-                marginTop:'2px',
-                marginBottom:'2px',
+                marginRight: '5px'
             },
             on: {
                 'on-ok': () => {
@@ -386,9 +358,7 @@
                 size: 'small'
             },
             style: {
-                marginRight: '5px',
-                marginTop:'2px',
-                marginBottom:'2px',
+                marginRight: '5px'
             },
             on: {
                 click: () => {
@@ -396,24 +366,6 @@
                 }
             }
         }, '手续费管理')
-    }
-    const feeAddBtn = (vm, h, param) => {
-        return h('Button', {
-            props: {
-                type: 'primary',
-                size: 'small'
-            },
-            style: {
-                marginRight: '5px',
-                marginTop:'2px',
-                marginBottom:'2px',
-            },
-            on: {
-                click: () => {
-                    vm.feeAmountAdd(param.row)
-                }
-            }
-        }, '续存')
     }
 
     export default {
@@ -595,28 +547,6 @@
                     this.merFee.amount = null
                 }
             },
-
-            feeAmountAdd(i) {
-                this.merFeeAmount.merName = i.merchantName
-                this.merFeeAmount.merIdFee = i.id
-                this.merFeeAddModal = true
-            },
-            addFeeAmount(){
-                let vm = this
-                this.$refs['formFeeAmountValidate'].validate((valid) => {
-                        if (valid) {
-                        //获取输入的手续费数据
-                        this.$store.dispatch('add_merFeeAmount', vm.merFeeAmount).then((res) => {
-                            if (res && res == 'success') {
-                                vm.merFeeAddModal = false;
-                                this.$store.dispatch('merInfo_list')
-                            } else {
-                                this.modalLoading = false;
-                            }
-                        })
-                        }
-                })
-            }
         },
         mounted() {
             //页面加载时或数据方法
@@ -644,9 +574,7 @@
                 modalTitle: '新增用户',
                 uploadAction: consts.env + '/cmn/act03',
                 modalLoading: false,
-                merFeeAddTitle:'手续费续存',
-                merFeeAddModal:false,
-                merFeeAmount:{},
+
                 ruleValidate: {
                     merchantName: [
                         {type: 'string', required: true, message: '商户名称不能为空', trigger: 'blur'},
@@ -711,19 +639,6 @@
 
 
                 },
-                feeAmountValidate: {
-                    merFeeAmount: [
-                        {type: 'string', required: true, message: '手续费续存金额不能为空', trigger: 'blur'},
-                        {
-                            type: 'string',
-                            message: '手续费续存金额输入无效',
-                            pattern: /^([+]?\d{1,10})(\.\d{1,10})?$/,
-                            trigger: 'blur'
-                        }
-                    ],
-
-
-                },
 
                 feeValidate: {
                     tradeType: [
@@ -766,18 +681,20 @@
                         title: '商户编号',
                         key: 'merchantNo',
                         align: 'center',
+                        width: 100,
 
                     },
                     {
                         title: '商户类型',
                         key: 'merTypeTxt',
                         align: 'center',
-
+                        width: 100,
                     },
                     {
                         title: '负责人姓名',
                         key: 'perName',
                         align: 'center',
+                        width: 120,
                     },
                     // {
                     //     title: '身份证号码',
@@ -787,11 +704,13 @@
                         title: '手机',
                         key: 'mobile',
                         align: 'center',
+                        width: 120,
                     },
                     {
                         title: '手续费',
                         key: 'feeAmount',
                         align: 'center',
+                        width: 120,
                     },
                     {
                         title: '创建时间',
@@ -823,42 +742,40 @@
                             }
                         }
                     },
-                    {
-                        title: '操作',
-                        key: 'action',
-                        width: 310,
-                        align: 'center',
-                        render: (h, param) => {
-                            if (!param.row.dAt) {
-                                if (param.row.status == '0') {
-
-
-                                    return h('div', [
-                                        feeBtn(this, h, param),
-                                        feeAddBtn(this, h, param),
-                                        editBtn(this, h, param),
-                                        delBtn(this, h, param),
-                                        stopBtn(this, h, param),
-                                    ]);
-
-                                } else {
-
-
-                                    return h('div', [
-                                        feeBtn(this, h, param),
-                                        feeAddBtn(this, h, param),
-                                        editBtn(this, h, param),
-                                        delBtn(this, h, param),
-                                        actBtn(this, h, param),
-
-                                    ]);
-
-
-                                }
-
-                            }
-                        }
-                    }
+                    // {
+                    //     title: '操作',
+                    //     key: 'action',
+                    //     width: 260,
+                    //     align: 'center',
+                    //     render: (h, param) => {
+                    //         if (!param.row.dAt) {
+                    //             if (param.row.status == '0') {
+                    //
+                    //
+                    //                 return h('div', [
+                    //                     feeBtn(this, h, param),
+                    //                     editBtn(this, h, param),
+                    //                     delBtn(this, h, param),
+                    //                     stopBtn(this, h, param),
+                    //                 ]);
+                    //
+                    //             } else {
+                    //
+                    //
+                    //                 return h('div', [
+                    //                     feeBtn(this, h, param),
+                    //                     editBtn(this, h, param),
+                    //                     delBtn(this, h, param),
+                    //                     actBtn(this, h, param),
+                    //
+                    //                 ]);
+                    //
+                    //
+                    //             }
+                    //
+                    //         }
+                    //     }
+                    // }
 
                 ]
             }

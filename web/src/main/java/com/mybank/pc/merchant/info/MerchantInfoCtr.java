@@ -12,6 +12,7 @@ import com.mybank.pc.admin.model.UserRole;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.kits.ext.BCrypt;
 import com.mybank.pc.merchant.model.MerchantFee;
+import com.mybank.pc.merchant.model.MerchantFeeAmountRecord;
 import com.mybank.pc.merchant.model.MerchantInfo;
 import com.mybank.pc.merchant.model.MerchantUser;
 
@@ -331,5 +332,30 @@ public class MerchantInfoCtr extends CoreController {
 
 
 
+    @Before({ Tx.class})
+    public void addFeeAmount(){
+        BigDecimal merFeeAmount   = new BigDecimal(getPara("merFeeAmount"));
+        String merID = getPara("id");
 
+        MerchantInfo merchantInfo =MerchantInfo.dao.findById(new Integer(merID));
+        BigDecimal merFeeBAmount = merchantInfo.getFeeAmount();
+        BigDecimal merFeeAAmount =merchantInfo.getFeeAmount().add(merFeeAmount);
+
+        MerchantFeeAmountRecord mfr = new MerchantFeeAmountRecord();
+        mfr.setMerId(merchantInfo.getId());
+        mfr.setBAmount(merFeeBAmount);
+        mfr.setAmount(merFeeAmount);
+        mfr.setAAmount(merFeeAAmount);
+        mfr.setType("1");
+        mfr.setCAt(new Date());
+        mfr.setMerName(merchantInfo.getMerchantName());
+        mfr.setMerNo(merchantInfo.getMerchantNo());
+        mfr.setOperId(currUser().getId().intValue());
+        mfr.setOperName(currUser().getNickname());
+
+        merchantInfo.setFeeAmount(merFeeAAmount);
+        merchantInfo.update();
+        mfr.save();
+        renderSuccessJSON("手续费续存成功。", "");
+    }
 }

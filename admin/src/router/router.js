@@ -101,7 +101,8 @@ export const appRouter = [
         component: Main,
         children: [
             { path: 'merinfo', title: '商户信息管理', isCheck: 'yes', name: 'merinfo', component: resolve => { require(['@/views/mer/merinfo/main.vue'], resolve); } },
-            { path: 'custquery', title: '商户客户查询', isCheck: 'yes', name: 'custquery', component: resolve => { require(['@/views/mer/custquery/main.vue'], resolve); } },
+            { path: 'merquery', title: '商户信息查询', isCheck: 'yes', name: 'merquery', component: resolve => { require(['@/views/mer/merinfo/merquery.vue'], resolve); } },
+            { path: 'custquery', title: '商户客户管理', isCheck: 'yes', name: 'custquery', component: resolve => { require(['@/views/mer/custquery/main.vue'], resolve); } },
         ]
     },
     {
