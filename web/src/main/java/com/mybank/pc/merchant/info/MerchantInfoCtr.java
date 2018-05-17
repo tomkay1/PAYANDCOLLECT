@@ -1,6 +1,9 @@
 package com.mybank.pc.merchant.info;
 
+import cn.hutool.core.util.StrUtil;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.Kv;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.plugin.ehcache.CacheKit;
@@ -10,6 +13,7 @@ import com.mybank.pc.admin.model.Taxonomy;
 import com.mybank.pc.admin.model.User;
 import com.mybank.pc.admin.model.UserRole;
 import com.mybank.pc.core.CoreController;
+import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.ext.BCrypt;
 import com.mybank.pc.merchant.model.MerchantFee;
 import com.mybank.pc.merchant.model.MerchantFeeAmountRecord;
@@ -357,5 +361,61 @@ public class MerchantInfoCtr extends CoreController {
         merchantInfo.update();
         mfr.save();
         renderSuccessJSON("手续费续存成功。", "");
+    }
+
+    /**
+     *
+     * 商户操作员只能查询本商户的
+     * bDate eDate 查询时间区间
+     * operName 操作员名字
+     * merNo 商户编号
+     * type 流水类型
+     *
+     *
+     */
+    public void listFeeAmount(){
+        String search = getPara("search");
+
+        Integer merId=null;
+        Kv kv= Kv.create();
+        Boolean isOper = true;
+
+        //获取当前登录用户信息
+        MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
+        if (merInfo != null) {
+            search = merInfo.getMerchantNo();
+            merId=merInfo.getId();
+            kv.put("merId=",merId);
+            isOper = false;
+        }
+
+
+        String bDate=getPara("bDate");
+        String eDate=getPara("eDate");
+
+        if(StrUtil.isNotBlank(bDate)){
+            bDate= DateKit.getTimeStampBegin(DateKit.strToDate(bDate,DateKit.yyyy_MM_dd));
+            kv.put("cAt>=",bDate);
+        }
+        if(StrUtil.isNotBlank(eDate)){
+            bDate= DateKit.getTimeStampEnd(DateKit.strToDate(eDate,DateKit.yyyy_MM_dd));
+            kv.put("cAt<=",eDate);
+        }
+        String operName=getPara("operName");
+        if(StrUtil.isNotBlank(operName))kv.put("operName=",operName);
+        String merNo=getPara("merNo");
+        if(StrUtil.isNotBlank(merNo))kv.put("merNo=",merNo);
+        String type=getPara("type");
+        if(StrUtil.isNotBlank(type))kv.put("type=",type);
+
+        Kv kv1 = Kv.by("cond",kv);
+        if(StrUtil.isNotBlank(search)){
+            kv1.put("search","%"+search+"%");
+        }
+        Page<MerchantFeeAmountRecord> page=MerchantFeeAmountRecord.dao.paginate(getPN(),getPS(), Db.getSqlPara("merchantFeeAmountRecord.page",kv1));
+        Map map = new HashMap();
+        map.put("page", page);
+        map.put("isOper", isOper);
+        renderJson(map);
     }
 }

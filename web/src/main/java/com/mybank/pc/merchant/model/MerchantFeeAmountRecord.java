@@ -1,5 +1,6 @@
 package com.mybank.pc.merchant.model;
 
+import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.merchant.model.base.BaseMerchantFeeAmountRecord;
 
 /**
@@ -8,4 +9,21 @@ import com.mybank.pc.merchant.model.base.BaseMerchantFeeAmountRecord;
 @SuppressWarnings("serial")
 public class MerchantFeeAmountRecord extends BaseMerchantFeeAmountRecord<MerchantFeeAmountRecord> {
 	public static final MerchantFeeAmountRecord dao = new MerchantFeeAmountRecord().dao();
+	public String getTypeTxt(){
+		String sts = getType();
+		if(sts==null)return "";
+		if("1".equals(sts)){
+			return "续存";
+		}
+		else if("2".equals(sts)){
+			return "代缴";
+		}else {
+			return "";
+		}
+
+
+	}
+	public String getCatTxt(){
+		return DateKit.dateToStr(getCAt(),DateKit.yyyy_MM_dd);
+	}
 }

@@ -103,6 +103,7 @@ export const appRouter = [
             { path: 'merinfo', title: '商户信息管理', isCheck: 'yes', name: 'merinfo', component: resolve => { require(['@/views/mer/merinfo/main.vue'], resolve); } },
             { path: 'merquery', title: '商户信息查询', isCheck: 'yes', name: 'merquery', component: resolve => { require(['@/views/mer/merinfo/merquery.vue'], resolve); } },
             { path: 'custquery', title: '商户客户管理', isCheck: 'yes', name: 'custquery', component: resolve => { require(['@/views/mer/custquery/main.vue'], resolve); } },
+            { path: 'feequery', title: '商户手续费查询', isCheck: 'yes', name: 'feequery', component: resolve => { require(['@/views/mer/fee/main.vue'], resolve); } },
         ]
     },
     {
@@ -110,10 +111,11 @@ export const appRouter = [
         icon: 'monitor',
         isCheck: 'yes',
         name: 'mer1',
-        title: '商户客户管理',
+        title: '商户操作管理',
         component: Main,
         children: [
             { path: 'custquery', title: '商户客户管理', isCheck: 'yes', name: 'custquery', component: resolve => { require(['@/views/mer/custquery/main.vue'], resolve); } },
+            { path: 'feequery', title: '商户手续费查询', isCheck: 'yes', name: 'feequery', component: resolve => { require(['@/views/mer/fee/main.vue'], resolve); } },
         ]
     },
     {

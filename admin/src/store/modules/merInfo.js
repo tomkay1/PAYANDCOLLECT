@@ -12,7 +12,8 @@ const merInfo = {
         merchantTypeList:[],
         merFeeListJ:[],
         merFeeListB:[],
-
+        feeAmountList:[],
+        isOper:false,
     },
     mutations: {
         set_merInfo_list(state,page){
@@ -32,6 +33,15 @@ const merInfo = {
             state.merFeeListJ=map.feeListJ
             state.merFeeListB=map.feeListB
 
+        },
+
+        set_merInfo_listFeeAmount(state,page){
+            state.feeAmountList=page.page.list
+            state.totalPage=page.page.totalPage
+            state.pageSize=page.page.pageSize
+            state.pageNumber=page.page.pageNumber
+            state.totalRow=page.page.totalRow
+            state.isOper = page.isOper
         },
     },
     actions:{
@@ -134,6 +144,14 @@ const merInfo = {
 
 
                 })
+            });
+        },
+        merInfo_listFeeAmount:function ({ commit,state },param) {
+            if(param&&!param.pn){
+                param.pn=state.pageNumber;
+            }
+            this._vm.$axios.post('/mer00/listFeeAmount',param).then((res)=>{
+                commit('set_merInfo_listFeeAmount',res)
             });
         },
     }
