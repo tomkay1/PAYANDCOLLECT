@@ -63,9 +63,9 @@
                 <FormItem label="备用联系地址2" prop="mobile2">
                     <Input v-model="merInfo.mobile2" placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
-                <FormItem label="预存手续费余额" prop="feeAmount">
+                <!--<FormItem label="预存手续费余额" prop="feeAmount">
                     <Input v-model="merInfo.feeAmount" placeholder="请输入..." style="width: 300px"/>
-                </FormItem>
+                </FormItem>-->
                 <FormItem label="最大代扣金额" prop="maxTradeAmount">
                     <Input v-model="merInfo.maxTradeAmount" placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
@@ -150,14 +150,14 @@
             </div>
         </Modal>
 
-        <Modal v-model="merFeeAddModal" @on-visible-change="vChange" :mask-closable="false">
+        <Modal v-model="merFeeAddModal" @on-visible-change="vFeeAmountChange" :mask-closable="false">
             <p slot="header">
                 <Icon type="information-circled"></Icon>
                 <span>{{merFeeAddTitle}} {{merFeeAmount.merName}}</span>
             </p>
-            <Form ref="formFeeAmountValidate"  :label-width="150" v-model="merFeeAmount"  :rules="feeAmountValidate">
+            <Form ref="formFeeAmountValidate"  :label-width="150" :model="merFeeAmount"  :rules="feeAmountValidate">
 
-                <FormItem label="手续费续存金额" prop="merFeeAmount">
+                <FormItem label="手续费续存金额" prop="merFeeAmount" style="margin-top: 20px">
                     <Input v-model="merFeeAmount.merFeeAmount" placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
 
@@ -616,7 +616,13 @@
                         })
                         }
                 })
-            }
+            },
+            vFeeAmountChange(b) {
+                if (!b) {
+                    this.$refs['formFeeAmountValidate'].resetFields()
+                    this.merFeeAmount.merFeeAmount =''
+                }
+            },
         },
         mounted() {
             //页面加载时或数据方法
@@ -713,7 +719,7 @@
                 },
                 feeAmountValidate: {
                     merFeeAmount: [
-                        {type: 'string', required: true, message: '手续费续存金额不能为空', trigger: 'blur'},
+                        {required: true, message: '手续费续存金额不能为空', trigger: 'blur'},
                         {
                             type: 'string',
                             message: '手续费续存金额输入无效',
