@@ -8,6 +8,7 @@ const merCust = {
         totalRow:0,
         merCust:{},
         isOper:true,
+        merInfoList:[],
 
     },
     mutations: {
@@ -19,10 +20,16 @@ const merCust = {
             state.pageNumber=map.page.pageNumber
             state.totalRow=map.page.totalRow
             state.isOper = map.isOper
+            state.merInfoList = map.merInfoList
 
         },
         merCust_info:function(state,param){
             state.merCust = kit.clone(param)
+        },
+        merCust_reset(state,param){
+            if(param) {
+                state.merCust = kit.clone(param)
+            }
         },
 
     },
@@ -35,7 +42,18 @@ const merCust = {
                 commit('set_merCust_list',res)
             });
         },
-
+        merCust_save:function ({ commit,state },action) {
+            let vm=this._vm;
+            let p=kit.clone(state.merCust)
+            return new Promise(function (resolve, reject) {
+                vm.$axios.post('/mer01/'+action, p).then((res) => {
+                    // if(res.resCode&&res.resCode=='success'){
+                    //     commit('user_reset');
+                    // }
+                    resolve(res.resCode);
+                });
+            });
+        },
 
         merCust_del:function({commit,state},param){
             let vm=this._vm;

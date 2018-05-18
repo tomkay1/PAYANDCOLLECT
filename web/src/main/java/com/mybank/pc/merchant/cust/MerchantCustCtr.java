@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.XmlUtil;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.HttpKit;
@@ -30,10 +31,7 @@ import org.w3c.dom.Document;
 import javax.xml.xpath.XPathConstants;
 import java.io.File;
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -52,13 +50,17 @@ public class MerchantCustCtr extends CoreController {
         Kv kv = Kv.create();
         BigInteger i = currUser().getId();
         Boolean isOper = true;
+        List<MerchantInfo> merInfoList =new ArrayList<>();
 
         //获取当前登录用户信息
         MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
         if (merInfo != null) {
             search1 = merInfo.getMerchantNo();
             isOper = false;
+        }else{
+            merInfoList  = MerchantInfo.dao.find("select *  from merchant_info mi  where 1=1 and mi.dat is null  ");
         }
+
         kv.set("search", search);
         kv.set("search1", search1);
         SqlPara sqlPara = Db.getSqlPara("merchant.custList", kv);
@@ -68,11 +70,43 @@ public class MerchantCustCtr extends CoreController {
         Map map = new HashMap();
         map.put("page", page);
         map.put("isOper", isOper);
+        map.put("merInfoList",merInfoList);
         renderJson(map);
 
     }
 
+    @Before({MerchantCustValidator.class, Tx.class})
+    public void save() {
 
+        MerchantCust merCust = getModel(MerchantCust.class,"",true);
+        //判断是否是操作员操作
+        if (StrUtil.isBlankIfStr(merCust.getMerID())) {
+            MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
+            merCust.setMerID(merInfo.getId());
+            merCust.setMerNo(merInfo.getMerchantNo());
+        }else{
+            MerchantInfo merchantInfo =  MerchantInfo.dao.findById(merCust.getMerID());
+            merCust.setMerNo(merchantInfo.getMerchantNo());
+        }
+
+
+        merCust.setCat(new Date());
+        merCust.setMat(new Date());
+        merCust.setOperID(String.valueOf(currUser().getId()));
+//        merCust.save();
+
+        renderSuccessJSON("新增客户信息成功。", "");
+    }
+
+    @Before({MerchantCustValidator.class, Tx.class})
+    public void update() {
+        MerchantCust merCust = getModel(MerchantCust.class,"",true);
+
+        merCust.setMat(new Date());
+        merCust.setOperID(String.valueOf(currUser().getId()));
+        merCust.update();
+        renderSuccessJSON("更新客户信息成功。", "");
+    }
     @Before({Tx.class})
     public void del() {
         int id = getParaToInt("id");

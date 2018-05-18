@@ -119,6 +119,7 @@ public class CMNCtr extends CoreController {
     /**
      * 图片上传
      */
+    @com.jfinal.aop.Clear(AdminIAuthInterceptor.class)
     public void act03() {
         UploadFile uf = getFile("file");
         File file = uf.getFile();
