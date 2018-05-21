@@ -22,6 +22,7 @@ import collMerCust from './modules/collection_trade_mercust';
 import merCust from './modules/merCust';
 import unionpayEntrust from './modules/unionpay_entrust';
 import unionpayCollection from './modules/unionpay_collection';
+import merUser from './modules/merUser';
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
@@ -64,7 +65,8 @@ const store = new Vuex.Store({
         collReconciliation,
         collMerCust,
         unionpayEntrust,
-        unionpayCollection
+        unionpayCollection,
+        merUser
     }
 });
 

@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import kit from '../../libs/kit';
 
-const user = {
+const merUser = {
     state: {
         userList:[],
         totalPage:0,
@@ -90,4 +90,4 @@ const user = {
     }
 };
 
-export default user;
+export default merUser;

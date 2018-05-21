@@ -262,7 +262,7 @@
             },
 
             search(pn){
-                this.$store.dispatch(merUser_list',{search:this.searchKey,pn:pn})
+                this.$store.dispatch('merUser_list',{search:this.searchKey,pn:pn})
             },
 
             refresh(){
