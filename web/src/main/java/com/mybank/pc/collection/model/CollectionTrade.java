@@ -182,6 +182,18 @@ public class CollectionTrade extends BaseCollectionTrade<CollectionTrade> {
 		return tradeList;
 	}
 
+	public CollectionTrade findAndSetMerInfo() {
+		try {
+			Integer merchantID = getMerchantID();
+			if (merchantID != null) {
+				setMerchantInfo(MerchantInfo.dao.findById(merchantID));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return this;
+	}
+
 	public static List<CollectionTrade> find(Kv kv) {
 		SqlPara sqlPara = Db.getSqlPara("collection_trade.findTradeList", kv);
 		return getMerInfo(CollectionTrade.dao.find(sqlPara));

@@ -194,15 +194,20 @@ public class AcpService {
 	 * @return 应答http 200返回true ,其他false<br>
 	 * @throws Exception
 	 */
-	public Map<String, String> post(Map<String, String> reqData, String reqUrl, String encoding) throws Exception {
+	public AcpResponse post(Map<String, String> reqData, String reqUrl, String encoding) throws Exception {
+		AcpResponse acpResponse = new AcpResponse();
 		Map<String, String> rspData = new HashMap<String, String>();
+		acpResponse.setRspData(rspData);
+
 		LogKit.info("请求银联地址:" + reqUrl);
 		// 发送后台请求数据
 		HttpClient hc = new HttpClient(reqUrl, 30000, 30000, sdkConfig);// 连接超时时间，读超时时间（可自行判断，修改）
 		try {
 			int status = hc.send(reqData, encoding);
+			String resultString = hc.getResult();
+			acpResponse.setStatus(status);
+			acpResponse.setResult(resultString);
 			if (200 == status) {
-				String resultString = hc.getResult();
 				if (null != resultString && !"".equals(resultString)) {
 					// 将返回结果转换为map
 					Map<String, String> tmpRspData = SDKUtil.convertResultStringToMap(resultString);
@@ -215,7 +220,7 @@ public class AcpService {
 			LogKit.error(e.getMessage(), e);
 			throw e;
 		}
-		return rspData;
+		return acpResponse;
 	}
 
 	/**

@@ -16,6 +16,7 @@ import com.mybank.pc.collection.model.CollectionTrade;
 import com.mybank.pc.collection.model.UnionpayBatchCollection;
 import com.mybank.pc.collection.model.UnionpayBatchCollectionQuery;
 import com.mybank.pc.collection.model.UnionpayCollection;
+import com.mybank.pc.collection.model.sender.SendProxy;
 import com.mybank.pc.exception.BaseCollectionRuntimeException;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDKConstants;
@@ -80,7 +81,7 @@ public class CBatchQuerySrv {
 		UnionpayBatchCollectionQuery unionpayBatchCollectionQuery = null;
 		boolean isSaved = false;
 		try {
-			unionpayBatchCollectionQuery = unionpayBatchCollection.buildQueryResult();
+			unionpayBatchCollectionQuery = unionpayBatchCollection.buildQuery();
 			if (isSaved = unionpayBatchCollectionQuery.save()) {
 				unionpayBatchCollection.queryResult();
 				handlingBatchQueryResult(unionpayBatchCollection);
@@ -107,15 +108,17 @@ public class CBatchQuerySrv {
 	private boolean handlingBatchQueryResult(UnionpayBatchCollection unionpayBatchCollection) throws Exception {
 		boolean isSuccess = false;
 		try {
+			Date now = new Date();
 			Integer queryCount = unionpayBatchCollection.getQueryResultCount();
 			queryCount = queryCount == null ? 0 : queryCount;
 			UnionpayBatchCollectionQuery unionpayBatchCollectionQuery = unionpayBatchCollection.getQuery();
 			unionpayBatchCollectionQuery.validateBatchQueryResp();
 
-			Map<String, String> rspData = unionpayBatchCollectionQuery.getQueryRspData();
+			SendProxy sendProxy = unionpayBatchCollectionQuery.getSendProxy();
+			Map<String, String> rspData = sendProxy.getRspData();
 
-			String respCode = rspData.get("respCode");
-			String respMsg = rspData.get("respMsg");
+			String respCode = sendProxy.getRespCode();
+			String respMsg = sendProxy.getRespMsg();
 
 			unionpayBatchCollectionQuery.setRespCode(respCode);
 			unionpayBatchCollectionQuery.setRespMsg(respMsg);
@@ -159,7 +162,7 @@ public class CBatchQuerySrv {
 
 				// 批次（xxxx）不存在
 				if ("34".equals(respCode)) {
-					if (unionpayBatchCollectionQuery.isTimeout()) {
+					if (unionpayBatchCollectionQuery.isTimeout(now)) {
 						BatchCollectionRequest batchCollectionRequest = unionpayBatchCollection
 								.toBatchCollectionRequest();
 						if (batchCollectionRequest != null) {
@@ -176,7 +179,6 @@ public class CBatchQuerySrv {
 			unionpayBatchCollection.setQueryResultCount(queryCount + 1);
 			unionpayBatchCollection.setNextAllowQueryDate();
 
-			Date now = new Date();
 			unionpayBatchCollectionQuery.setMat(now);
 			unionpayBatchCollectionQuery.update();
 

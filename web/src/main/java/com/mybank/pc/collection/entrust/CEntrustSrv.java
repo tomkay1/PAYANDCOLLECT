@@ -20,6 +20,7 @@ import com.mybank.pc.exception.EntrustRuntimeException;
 import com.mybank.pc.exception.TxnKey;
 import com.mybank.pc.exception.ValidateEERException;
 import com.mybank.pc.interceptors.EntrustExceptionInterceptor;
+import com.mybank.pc.kits.unionpay.acp.AcpResponse;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.kits.unionpay.acp.SDKConfig;
@@ -382,7 +383,9 @@ public class CEntrustSrv {
 
 			String requestBackUrl = sdkConfig.getBackRequestUrl(); // 交易请求url从配置文件读取对应属性文件acp_sdk.properties中的
 																	// acpsdk.backTransUrl
-			Map<String, String> rspData = acpService.post(reqData, requestBackUrl, encoding); // 发送请求报文并接受同步应答（默认连接超时时间30秒，读取返回结果超时时间30秒）;这里调用signData之后，调用submitUrl之前不能对submitFromData中的键值对做任何修改，如果修改会导致验签不通过
+			AcpResponse acpResponse = acpService.post(reqData, requestBackUrl, encoding); // 发送请求报文并接受同步应答（默认连接超时时间30秒，读取返回结果超时时间30秒）;这里调用signData之后，调用submitUrl之前不能对submitFromData中的键值对做任何修改，如果修改会导致验签不通过
+			Map<String, String> rspData = acpResponse.getRspData();
+
 			unionpayEntrust.setResp(JsonKit.toJson(rspData));
 			return handlingTerminateResult(rspData, acpService, encoding, unionpayEntrust, collectionEntrust);
 		} catch (EntrustRuntimeException e) {

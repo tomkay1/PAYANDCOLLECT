@@ -25,7 +25,7 @@ public class CTradeCtr extends CoreController {
 
 	private static final String ADMIN_LIST_POWER = "#p/coll/trade/admin/list";
 
-	private CTradeSrv cCTradeSrvSrv = Duang.duang(CTradeSrv.class);
+	private CTradeSrv cCTradeSrv = Duang.duang(CTradeSrv.class);
 
 	@ActionKey("/coll/trade/list")
 	public void list() {
@@ -92,7 +92,7 @@ public class CTradeCtr extends CoreController {
 			}
 
 			try {
-				Kv result = cCTradeSrvSrv.exportTradeDetailExcel(kv, isAdmin, currUser);
+				Kv result = cCTradeSrv.exportTradeDetailExcel(kv, isAdmin, currUser);
 				if (result.containsKey("errorMsg")) {
 					renderFailJSON(result.getStr("errorMsg"));
 				} else {
@@ -154,7 +154,7 @@ public class CTradeCtr extends CoreController {
 
 		Kv initiateRequest = null;
 		try {
-			initiateRequest = cCTradeSrvSrv.validateAndBuildInitiateRequest(kv);
+			initiateRequest = cCTradeSrv.validateAndBuildInitiateRequest(kv);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -180,7 +180,7 @@ public class CTradeCtr extends CoreController {
 		boolean isSuccess = false;
 		String errorMsg = null;
 		try {
-			isSuccess = cCTradeSrvSrv.initiate(kv);
+			isSuccess = cCTradeSrv.initiate(kv);
 		} catch (ValidateCTRException ve) {
 			ve.printStackTrace();
 			isSuccess = false;
@@ -205,17 +205,17 @@ public class CTradeCtr extends CoreController {
 		boolean isThrowException = false;
 		try {
 			unionpayCollection = UnionpayCollection.findByTradeNo(tradeNo);
-			cCTradeSrvSrv.syncOrderStatus(unionpayCollection);
+			cCTradeSrv.syncOrderStatus(unionpayCollection);
 		} catch (Exception e) {
 			e.printStackTrace();
 			isThrowException = true;
 		} finally {
-			CollectionTrade updatedcollectionTrade = null;
+			CollectionTrade updatedCollectionTrade = null;
 			if (isThrowException || unionpayCollection == null
-					|| (updatedcollectionTrade = CollectionTrade.findByTradeNo(unionpayCollection)) == null) {
+					|| (updatedCollectionTrade = CollectionTrade.findByTradeNo(unionpayCollection)) == null) {
 				renderJson(new CollectionTrade());
 			}
-			renderJson(updatedcollectionTrade);
+			renderJson(updatedCollectionTrade.findAndSetMerInfo());
 		}
 	}
 

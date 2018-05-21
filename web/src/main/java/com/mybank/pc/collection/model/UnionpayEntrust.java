@@ -8,6 +8,7 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseUnionpayEntrust;
+import com.mybank.pc.kits.unionpay.acp.AcpResponse;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.kits.unionpay.acp.SDKConfig;
@@ -129,7 +130,9 @@ public class UnionpayEntrust extends BaseUnionpayEntrust<UnionpayEntrust> {
 		if (entrustReqData == null) {
 			assemblyEntrustRequest();
 		}
-		entrustRspData = acpService.post(this.entrustReqData, requestBackUrl, SDKConstants.UTF_8_ENCODING); // 发送请求报文并接受同步应答（默认连接超时时间30秒，读取返回结果超时时间30秒）;这里调用signData之后，调用submitUrl之前不能对submitFromData中的键值对做任何修改，如果修改会导致验签不通过
+		AcpResponse acpResponse = acpService.post(this.entrustReqData, requestBackUrl, SDKConstants.UTF_8_ENCODING); // 发送请求报文并接受同步应答（默认连接超时时间30秒，读取返回结果超时时间30秒）;这里调用signData之后，调用submitUrl之前不能对submitFromData中的键值对做任何修改，如果修改会导致验签不通过
+		entrustRspData = acpResponse.getRspData();
+
 		this.setResp(JsonKit.toJson(entrustRspData));
 		return entrustRspData;
 	}

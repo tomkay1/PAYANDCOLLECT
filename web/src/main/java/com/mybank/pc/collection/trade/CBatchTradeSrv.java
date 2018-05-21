@@ -3,7 +3,6 @@ package com.mybank.pc.collection.trade;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -16,6 +15,7 @@ import com.mybank.pc.collection.model.CollectionTrade;
 import com.mybank.pc.collection.model.UnionpayBatchCollection;
 import com.mybank.pc.collection.model.UnionpayBatchCollectionBatchno;
 import com.mybank.pc.collection.model.UnionpayCollection;
+import com.mybank.pc.collection.model.sender.SendProxy;
 import com.mybank.pc.exception.ValidateUnionpayRespException;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 
@@ -36,7 +36,7 @@ public class CBatchTradeSrv {
 		int count = 0;
 		boolean isSaved = false;
 		List<UnionpayCollection> toBeSentOrder = null;
-		Map<String, String> sendResult = null;
+		SendProxy sendProxy = null;
 		Kv kv = Kv.create();
 		Date now = new Date();
 		try {
@@ -51,7 +51,7 @@ public class CBatchTradeSrv {
 				unionpayBatchCollection.assemblyBatchRequest();
 
 				if (isSaved = unionpayBatchCollection.save()) {
-					sendResult = unionpayBatchCollection.sendBatchOrder();
+					sendProxy = unionpayBatchCollection.sendBatchOrder();
 					handlingBatchTradeResult(unionpayBatchCollection, toBeSentOrder);
 				}
 			}
@@ -78,8 +78,8 @@ public class CBatchTradeSrv {
 				if (count > 0 && CollectionUtils.isEmpty(toBeSentOrder)) {
 					toBeSentOrder = UnionpayCollection.findToBeSentUnionpayCollectionByBatchNo(kv);
 				}
-				if (CollectionUtils.isNotEmpty(toBeSentOrder) && sendResult != null) {
-					String respCode = sendResult.get("respCode");
+				if (CollectionUtils.isNotEmpty(toBeSentOrder) && sendProxy != null) {
+					String respCode = sendProxy.getRespCode();
 					// 没有成功也没有最终失败需要更新订单状态为待发送
 					if (!isSuccessed(respCode) && !isFailed(respCode)) {
 						for (UnionpayCollection unionpayCollection : toBeSentOrder) {
@@ -122,9 +122,9 @@ public class CBatchTradeSrv {
 		try {
 			unionpayBatchCollection.validateBatchOrderResp();
 
-			Map<String, String> rspData = unionpayBatchCollection.getBatchRspData();
-			String respCode = rspData.get("respCode");
-			String respMsg = rspData.get("respMsg");
+			SendProxy sendProxy = unionpayBatchCollection.getSendProxy();
+			String respCode = sendProxy.getRespCode();
+			String respMsg = sendProxy.getRespMsg();
 
 			Date now = new Date();
 
