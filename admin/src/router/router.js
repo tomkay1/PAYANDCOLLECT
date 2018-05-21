@@ -119,6 +119,18 @@ export const appRouter = [
         ]
     },
     {
+        path: '/mer2',
+        icon: 'monitor',
+        isCheck: 'yes',
+        name: 'mer2',
+        title: '商户用户管理',
+        component: Main,
+        children: [
+            { path: 'meruser', title: '商户用户管理', isCheck: 'yes', name: 'meruser', component: resolve => { require(['@/views/mer/user/main.vue'], resolve); } },
+
+        ]
+    },
+    {
         path: '/coll',
         icon: 'monitor',
         isCheck: 'no',
