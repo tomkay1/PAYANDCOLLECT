@@ -40,22 +40,22 @@
             </p>
             <Form ref="formValidate" :label-width="150" :model="merCust" :rules="ruleValidate">
 
-                <FormItem label="商户名称" prop="merID">
-                    <Select v-model="merCust.merID" style="width:300px" :disabled="isEditMerType">
+                <FormItem label="商户名称" prop="merID" v-if="isOper">
+                    <Select v-model="merCust.merID" style="width:300px" :disabled="!isAdd" filterable placeholder="请输入 商户名称/编号 可模糊查找">
                         <Option v-for="item in merInfoList" :value="item.id" :key="item.id">{{item.merchantNo}} {{item.merchantName}}</Option>
                     </Select>
                 </FormItem>
                 <FormItem label="客户姓名" prop="custName">
-                    <Input v-model="merCust.custName" placeholder="请输入..." style="width: 300px"/>
+                    <Input v-model="merCust.custName"  placeholder="请输入..." :disabled="!isAdd" style="width: 300px"/>
                 </FormItem>
                 <FormItem label="身份证号码" prop="cardID">
-                    <Input v-model="merCust.cardID" placeholder="请输入..." style="width: 300px"/>
+                    <Input v-model="merCust.cardID" placeholder="请输入..." :disabled="!isAdd" style="width: 300px"/>
                 </FormItem>
                 <FormItem label="银行预留手机号" prop="mobileBank">
-                    <Input v-model="merCust.mobileBank" placeholder="请输入..." style="width: 300px"/>
+                    <Input v-model="merCust.mobileBank" placeholder="请输入..." :disabled="!isAdd" style="width: 300px"/>
                 </FormItem>
                 <FormItem label="银行卡号" prop="bankcardNo">
-                    <Input v-model="merCust.bankcardNo" placeholder="请输入..." style="width: 300px"/>
+                    <Input v-model="merCust.bankcardNo" placeholder="请输入..." :disabled="!isAdd" style="width: 300px"/>
                 </FormItem>
 
                 <FormItem label="本人现场照片" prop="selfImg">
@@ -115,6 +115,9 @@
                         <img :src="urlAuthImg" v-show="showImgAuth" width="300">
                     </Upload>
                 </FormItem>
+
+                <Alert type="error" show-icon style="margin: 0px 38px" v-show="isResMsg" >失败原因：{{resMsg}}</Alert>
+
             </Form>
             <div slot="footer">
                 <Button type="success" :loading="modalLoading" @click="save">保存</Button>
@@ -318,20 +321,21 @@
                 //点击添加按钮是将对象设置成空
                 this.$store.commit('merCust_reset', {})
             },
-            edit(merInfo) {
+            edit(merCust) {
+
                 this.modalTitle = "修改客户"
                 this.isAdd = false
-                this.isEditMerType = true
+
                 let vm = this
 
-                vm.$store.commit('merInfo_reset', merInfo)
-                this.urlCard = consts.devLocation + "/cmn/act04?picid=" + merInfo.cardImg;
-                this.urlCardF = consts.devLocation + "/cmn/act04?picid=" + merInfo.cardF;
-                this.urlCardZ = consts.devLocation + "/cmn/act04?picid=" + merInfo.cardZ;
-                this.showImgCard = true;
-                this.showImgCardF = true;
+                vm.$store.commit('merCust_reset', merCust)
+                this.urlSelfImg = consts.devLocation + "/cmn/act04?picid=" + merCust.selfImg;
+                this.urlCardImgZ = consts.devLocation + "/cmn/act04?picid=" + merCust.cardImgZ;
+                this.urlAuthImg = consts.devLocation + "/cmn/act04?picid=" + merCust.authImg;
+                this.showImgSelf = true;
                 this.showImgCardZ = true;
-                vm.merInfoModal = true
+                this.showImgAuth = true;
+                vm.merCustModal = true
 
             },
             save() {
@@ -343,10 +347,12 @@
                         if (!vm.isAdd)
                             action = 'update';
                         this.$store.dispatch('merCust_save', action).then((res) => {
-                            if (res && res == 'success') {
-                                vm.merInfoModal = false;
+                            if (res.resCode && res.resCode == 'success') {
+                                vm.merCustModal = false;
                                 this.$store.dispatch('merCust_list')
-                            } else {
+                            }else{
+                                vm.resMsg=res.resMsg;
+                                vm.isResMsg=true;
                                 this.modalLoading = false;
                             }
                         })
@@ -365,6 +371,8 @@
                     this.urlSelfImg = '';
                     this.urlCardImgZ = '';
                     this.urlAuthImg = '';
+                    this.resMsg='';
+                    this.isResMsg=false;
                 }
             },
             handleBeforeUpload(res, file) {
@@ -418,7 +426,6 @@
                 modalTitle: '客户详细信息',
                 merCustInfoModal: false,
                 isAdd: true,
-                isEditMerType: false,
                 uploadAction: consts.env + '/cmn/act03',
                 imgUrl:consts.devLocation+"/cmn/act04?picid=",
                 showImgSelf: false,
@@ -430,6 +437,8 @@
                 merCustModal:false,
                 merCustModalTitle:'新增客户',
                 modalLoading: false,
+                resMsg:'',
+                isResMsg:false,
                 ruleValidate: {
                     merID:[
                         {type: 'number', required: true, message: '必须选择商户', trigger: 'blur'},

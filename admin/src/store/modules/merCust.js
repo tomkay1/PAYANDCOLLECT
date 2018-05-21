@@ -47,10 +47,10 @@ const merCust = {
             let p=kit.clone(state.merCust)
             return new Promise(function (resolve, reject) {
                 vm.$axios.post('/mer01/'+action, p).then((res) => {
-                    // if(res.resCode&&res.resCode=='success'){
-                    //     commit('user_reset');
-                    // }
-                    resolve(res.resCode);
+                    if(res.resCode&&res.resCode=='success'){
+                        commit('merCust_reset');
+                    }
+                    resolve(res);
                 });
             });
         },

@@ -93,8 +93,38 @@ public class MerchantCustCtr extends CoreController {
         merCust.setCat(new Date());
         merCust.setMat(new Date());
         merCust.setOperID(String.valueOf(currUser().getId()));
-//        merCust.save();
 
+
+
+        Kv kv = Kv.create();
+        kv.set("customerNm", merCust.getCustName());
+        kv.set("certifTp", "01");
+        kv.set("certifId", merCust.getCardID());
+        kv.set("phoneNo", merCust.getMobileBank());
+        kv.set("accNo", merCust.getBankcardNo());
+        kv.set("merchantID", merCust.getMerID());
+        kv.set("cvn2", "");
+        kv.set("expired", "");
+        Kv[] resKv = cEntrustSrv.establishAll(kv);
+
+        for (int i = 0; i < resKv.length; i++) {
+            if (!resKv[i].getBoolean("isSuccess")) {
+                String errMsg;
+                if (ObjectUtil.isNotNull(resKv[i].get("unionpayEntrust"))) {
+                    errMsg = ((UnionpayEntrust) resKv[i].get("unionpayEntrust")).getRespMsg();
+                    if (ObjectUtil.isNull(errMsg)) {
+                        errMsg = "远程调用失败（系统内部异常）！";
+                    }
+                } else {
+                    errMsg = "远程调用异常！";
+                }
+
+                renderFailJSON(errMsg);
+                return;
+            }
+        }
+
+        merCust.save();
         renderSuccessJSON("新增客户信息成功。", "");
     }
 
