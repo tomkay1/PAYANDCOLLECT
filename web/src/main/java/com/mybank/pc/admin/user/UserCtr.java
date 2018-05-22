@@ -208,7 +208,7 @@ public class UserCtr extends CoreController {
         if(old_pwd.equals(new_pwd)){
             renderFailJSON("新密码不能同旧密码一致。","");
         }else{
-            User user=User.dao.findFirst("select * from s_user where loginname=? ",loginname);
+            User user=User.dao.findFirst("select * from s_user where loginname=? and d_at is null",loginname);
             Boolean bl=BCrypt.checkpw(old_pwd,user.getPassword());
             if(bl){
                 user.setSalt(BCrypt.gensalt());

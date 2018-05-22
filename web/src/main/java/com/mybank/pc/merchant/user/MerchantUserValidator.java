@@ -7,7 +7,6 @@ import com.mybank.pc.admin.model.User;
 import com.mybank.pc.core.CoreValidator;
 import com.mybank.pc.merchant.model.MerchantInfo;
 
-import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -35,7 +34,8 @@ public class MerchantUserValidator extends CoreValidator {
 			}
 
 
-		} else if (ak.equals("/mer02/update")) {
+		}
+		/*else if (ak.equals("/mer02/update")) {
 			BigInteger id = user.getId();
 			User _user = User.dao.findFirst("select id from s_user where loginname=? and id<>?", user.getLoginname(),
 					user.getId());
@@ -44,7 +44,7 @@ public class MerchantUserValidator extends CoreValidator {
 				return;
 			}
 
-		}
+		}*/
 	}
 
 	@Override

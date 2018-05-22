@@ -10,7 +10,7 @@
                 <Row>
                     <Col span="8">
                     <Button type="primary" icon="person-add" @click="add">新增用户</Button>
-                    <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
+
                     </Col>
                     <Col span="8" offset="8" align="right">
                     <Input v-model="searchKey" placeholder="请输入..." style="width: 200px"/>
@@ -43,7 +43,7 @@
                 <FormItem label="用户名" prop="loginname">
                     <Input v-model="user.loginname" :disabled="!isAdd" placeholder="请输入..." style="width: 370px">
                     <span slot="append" style="margin-right: 100px">@{{merInfo.merchantNo}}</span>
-                    </Input >
+                    </Input>
                 </FormItem>
                 <FormItem label="姓名" prop="nickname">
                     <Input v-model="user.nickname" placeholder="请输入..." style="width: 370px"></Input>
@@ -341,14 +341,17 @@
                     {
                         title: '登录名',
                         key: 'loginname',
+                        align:'center',
                     },
                     {
                         title: '姓名',
                         key: 'nickname',
+                        align:'center',
                     },
                     {
                         title: '手机号',
                         key: 'phone',
+                        align:'center',
                     },
 
                     {
@@ -370,15 +373,18 @@
                     {
                         title: '最后登录时间',
                         key: 'logged',
+                        align:'center',
                     },
                     {
                         title: '创建时间',
                         key: 'catTxt',
+                        align:'center',
                     },
 
                     {
                         title: '状态',
                         key: 'statusTxt',
+                        align:'center',
                         width:120,
                         render:(h, param)=>{
                             if (param.row.status == '0') {
@@ -405,35 +411,35 @@
                         align: 'center',
                         render: (h, param) =>{
                             if (!param.row.dAt) {
-                                if (param.row.status == '0') {
+                               /* return h('Dropdown',[
+                                h('a',['下拉菜单',
+                                    h('Icon',{
+                                    props: {
+                                        type:'arrow-down-b',
+                                    }})
+                                    ],{
+                                    props: {
+                                    href:'javascript:void(0)',
+                                }
+                                    })
+                                ]);*/
 
-                                    if(param.row.isAdmin=='0'){
-                                        return h('div', [
-                                            editBtn(this,h,param),
-                                            resetPwdBtn(this,h,param),
-                                        ]);
-                                    }else{
+                                if (param.row.status == '0') {
                                         return h('div', [
                                             editBtn(this,h,param),
                                             delBtn(this,h,param),
                                             stopBtn(this,h,param),
                                             resetPwdBtn(this,h,param),
                                         ]);
-                                    }
+
                                 } else {
-                                    if(param.row.isAdmin=='0'){
-                                        return h('div', [
-                                            editBtn(this,h,param),
-                                            resetPwdBtn(this,h,param),
-                                        ]);
-                                    }else{
                                         return h('div', [
                                             editBtn(this,h,param),
                                             delBtn(this,h,param),
                                             actBtn(this,h,param),
                                             resetPwdBtn(this,h,param),
                                         ]);
-                                    }
+
 
                                 }
 

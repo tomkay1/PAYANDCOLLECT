@@ -1,11 +1,8 @@
 package com.mybank.pc.merchant.user;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.jfinal.aop.Before;
-import com.jfinal.aop.Clear;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.plugin.ehcache.CacheKit;
@@ -14,7 +11,6 @@ import com.mybank.pc.admin.model.Role;
 import com.mybank.pc.admin.model.User;
 import com.mybank.pc.admin.model.UserRole;
 import com.mybank.pc.core.CoreController;
-import com.mybank.pc.interceptors.AdminAAuthInterceptor;
 import com.mybank.pc.kits.ext.BCrypt;
 import com.mybank.pc.merchant.model.MerchantInfo;
 import com.mybank.pc.merchant.model.MerchantUser;
@@ -145,27 +141,6 @@ public class MerchantUserCtr extends CoreController {
         CacheKit.remove(Consts.CACHE_NAMES.userReses.name(),"findResesByUserId_"+user.getId());
         renderSuccessJSON("删除用户信息成功。");
     }
-    /**
-     * @param
-     * @return void
-     * @throws
-     * @author: 于海慧  2016/12/10
-     * @Description: 查询用户持有的角色和全部角色
-     **/
-    @Clear(AdminAAuthInterceptor.class)
-    public void loadRoles() {
-        int userId = getParaToInt("userId", -1);
-        List<Role> ownRoles = CollUtil.newArrayList();
-        List<Role> allRoles = CollUtil.newArrayList();
-        if (userId != -1) {
-            ownRoles = Role.dao.find(Consts.CACHE_NAMES.userRoles.name(),"ownRoles"+userId,"select sr.* from s_role sr,s_user_role sur where sr.id=sur.rId and sur.uId=?", userId);
-        }
-        allRoles = Role.dao.findByCache(Consts.CACHE_NAMES.userRoles.name(),"allRoles","select * from s_role ");
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("ownRoles", ownRoles);
-        jsonObject.put("allRoles", allRoles);
-        renderJson(jsonObject.toJSONString());
-    }
 
     /**
      * @param
@@ -218,40 +193,20 @@ public class MerchantUserCtr extends CoreController {
 
         renderSuccessJSON("恢复操作执行成功。", "");
     }
-    @Before(Tx.class)
-    @Clear(AdminAAuthInterceptor.class)
-    public void modifyPassword(){
-        String loginname=getPara("loginname");
-        String old_pwd=getPara("oldPwd");
-        String new_pwd=getPara("newPwd");
-        if(old_pwd.equals(new_pwd)){
-            renderFailJSON("新密码不能同旧密码一致。","");
-        }else{
-            User user=User.dao.findFirst("select * from s_user where loginname=? ",loginname);
-            Boolean bl=BCrypt.checkpw(old_pwd,user.getPassword());
-            if(bl){
-                user.setSalt(BCrypt.gensalt());
-                user.setPassword(BCrypt.hashpw(new_pwd,user.getSalt()));
-                user.update();
-                renderSuccessJSON("密码修改成功。","");
-            }else{
-                renderFailJSON("您输入的旧密码不正确！","");
-            }
-        }
-    }
+
 
     public void resetPwd(){
-        if(currUser()!=null&&!currUser().getIsAdmin().equals(Consts.YORN_STR.yes.getVal())){
+        /*if(currUser()!=null&&!currUser().getIsAdmin().equals(Consts.YORN_STR.yes.getVal())){
             renderFailJSON("重置密码需要超级管理员权限");
             return;
-        }
+        }*/
         Integer id=getParaToInt("id");
         User user=User.dao.findById(id);
         String newPwd= RandomUtil.randomString(6);
         user.setSalt(BCrypt.gensalt());
         user.setPassword(BCrypt.hashpw(newPwd,user.getSalt()));
         user.update();
-        renderSuccessJSON("新密码为:"+newPwd+",请尽快登录进行密码修改!");
+        renderSuccessJSON("新密码为 "+newPwd+" 请尽快登录进行密码修改!");
     }
     public void rolelist() {
         List<Role> roleList =Role.dao.find("select * from s_role r where r.name like 'mer-%'");
