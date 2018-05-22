@@ -16,7 +16,7 @@ const merCust = {
         set_merCust_list(state,map){
             state.merCustList=map.page.list
             state.totalPage=map.page.totalPage
-            state.pageSize=map.pageSize
+            state.pageSize=map.page.pageSize
             state.pageNumber=map.page.pageNumber
             state.totalRow=map.page.totalRow
             state.isOper = map.isOper

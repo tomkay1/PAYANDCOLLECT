@@ -74,6 +74,7 @@ public class MerchantInfoCtr extends CoreController {
         user.setLoginname("oper@"+merInfo.getMerchantNo());
         user.setIdcard(merInfo.getCardID());
         user.setNickname("商户"+merInfo.getMerchantNo());
+        user.setPhone(merInfo.getMobile());
         user.setCAt(new Date());
         user.setEmailStatus(Consts.YORN.no.isVal());
         user.setPhoneStatus(Consts.YORN.no.isVal());

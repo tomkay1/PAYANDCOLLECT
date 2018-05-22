@@ -3,6 +3,7 @@ package com.mybank.pc.core;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.mybank.pc.merchant.user.MerchantUserCtr;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.druid.filter.stat.StatFilter;
@@ -132,6 +133,12 @@ public class CoreConfig extends JFinalConfig {
 			@Override
 			public void config() {
 				add("/mer01", MerchantCustCtr.class);
+			}
+		});
+		routes.add(new Routes() {
+			@Override
+			public void config() {
+				add("/mer02", MerchantUserCtr.class);
 			}
 		});
 
