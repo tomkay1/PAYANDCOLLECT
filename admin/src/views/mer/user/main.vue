@@ -13,7 +13,7 @@
 
                     </Col>
                     <Col span="8" offset="8" align="right">
-                    <Input v-model="searchKey" placeholder="请输入..." style="width: 200px"/>
+                    <Input v-model="searchKey" placeholder="请输入用户名/姓名/手机号." style="width: 200px"/>
                     <span @click="search" style="margin: 0 10px;"><Button type="primary"
                                                                           icon="search">搜索</Button></span>
 
