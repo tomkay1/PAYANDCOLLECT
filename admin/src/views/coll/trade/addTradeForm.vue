@@ -23,7 +23,7 @@
                                 </div>
                                 <div>
                                     <span style="margin-right: 10px;">{{option.bankcardNo}}</span>
-                                    <span v-if="option.cardBin.cardName" style="color:#ccc">{{option.cardBin.cardName}}</span>
+                                    <span v-if="option.cardBin && option.cardBin.cardName" style="color:#ccc">{{option.cardBin.cardName}}</span>
                                 </div>
                             </div>
                         </Option>

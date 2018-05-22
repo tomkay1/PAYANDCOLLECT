@@ -180,7 +180,14 @@ public class CTradeCtr extends CoreController {
 		boolean isSuccess = false;
 		String errorMsg = null;
 		try {
-			isSuccess = cCTradeSrv.initiate(kv);
+			Kv result = cCTradeSrv.initiate(kv);
+			isSuccess = result.getBoolean("isSuccess");
+			if (!isSuccess) {
+				UnionpayCollection unionpayCollection = (UnionpayCollection) result.get("unionpayCollection");
+				if (unionpayCollection != null && "2".equals(unionpayCollection.getFinalCode())) {
+					errorMsg = unionpayCollection.getRespMsg();
+				}
+			}
 		} catch (ValidateCTRException ve) {
 			ve.printStackTrace();
 			isSuccess = false;

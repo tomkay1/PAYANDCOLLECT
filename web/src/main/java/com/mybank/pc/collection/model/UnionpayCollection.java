@@ -28,9 +28,9 @@ import com.mybank.pc.kits.unionpay.acp.SDKConstants;
 public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollection>
 		implements BaseUnionpayCollectionTrade {
 	private static final long serialVersionUID = 1L;
-	
-	public static final int TIMEOUT_MINUTE = 10;
-	
+
+	public static final int TIMEOUT_MINUTE = 15;
+
 	public static final UnionpayCollection dao = new UnionpayCollection().dao();
 
 	private SendProxy sendProxy;
@@ -144,8 +144,6 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 	public boolean isBatchTradeOrder() {
 		return "21".equals(getTxnType());
 	}
-	
-	//public boolean isFailInRespCode34()
 
 	public static boolean isFailCode(String resultCode) {
 		return StringUtils.isNotBlank(resultCode) && !("00".equals(resultCode) || "A6".equals(resultCode)
