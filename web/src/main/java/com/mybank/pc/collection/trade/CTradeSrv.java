@@ -546,7 +546,7 @@ public class CTradeSrv {
 
 	private static String buildSyncLock(UnionpayCollection unionpayCollection) {
 		String orderId = unionpayCollection.getOrderId();
-		return "syncOrderStatus-" + (StringUtils.isNotBlank(orderId) ? orderId.intern() : "");
+		return ("syncOrderStatus-" + (StringUtils.isNotBlank(orderId) ? orderId : "")).intern();
 	}
 
 	public UnionpayCollection syncBatchOrderStatus(UnionpayCollection unionpayCollection) {
