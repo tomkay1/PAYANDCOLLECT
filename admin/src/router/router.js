@@ -75,6 +75,7 @@ export const appRouter = [
             { path: 'role', title: '角色管理', isCheck: 'yes', name: 'admin_role', component: resolve => { require(['@/views/admin/role/main.vue'], resolve); } },
             { path: 'tax', title: '分类管理', isCheck: 'yes', name: 'admin_tax', component: resolve => { require(['@/views/admin/taxonomy/main.vue'], resolve); } },
             { path: 'art', title: '文章管理', isCheck: 'yes', name: 'admin_art', component: resolve => { require(['@/views/admin/art/main.vue'], resolve); } },
+            { path: 'res', title: '功能管理', isCheck: 'yes', name: 'admin_res', component: resolve => { require(['@/views/admin/res/main.vue'], resolve); } },
             // { path: 'artList', title: '文章列表', name: 'admin_artList', component: resolve => { require(['@/views/admin/art/list.vue'], resolve); } },
         ]
     },
