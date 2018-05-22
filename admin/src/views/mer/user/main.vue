@@ -41,32 +41,25 @@
             </p>
             <Form ref="formValidate" :label-width="80" :model="user" :rules="ruleValidate">
                 <FormItem label="用户名" prop="loginname">
-                    <Input v-model="user.loginname" :disabled="!isAdd" placeholder="请输入..." style="width: 300px"></Input>
+                    <Input v-model="user.loginname" :disabled="!isAdd" placeholder="请输入..." style="width: 370px">
+                    <span slot="append" style="margin-right: 100px">@{{merInfo.merchantNo}}</span>
+                    </Input >
                 </FormItem>
                 <FormItem label="姓名" prop="nickname">
-                    <Input v-model="user.nickname" placeholder="请输入..." style="width: 300px"></Input>
+                    <Input v-model="user.nickname" placeholder="请输入..." style="width: 370px"></Input>
                 </FormItem>
                 <FormItem label="手机号" prop="phone">
-                    <Input v-model="user.phone" placeholder="请输入..." style="width: 300px"></Input>
+                    <Input v-model="user.phone" placeholder="请输入..." style="width: 370px"></Input>
                 </FormItem>
-                <FormItem label="EMAIL" prop="email">
+                <!--<FormItem label="EMAIL" prop="email">
                     <Input v-model="user.email" placeholder="请输入..." style="width: 300px"></Input>
                 </FormItem>
                 <FormItem label="身份证号" prop="idcard">
                     <Input v-model="user.idcard" placeholder="请输入..." style="width: 300px"></Input>
-                </FormItem>
-                <FormItem label="管理员身份" prop="isAdmin">
-                    <!--<i-switch v-model="user.isAdmin" true-value="0" false-value="1">-->
-                        <!--<span slot="open">是</span>-->
-                        <!--<span slot="close">否</span>-->
-                    <!--</i-switch>-->
-                    <RadioGroup v-model="user.isAdmin">
-                        <Radio label="0" >是</Radio>
-                        <Radio label="1" >否</Radio>
-                    </RadioGroup>
-                </FormItem>
+                </FormItem>-->
+
                 <FormItem label="角色" prop="roleIds">
-                    <CheckboxGroup v-model="user.roleIds" @on-change="">
+                    <CheckboxGroup v-model="user.roleIds" @on-change="" size="large">
                         <Checkbox v-for="role in roleList" :key="role.id" :label="role.id+''">
                             <span>{{role.description}}</span>
                         </Checkbox>
@@ -193,13 +186,15 @@
     export default {
         computed: {
             ...mapState({
-                'userList': state => state.user.userList,
-                'totalPage': state => state.user.totalPage,
-                'pageNumber': state => state.user.pageNumber,
-                'pageSize': state => state.user.pageSize,
-                'total': state => state.user.totalRow,
-                'roleList': state => state.role.roleList,
-                'user': state => state.user.user,
+                'userList': state => state.merUser.userList,
+                'totalPage': state => state.merUser.totalPage,
+                'pageNumber': state => state.merUser.pageNumber,
+                'pageSize': state => state.merUser.pageSize,
+                'total': state => state.merUser.totalRow,
+                 'roleList': state => state.merUser.roleList,
+                 'user': state => state.merUser.user,
+                 'merInfo': state => state.merUser.merInfo,
+
             })
         },
         methods: {
@@ -213,7 +208,7 @@
                 this.modalTitle="修改用户"
                 this.isAdd=false;
                 let vm=this
-                this.$store.dispatch('role_list').then((res) => {
+                this.$store.dispatch('merRole_list').then((res) => {
                     vm.$store.commit('merUser_reset',user);
                     vm.userModal = true;
                 });
@@ -234,7 +229,7 @@
                 this.isAdd=true
                 this.modalTitle="新增用户"
                 let vm = this;
-                this.$store.dispatch('role_list').then((res) => {
+                this.$store.dispatch('merRole_list').then((res) => {
                     vm.userModal = true;
                     vm.$store.commit('merUser_reset');
                 });
@@ -355,14 +350,7 @@
                         title: '手机号',
                         key: 'phone',
                     },
-                    {
-                        title: 'EMAIL',
-                        key: 'email',
-                    },
-                    {
-                        title: '证件号',
-                        key: 'idcard',
-                    },
+
                     {
                         title: '角色信息',
                         key: 'rolesDescStr',
@@ -387,28 +375,7 @@
                         title: '创建时间',
                         key: 'catTxt',
                     },
-                    {
-                        title: '超级权限',
-                        key: 'isAdmin',
-                        width:100,
-                        render:(h,param)=>{
-                            if(param.row.isAdmin=='0'){
-                                return h('Tag',{
-                                    props: {
-                                        type: 'dot',
-                                        color: 'green'
-                                    }
-                                },'是')
-                            }else{
-                                return h('Tag',{
-                                    props: {
-                                        type: 'dot',
-                                        color: 'red'
-                                    }
-                                },'否')
-                            }
-                        }
-                    },
+
                     {
                         title: '状态',
                         key: 'statusTxt',

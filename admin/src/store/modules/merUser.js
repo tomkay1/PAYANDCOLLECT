@@ -4,19 +4,27 @@ import kit from '../../libs/kit';
 const merUser = {
     state: {
         userList:[],
+        roleList:[],
         totalPage:0,
         pageNumber:1,
         totalRow:0,
         pageSize:15,
-        user:{}
+        user:{},
+        merInfo:{},
     },
     mutations: {
         set_merUser_list(state,page){
-            state.userList=page.list
-            state.totalPage=page.totalPage
-            state.pageNumber=page.pageNumber
-            state.pageSize=page.pageSize;
-            state.totalRow=page.totalRow
+            state.userList=page.page.list
+            state.totalPage=page.page.totalPage
+            state.pageNumber=page.page.pageNumber
+            state.pageSize=page.page.pageSize
+            state.totalRow=page.page.totalRow
+            state.merInfo=page.merInfo
+
+        },
+        set_merRole_list(state,roleList){
+            state.roleList=roleList
+
         },
         merUser_reset(state,param){
 
@@ -33,7 +41,7 @@ const merUser = {
             if(param&&!param.pn){
                 param.pn=state.pageNumber;
             }
-            this._vm.$axios.post('/mer2/list',param).then((res)=>{
+            this._vm.$axios.post('/mer02/list',param).then((res)=>{
                 commit('set_merUser_list',res)
             });
         },
@@ -45,7 +53,7 @@ const merUser = {
             let rIds_str=rIds.join(",");
             p.roleIds=rIds_str;
             return new Promise(function (resolve, reject) {
-                vm.$axios.post('/mer2/'+action, p).then((res) => {
+                vm.$axios.post('/mer02/'+action, p).then((res) => {
                     if(res.resCode&&res.resCode=='success'){
                         commit('merUser_reset');
                     }
@@ -56,7 +64,7 @@ const merUser = {
         merUser_del:function({commit,state},param){
             let vm=this._vm;
             return new Promise(function (resolve, reject) {
-                vm.$axios.post('/mer2/del', param).then((res) => {
+                vm.$axios.post('/mer02/del', param).then((res) => {
                     resolve(res.resCode)
                 })
             });
@@ -64,7 +72,7 @@ const merUser = {
         merUser_stop:function({commit,state},param){
             let vm=this._vm;
             return new Promise(function (resolve, reject) {
-                vm.$axios.post('/mer2/forbidden', param).then((res) => {
+                vm.$axios.post('/mer02/forbidden', param).then((res) => {
                     resolve(res.resCode)
                 })
             });
@@ -72,7 +80,7 @@ const merUser = {
         merUser_active:function({commit,state},param){
             let vm=this._vm;
             return new Promise(function (resolve, reject) {
-                vm.$axios.post('/mer2/resumed', param).then((res) => {
+                vm.$axios.post('/mer02/resumed', param).then((res) => {
                     resolve(res.resCode)
                 })
             });
@@ -80,13 +88,20 @@ const merUser = {
         merUser_reset_pwd:function ({ commit,state },param) {
             let vm=this._vm;
             return new Promise(function (resolve, reject) {
-                vm.$axios.post('/mer2/resetPwd', param).then((res) => {
+                vm.$axios.post('/mer02/resetPwd', param).then((res) => {
                     resolve(res);
                 });
             });
         },
 
-
+        merRole_list:function ({ commit,state },param) {
+            if(param&&!param.pn){
+                param.pn=state.pageNumber;
+            }
+            this._vm.$axios.post('/mer02/rolelist',param).then((res)=>{
+                commit('set_merRole_list',res)
+            });
+        },
     }
 };
 

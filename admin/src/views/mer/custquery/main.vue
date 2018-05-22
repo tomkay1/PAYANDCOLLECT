@@ -441,7 +441,7 @@
                 isResMsg:false,
                 ruleValidate: {
                     merID:[
-                        {type: 'number', required: true, message: '必须选择商户', trigger: 'blur'},
+                        {type: 'number', required: true, message: '必须选择商户', trigger: 'change'},
                     ],
                     custName: [
                         {type: 'string', required: true, message: '客户姓名不能为空', trigger: 'blur'},
