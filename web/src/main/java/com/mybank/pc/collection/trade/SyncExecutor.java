@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import com.jfinal.aop.Duang;
 import com.mybank.pc.collection.model.UnionpayCollection;
 
-public class RealtimeQueryExecutor {
+public class SyncExecutor {
 
 	private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4);
 
@@ -66,7 +66,7 @@ public class RealtimeQueryExecutor {
 					}
 					long currentDelay = delay * 2;
 					InProcessQuery nextTask = new InProcessQuery(orderId, currentQueryCount, currentDelay);
-					RealtimeQueryExecutor.schedule(nextTask, currentDelay, TimeUnit.SECONDS);
+					SyncExecutor.schedule(nextTask, currentDelay, TimeUnit.SECONDS);
 				}
 			}
 			return unionpayCollection;

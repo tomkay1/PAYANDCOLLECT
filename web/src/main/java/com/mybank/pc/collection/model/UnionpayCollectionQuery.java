@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.jfinal.kit.JsonKit;
+import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseUnionpayCollectionQuery;
@@ -104,19 +105,19 @@ public class UnionpayCollectionQuery extends BaseUnionpayCollectionQuery<Unionpa
 		return sendProxy.validateResp();
 	}
 
-	public boolean isTimeout() {
-		return isTimeout(getTxnTime(), getMat(), getRespCode());
+	public boolean isTimeout(int timeoutMinute) {
+		return isTimeout(getTxnTime(), getMat(), getRespCode(),timeoutMinute);
 	}
 
-	public boolean isTimeout(Date queryDate) {
-		return isTimeout(getTxnTime(), queryDate, getRespCode());
+	public boolean isTimeout(Date queryDate,int timeoutMinute) {
+		return isTimeout(getTxnTime(), queryDate, getRespCode(),timeoutMinute);
 	}
 
-	public static boolean isTimeout(String time, Date queryTime, String respCode) {
+	public static boolean isTimeout(String time, Date queryTime, String respCode,int timeoutMinute) {
 		try {
 			Date timeDate = new SimpleDateFormat("yyyyMMddHHmmss").parse(time);
 			return "34".equals(respCode) && DateUtil.between(timeDate, queryTime, DateUnit.MINUTE,
-					false) > UnionpayCollection.TIMEOUT_MINUTE;
+					false) > timeoutMinute;
 		} catch (ParseException e) {
 			e.printStackTrace();
 			return false;
@@ -125,6 +126,11 @@ public class UnionpayCollectionQuery extends BaseUnionpayCollectionQuery<Unionpa
 
 	public List<UnionpayCollectionQuery> findUnionpayCollectionQuery() {
 		return findUnionpayCollectionQuery(this);
+	}
+
+	public static List<UnionpayCollectionQuery> findByOrderId(String orderId) {
+		SqlPara sqlPara = Db.getSqlPara("collection_trade.findUnionpayCollectionQuery", Kv.by("orderId", orderId));
+		return UnionpayCollectionQuery.dao.find(sqlPara);
 	}
 
 	public static List<UnionpayCollectionQuery> findUnionpayCollectionQuery(UnionpayCollectionQuery param) {

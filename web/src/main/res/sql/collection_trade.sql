@@ -77,6 +77,35 @@
 	    ORDER BY
 			cat DESC
 #end
+#sql("findCallback")
+	SELECT * FROM unionpay_callback_log WHERE 1=1
+	    #if(respCode)
+	        AND respCode = #para(respCode)
+	    #end
+	    #if(batchNo)
+	        AND batchNo = #para(batchNo)
+	    #end
+	    #if(merId)
+	        AND merId = #para(merId)
+	    #end
+	    #if(txnTime)
+	        AND txnTime = #para(txnTime)
+	    #end
+	    #if(txnType)
+	        AND txnType = #para(txnType)
+	    #end
+	    #if(txnSubType)
+	        AND txnSubType = #para(txnSubType)
+	    #end
+	     #if(orderId)
+	        AND orderId = #para(orderId)
+	    #end
+	     #if(queryId)
+	        AND queryId = #para(queryId)
+	    #end
+	    ORDER BY
+			cat DESC
+#end
 #sql("findUnionpayCollection")
 	SELECT * FROM unionpay_collection  WHERE 1=1
 	    #if(customerNm)

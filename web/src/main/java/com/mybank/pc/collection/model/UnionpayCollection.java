@@ -145,6 +145,24 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 		return "21".equals(getTxnType());
 	}
 
+	public UnionpayBatchCollection findUnionpayBatchCollection() {
+		if (isBatchTradeOrder()) {
+			String batchId = getBatchId();
+			String merId = getMerId();
+			String batchNo = getBatchNo();
+			String txnTime = getTxnTime();
+			UnionpayBatchCollection result = UnionpayBatchCollection.findByIdOrBizColumn(batchId, merId, batchNo,
+					txnTime);
+			if (result == null) {
+				throw new RuntimeException("批量交易信息不存在["
+						+ Kv.by("batchId", batchId).set("merId", merId).set("batchNo", batchNo).set("txnTime", txnTime)
+						+ "]");
+			}
+			return result;
+		}
+		return null;
+	}
+
 	public static boolean isFailCode(String resultCode) {
 		return StringUtils.isNotBlank(resultCode) && !("00".equals(resultCode) || "A6".equals(resultCode)
 				|| "03".equals(resultCode) || "04".equals(resultCode) || "05".equals(resultCode));

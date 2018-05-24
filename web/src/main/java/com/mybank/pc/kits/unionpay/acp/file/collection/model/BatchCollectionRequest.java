@@ -8,7 +8,9 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -33,10 +35,13 @@ public class BatchCollectionRequest implements BatchTxtFile {
 
 	private List<RequestContent> contents;
 
+	private Map<String, RequestContent> orderIdReqContentPair;
+
 	public BatchCollectionRequest() {
 		this.titles = new ArrayList<String>(Arrays.asList(DEFAULT_TITLES));
 		this.titlesLine = DEFAULT_TITLES_LINE;
 		this.contents = new ArrayList<RequestContent>();
+		this.orderIdReqContentPair = new HashMap<String, RequestContent>();
 	}
 
 	public BatchCollectionRequest(List<String> titles) {
@@ -65,7 +70,9 @@ public class BatchCollectionRequest implements BatchTxtFile {
 				this.titles = new ArrayList<String>(Arrays.asList(line.split("\\|")));
 				this.titlesLine = UnionPayFileUtils.parseTxtTitlesLine(this.titles);
 			} else {
-				contents.add(UnionPayFileUtils.parseTxtLine(line, this.titles, RequestContent.class));
+				RequestContent requestContent = UnionPayFileUtils.parseTxtLine(line, this.titles, RequestContent.class);
+				contents.add(requestContent);
+				orderIdReqContentPair.put(requestContent.getOrderId(), requestContent);
 			}
 			++count;
 		}
@@ -124,6 +131,11 @@ public class BatchCollectionRequest implements BatchTxtFile {
 
 	public void addContent(RequestContent content) {
 		this.contents.add(content);
+		this.orderIdReqContentPair.put(content.getOrderId(), content);
+	}
+	
+	public RequestContent getContentByOrderId(String orderId) {
+		return this.orderIdReqContentPair == null ? null : orderIdReqContentPair.get(orderId);
 	}
 
 	public static void main(String[] args) throws IOException {

@@ -8,7 +8,9 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -28,8 +30,11 @@ public class BatchCollectionResponse implements BatchTxtFile {
 
 	private List<ResponseContent> contents;
 
+	private Map<String, ResponseContent> orderIdRspContentPair;
+
 	public BatchCollectionResponse() {
 		this.contents = new ArrayList<ResponseContent>();
+		this.orderIdRspContentPair = new HashMap<String, ResponseContent>();
 	}
 
 	public BatchCollectionResponse(List<String> titles) {
@@ -63,6 +68,7 @@ public class BatchCollectionResponse implements BatchTxtFile {
 						ResponseContent.class);
 				responseContent.setTitles(this.titles);
 				contents.add(responseContent);
+				orderIdRspContentPair.put(responseContent.getOrderId(), responseContent);
 			}
 			++count;
 		}
@@ -117,6 +123,10 @@ public class BatchCollectionResponse implements BatchTxtFile {
 
 	public void setContents(List<ResponseContent> contents) {
 		this.contents = contents;
+	}
+
+	public ResponseContent getContentByOrderId(String orderId) {
+		return this.orderIdRspContentPair == null ? null : orderIdRspContentPair.get(orderId);
 	}
 
 	public static void main(String[] args) throws IOException {

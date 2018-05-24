@@ -14,6 +14,11 @@ import com.mybank.pc.collection.model.base.BaseUnionpayCallbackLog;
 public class UnionpayCallbackLog extends BaseUnionpayCallbackLog<UnionpayCallbackLog> {
 	public static final UnionpayCallbackLog dao = new UnionpayCallbackLog().dao();
 
+	public static List<UnionpayCallbackLog> findCallback(Kv kv) {
+		SqlPara sqlPara = Db.getSqlPara("collection_trade.findCallback", kv);
+		return dao.find(sqlPara);
+	}
+
 	public static List<UnionpayCallbackLog> findCallbackByOrderId(String orderId) {
 		SqlPara sqlPara = Db.getSqlPara("collection_trade.findCallbackByOrderId", Kv.create().set("orderId", orderId));
 		return dao.find(sqlPara);
