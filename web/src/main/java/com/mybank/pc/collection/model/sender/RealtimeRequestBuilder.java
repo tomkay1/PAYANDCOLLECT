@@ -72,8 +72,9 @@ public class RealtimeRequestBuilder implements SenderBuilder {
 			customerInfoMap.put("certifId", unionpayCollection.getCertifId()); // 证件号码
 			customerInfoMap.put("customerNm", unionpayCollection.getCustomerNm()); // 姓名
 			customerInfoMap.put("phoneNo", unionpayCollection.getPhoneNo()); // 手机号
-			// customerInfoMap.put("cvn2", "123"); //卡背面的cvn2三位数字
-			// customerInfoMap.put("expired", "1711"); //有效期 年在前月在后
+			customerInfoMap.put("cvn2", unionpayCollection.getCvn2()); // 卡背面的cvn2三位数字
+			customerInfoMap.put("expired", unionpayCollection.getExpired()); // 有效期
+																				// 年在前月在后
 			String customerInfoStr = acpService.getCustomerInfoWithEncrypt(customerInfoMap,
 					unionpayCollection.getAccNo(), SDKConstants.UTF_8_ENCODING);
 			//////////
