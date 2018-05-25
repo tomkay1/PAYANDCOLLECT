@@ -36,10 +36,10 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 
 	/**
 	 * 一般批量请求交易发起10分钟后，批量交易查询还是返回34，则可以认为批量请求交易失败<br>
-	 * 保险起见设置为60分钟
+	 * 保险起见设置为15分钟
 	 * 
 	 */
-	public static final int TIMEOUT_MINUTE = 60;
+	public static final int TIMEOUT_MINUTE = 15;
 
 	public static final UnionpayBatchCollection dao = new UnionpayBatchCollection().dao();
 

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.helper.StringUtil;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Db;
@@ -29,7 +30,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 		implements BaseUnionpayCollectionTrade {
 	private static final long serialVersionUID = 1L;
 
-	public static final int TIMEOUT_MINUTE = 15;
+	public static final int TIMEOUT_MINUTE = 10;
 
 	public static final UnionpayCollection dao = new UnionpayCollection().dao();
 
@@ -79,6 +80,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 		return sendProxy;
 	}
 
+	@JSONField(serialize = false)
 	public Map<String, String> getRealtimeRspData() {
 		return sendProxy == null ? null : sendProxy.getRspData();
 	}
@@ -230,6 +232,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 		this.sendProxy = sendProxy;
 	}
 
+	@JSONField(serialize = false)
 	public SendProxy getSendProxy() {
 		return this.sendProxy;
 	}

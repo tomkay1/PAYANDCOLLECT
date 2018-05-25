@@ -24,7 +24,7 @@ import com.mybank.pc.kits.unionpay.acp.file.collection.model.ResponseContent;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 
-public class OrderSynchronizer {
+public class StatusSynchronizer {
 
 	private static CBatchQuerySrv cBatchQuerySrv = Duang.duang(CBatchQuerySrv.class);
 
@@ -32,7 +32,7 @@ public class OrderSynchronizer {
 
 	private UnionpayBatchCollection unionpayBatchCollection;
 
-	public OrderSynchronizer(UnionpayCollection unionpayCollection) {
+	public StatusSynchronizer(UnionpayCollection unionpayCollection) {
 		this.unionpayCollection = unionpayCollection;
 	}
 
@@ -44,12 +44,13 @@ public class OrderSynchronizer {
 					boolean isBatchTradeOrder = unionpayCollection.isBatchTradeOrder();
 					// 批量订单
 					if (isBatchTradeOrder) {
-						syncBatchOrderStatus(unionpayCollection);
-						String merId = unionpayCollection.getMerId();
-						String batchNo = unionpayCollection.getBatchNo();
-						String txnTime = unionpayCollection.getTxnTime();
-						String resultCode = unionpayCollection.getResultCode();
 						try {
+							syncBatchOrderStatus(unionpayCollection);
+							String merId = unionpayCollection.getMerId();
+							String batchNo = unionpayCollection.getBatchNo();
+							String txnTime = unionpayCollection.getTxnTime();
+							String resultCode = unionpayCollection.getResultCode();
+
 							boolean canContinue = CollectionUtils
 									.isNotEmpty(UnionpayCallbackLog.findCallback(Kv.by("respCode", "00")
 											.set("merId", merId).set("batchNo", batchNo).set("txnTime", txnTime)));
@@ -62,7 +63,9 @@ public class OrderSynchronizer {
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
-							return;
+							if (this.unionpayBatchCollection != null) {
+								return;
+							}
 						}
 					}
 					// 实时或带查询订单
@@ -191,66 +194,6 @@ public class OrderSynchronizer {
 		}
 	}
 
-	private boolean syncInRespCode34(UnionpayCollection unionpayCollection, UnionpayCollectionQuery query) {
-		boolean isFail = false;
-		try {
-			Date now = new Date();
-			CollectionTrade collectionTrade = CollectionTrade.findByTradeNo(unionpayCollection);
-			int timeoutMinute = unionpayCollection.isBatchTradeOrder() ? UnionpayBatchCollection.TIMEOUT_MINUTE
-					: UnionpayCollection.TIMEOUT_MINUTE;
-			if (query.isTimeout(timeoutMinute)) {// 订单不存在且超时,视为原交易失败
-				unionpayCollection.setFinalCode("2");// 失败
-				unionpayCollection.setResultCode(query.getRespCode());
-				unionpayCollection.setResultMsg(query.getRespMsg());
-				unionpayCollection.setResult(query.getResp());
-				unionpayCollection.setMat(now);
-				unionpayCollection.update();
-				if (collectionTrade != null) {
-					collectionTrade.setFinalCode("2");// 失败
-					collectionTrade.setResultCode(query.getRespCode());
-					collectionTrade.setResultMsg(query.getRespMsg());
-					collectionTrade.setMat(now);
-					collectionTrade.update();
-				}
-				isFail = true;
-			} else {
-				UnionpayCallbackLog lastsCallbackLog = null;
-				List<UnionpayCallbackLog> callbackLog = UnionpayCallbackLog
-						.findCallbackByOrderId(unionpayCollection.getOrderId());
-				if (CollectionUtils.isNotEmpty(callbackLog)) {
-					lastsCallbackLog = callbackLog.get(0);
-					isFail = UnionpayCollection.isFailCode(lastsCallbackLog.getRespCode());
-				} else {
-					String respCode = unionpayCollection.getRespCode();
-					String resultCode = unionpayCollection.getResultCode();
-					isFail = UnionpayCollection.isFailCode(respCode) || UnionpayCollection.isFailCode(resultCode);
-				}
-				if (isFail) {
-					unionpayCollection.setFinalCode("2");// 失败
-					if (lastsCallbackLog != null) {
-						unionpayCollection.setResultCode(lastsCallbackLog.getRespCode());
-						unionpayCollection.setResultMsg(lastsCallbackLog.getRespMsg());
-						unionpayCollection.setResult(lastsCallbackLog.getInfo());
-					}
-					unionpayCollection.setMat(now);
-					unionpayCollection.update();
-					if (collectionTrade != null) {
-						collectionTrade.setFinalCode("2");// 失败
-						if (lastsCallbackLog != null) {
-							collectionTrade.setResultCode(lastsCallbackLog.getRespCode());
-							collectionTrade.setResultMsg(lastsCallbackLog.getRespMsg());
-						}
-						collectionTrade.setMat(now);
-						collectionTrade.update();
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return isFail;
-	}
-
 	public void queryResult(UnionpayCollection unionpayCollection) throws Exception {
 		boolean isSaved = false;
 		UnionpayCollectionQuery query = null;
@@ -336,6 +279,77 @@ public class OrderSynchronizer {
 		} else {
 			// 查询交易本身失败，如应答码10/11检查查询报文是否正确
 		}
+	}
+
+	private boolean syncInRespCode34(UnionpayCollection unionpayCollection, UnionpayCollectionQuery query) {
+		boolean isFail = false;
+		try {
+			Date now = new Date();
+			CollectionTrade collectionTrade = CollectionTrade.findByTradeNo(unionpayCollection);
+			int timeoutMinute = unionpayCollection.isBatchTradeOrder() ? UnionpayBatchCollection.TIMEOUT_MINUTE
+					: UnionpayCollection.TIMEOUT_MINUTE;
+			if (query.isTimeout(timeoutMinute)) {// 订单不存在且超时,视为原交易失败
+				unionpayCollection.setFinalCode("2");// 失败
+				unionpayCollection.setResultCode(query.getRespCode());
+				unionpayCollection.setResultMsg(query.getRespMsg());
+				unionpayCollection.setResult(query.getResp());
+				unionpayCollection.setMat(now);
+				unionpayCollection.update();
+				if (collectionTrade != null) {
+					collectionTrade.setFinalCode("2");// 失败
+					collectionTrade.setResultCode(query.getRespCode());
+					collectionTrade.setResultMsg(query.getRespMsg());
+					collectionTrade.setMat(now);
+					collectionTrade.update();
+				}
+				isFail = true;
+			} else {
+				UnionpayCallbackLog lastsCallbackLog = null;
+				List<UnionpayCallbackLog> callbackLog = UnionpayCallbackLog
+						.findCallbackByOrderId(unionpayCollection.getOrderId());
+				if (CollectionUtils.isNotEmpty(callbackLog)) {
+					lastsCallbackLog = callbackLog.get(0);
+					isFail = UnionpayCollection.isFailCode(lastsCallbackLog.getRespCode());
+				} else {
+					String respCode = unionpayCollection.getRespCode();
+					String resultCode = unionpayCollection.getResultCode();
+					isFail = UnionpayCollection.isFailCode(respCode) || UnionpayCollection.isFailCode(resultCode);
+				}
+
+				if (isFail) {
+					unionpayCollection.setFinalCode("2");// 失败
+				}
+				if (lastsCallbackLog != null) {
+					unionpayCollection.setResultCode(lastsCallbackLog.getRespCode());
+					unionpayCollection.setResultMsg(lastsCallbackLog.getRespMsg());
+					unionpayCollection.setResult(lastsCallbackLog.getInfo());
+				} else {
+					unionpayCollection.setResultCode(query.getRespCode());
+					unionpayCollection.setResultMsg(query.getRespMsg());
+					unionpayCollection.setResult(query.getResp());
+				}
+				unionpayCollection.setMat(now);
+				unionpayCollection.update();
+
+				if (collectionTrade != null) {
+					if (isFail) {
+						collectionTrade.setFinalCode("2");// 失败
+					}
+					if (lastsCallbackLog != null) {
+						collectionTrade.setResultCode(lastsCallbackLog.getRespCode());
+						collectionTrade.setResultMsg(lastsCallbackLog.getRespMsg());
+					} else {
+						collectionTrade.setResultCode(query.getRespCode());
+						collectionTrade.setResultMsg(query.getRespMsg());
+					}
+					collectionTrade.setMat(now);
+					collectionTrade.update();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return isFail;
 	}
 
 }

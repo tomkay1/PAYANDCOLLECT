@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -383,7 +384,6 @@ public class CTradeSrv {
 		boolean isSuccess = false;
 		try {
 			Date now = new Date();
-
 			try {
 				unionpayCollection.validateRealtimeResp();
 			} catch (ValidateUnionpayRespException vure) {
@@ -403,6 +403,8 @@ public class CTradeSrv {
 					unionpayCollection.setMat(now);
 					unionpayCollection.setFinalCode("3");// 状态未明 需后续处理
 					unionpayCollection.update();
+					SyncStatusExecutor.scheduleNotClearSingleQuery(unionpayCollection.getOrderId(), 10,
+							TimeUnit.SECONDS);
 				}
 				throw vure;
 			} catch (Exception e) {
@@ -433,7 +435,7 @@ public class CTradeSrv {
 				// //解密卡号使用的证书是商户签名私钥证书acpsdk.signCert.path
 				// LogUtil.writeLog("解密后的卡号："+accNo2);
 				isSuccess = true;
-				SyncExecutor.scheduleInProcessQuery(unionpayCollection.getOrderId(), 5);
+				SyncStatusExecutor.scheduleInProcessSingleQuery(unionpayCollection.getOrderId(), 5, TimeUnit.SECONDS);
 			} else {
 				isSuccess = false;
 				collectionTrade.setFinalCode("2");
@@ -461,7 +463,8 @@ public class CTradeSrv {
 				syncOrderStatus(unionpayCollection);
 			} else if ("03".equals(respCode) || "04".equals(respCode) || "05".equals(respCode)) {// 订单处理中或交易状态未明
 				setResultByCallback(unionpayCollection, reqParam, "1");// 处理中
-				SyncExecutor.scheduleInProcessQuery(unionpayCollection.getOrderId(), 5, 5);
+				SyncStatusExecutor.scheduleInProcessSingleQuery(unionpayCollection.getOrderId(), 5, 5,
+						TimeUnit.SECONDS);
 			} else {// 交易失败
 				setResultByCallback(unionpayCollection, reqParam, "2");// 失败
 			}
@@ -508,7 +511,7 @@ public class CTradeSrv {
 
 	public void syncOrderStatus(UnionpayCollection unionpayCollection) throws Exception {
 		if (unionpayCollection != null) {
-			new OrderSynchronizer(unionpayCollection).sync();
+			new StatusSynchronizer(unionpayCollection).sync();
 		}
 	}
 

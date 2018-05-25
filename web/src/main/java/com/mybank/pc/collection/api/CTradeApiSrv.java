@@ -204,9 +204,10 @@ public class CTradeApiSrv {
 					Kv entrustReqParam = Kv.by("merCode", merCode).set("merchantID", merchantID).set("accNo", accNo)
 							.set("certifTp", certifTp).set("certifId", certifId).set("customerNm", customerNm)
 							.set("phoneNo", phoneNo).set("cvn2", cvn2).set("expired", expired);
-					Kv resp = cEntrustApiSrv.establish(entrustReqParam);
-					collectionEntrust = (CollectionEntrust) resp.get("unionpayEntrust");
+					cEntrustApiSrv.establish(entrustReqParam);
+					collectionEntrust = query.findOne();
 				} catch (Exception e) {
+					e.printStackTrace();
 					throw new ValidateCTRException("建立委托失败");
 				}
 			} else if (collectionEntrust != null && "0".equals(collectionEntrust.getStatus())) {

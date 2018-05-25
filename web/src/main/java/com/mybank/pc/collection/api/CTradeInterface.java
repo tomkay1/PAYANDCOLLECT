@@ -2,7 +2,6 @@ package com.mybank.pc.collection.api;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.jfinal.aop.Clear;
 import com.jfinal.aop.Duang;
 import com.jfinal.core.ActionKey;
@@ -87,7 +86,7 @@ public class CTradeInterface extends CoreController {
 		LogKit.info("resp-CTradeInterface-initiate-respcontent[" + resp + "]");
 
 		try {
-			String respJson = JSON.toJSONString(resp, SerializerFeature.DisableCircularReferenceDetect);
+			String respJson = JSON.toJSONString(resp);
 			String encryptRespJson = RSAKit.encrypt(respJson,
 					RSAKit.getPublicKey(CollAPIRSAKey.COLL_CLIENT.getPublicKey()));
 			LogKit.info("resp-CTradeInterface-initiate[" + encryptRespJson + "]");
@@ -148,7 +147,7 @@ public class CTradeInterface extends CoreController {
 		LogKit.info("resp-CTradeInterface-query-respcontent[" + resp + "]");
 
 		try {
-			String respJson = JSON.toJSONString(resp, SerializerFeature.DisableCircularReferenceDetect);
+			String respJson = JSON.toJSONString(resp);
 			String encryptRespJson = RSAKit.encrypt(respJson,
 					RSAKit.getPublicKey(CollAPIRSAKey.COLL_CLIENT.getPublicKey()));
 			LogKit.info("resp-CTradeInterface-query[" + encryptRespJson + "]");
