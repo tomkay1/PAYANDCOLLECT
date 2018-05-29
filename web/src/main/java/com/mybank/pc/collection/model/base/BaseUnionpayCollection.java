@@ -305,6 +305,30 @@ public abstract class BaseUnionpayCollection<M extends BaseUnionpayCollection<M>
 		return getStr("queryId");
 	}
 
+	public void setReqReserved(java.lang.String reqReserved) {
+		set("reqReserved", reqReserved);
+	}
+
+	public java.lang.String getReqReserved() {
+		return getStr("reqReserved");
+	}
+
+	public void setReqReserved1(java.lang.String reqReserved1) {
+		set("reqReserved1", reqReserved1);
+	}
+
+	public java.lang.String getReqReserved1() {
+		return getStr("reqReserved1");
+	}
+
+	public void setReqReserved2(java.lang.String reqReserved2) {
+		set("reqReserved2", reqReserved2);
+	}
+
+	public java.lang.String getReqReserved2() {
+		return getStr("reqReserved2");
+	}
+
 	public void setReq(java.lang.String req) {
 		set("req", req);
 	}

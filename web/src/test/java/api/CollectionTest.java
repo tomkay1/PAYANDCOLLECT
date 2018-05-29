@@ -62,11 +62,11 @@ public class CollectionTest {
 		String orderId = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
 
 		Map<String, String> data = new HashMap<String, String>();
-		data.put("merCode", "0");// 系统商户号代码 4:测试 1:春城批量
+		data.put("merCode", "3");// 系统商户号代码 4:测试 1:春城批量
 		data.put("merchantID", "20");// 商户ID
 		data.put("bussType", "1");// 1加急 2批量
 		data.put("orderId", orderId);
-		data.put("txnAmt", "537612.85");
+		data.put("txnAmt", "1000");
 
 //		data.put("accNo", "6216261000000000018");
 //		data.put("certifTp", "01");
@@ -123,8 +123,8 @@ public class CollectionTest {
 	}
 
 	public static void main(String[] args) throws Exception {
-		establishTest();
-		//tradeTest();
+		//establishTest();
+		tradeTest();
 		 //queryTest();
 	}
 }

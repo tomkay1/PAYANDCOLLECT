@@ -68,7 +68,10 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 	public UnionpayBatchCollectionQuery buildQuery() {
 		Date now = new Date();
 		this.query = new UnionpayBatchCollectionQuery();
+		String reqReserved = JsonKit.toJson(Kv.by("from", "pac"));
 
+		query.setVersion(getVersion());
+		query.setEncoding(getEncoding());
 		query.setTxnType("22");
 		query.setTxnSubType("02");
 		query.setBizType("000501");
@@ -77,6 +80,7 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 		query.setMerId(getMerId());
 		query.setBatchNo(getBatchNo());
 		query.setTxnTime(getTxnTime());
+		query.setReqReserved(reqReserved);
 		query.setCat(now);
 		query.setMat(now);
 
@@ -107,6 +111,8 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 		String finalCode = "3";// 最终处理结果：0成功 1处理中 2失败 3待初始化
 		String status = "0";// 0 待查询 1 查询中
 
+		String reqReserved = JsonKit.toJson(Kv.by("from", "pac"));
+
 		UnionpayBatchCollection unionpayBatchCollection = new UnionpayBatchCollection();
 		unionpayBatchCollection.setVersion(sdkConfig.getVersion());
 		unionpayBatchCollection.setEncoding(SDKConstants.UTF_8_ENCODING);
@@ -120,6 +126,8 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 		unionpayBatchCollection.setTxnTime(txnTime);
 		unionpayBatchCollection.setQueryResultCount(0);
 		unionpayBatchCollection.setFinalCode(finalCode);
+		unionpayBatchCollection.setReqReserved(reqReserved);
+		unionpayBatchCollection.setReqReserved1(reqReserved);
 		unionpayBatchCollection.setStatus(status);
 		unionpayBatchCollection.setCat(now);
 		unionpayBatchCollection.setMat(now);
@@ -165,12 +173,15 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 			requestContent.setCertifId(unionpayCollection.getCertifId());
 			requestContent.setPhoneNo(unionpayCollection.getPhoneNo());
 			requestContent.setPostscript(unionpayCollection.getPostscript());
+			requestContent.setReqReserved1(unionpayCollection.getReqReserved1());
 
 			batchCollectionRequest.addContent(requestContent);
 			totalAmt = totalAmt.add(new BigDecimal(txnAmt));
 		}
 		requestHead.setTotalAmount(String.valueOf(totalAmt.longValue()));
 		requestHead.setTotalNumber(String.valueOf(totalNumber));
+		requestHead.setReqReserved1(getReqReserved1());
+		requestHead.setReqReserved2(getReqReserved2());
 		batchCollectionRequest.setHead(requestHead);
 
 		return batchCollectionRequest;

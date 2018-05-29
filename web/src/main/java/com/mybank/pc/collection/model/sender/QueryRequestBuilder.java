@@ -43,6 +43,8 @@ public class QueryRequestBuilder implements SenderBuilder {
 		contentData.put("orderId", unionpayCollectionQuery.getOrderId());
 		// 订单发送时间，格式为YYYYMMDDhhmmss，必须取当前时间，否则会报txnTime无效
 		contentData.put("txnTime", unionpayCollectionQuery.getTxnTime());
+		// 请求方保留域
+		contentData.put("reqReserved", unionpayCollectionQuery.getReqReserved());
 
 		sendProxy.setReqData(acpService.sign(contentData, SDKConstants.UTF_8_ENCODING));
 		// 交易请求url从配置文件读取对应属性文件acp_sdk.properties中的acpsdk.backTransUrl

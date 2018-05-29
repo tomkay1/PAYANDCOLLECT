@@ -12,7 +12,7 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.SqlPara;
 import com.mybank.pc.collection.model.base.BaseUnionpayBatchCollectionQuery;
 import com.mybank.pc.collection.model.sender.BaseUnionpayCollectionTrade;
-import com.mybank.pc.collection.model.sender.BatchRequestBuilder;
+import com.mybank.pc.collection.model.sender.BatchQueryRequestBuilder;
 import com.mybank.pc.collection.model.sender.SendProxy;
 import com.mybank.pc.collection.model.sender.SenderBuilder;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.BatchCollectionResponse;
@@ -31,7 +31,7 @@ public class UnionpayBatchCollectionQuery extends BaseUnionpayBatchCollectionQue
 	private SendProxy sendProxy;
 
 	public UnionpayBatchCollectionQuery assemblyBatchQueryRequest() {
-		accept(new BatchRequestBuilder());
+		accept(new BatchQueryRequestBuilder());
 		setReq(JsonKit.toJson(sendProxy.getReqData()));
 		return this;
 	}

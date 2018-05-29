@@ -64,6 +64,8 @@ public class BatchRequestBuilder implements SenderBuilder {
 		// 5.后台通知地址如果上送了带有？的参数，例如：http://abc/web?a=b&c=d
 		// 在后台通知处理程序验证签名之前需要编写逻辑将这些字段去掉再验签，否则将会验签失败
 		contentData.put("backUrl", sdkConfig.getBackUrl());
+		// 请求方保留域
+		contentData.put("reqReserved", unionpayBatchCollection.getReqReserved());
 
 		// 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
 		sendProxy.setReqData(acpService.sign(contentData, SDKConstants.UTF_8_ENCODING));

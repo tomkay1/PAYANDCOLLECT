@@ -118,7 +118,7 @@ public class StatusSynchronizer {
 				BatchCollectionRequest batchCollectionRequest = unionpayBatchCollection.toBatchCollectionRequest();
 				if (batchCollectionRequest != null) {
 					RequestContent requestContent = batchCollectionRequest.getContentByOrderId(orderId);
-					cBatchQuerySrv.updateOrderStatusToFail(requestContent, historyLastsQuery);
+					cBatchQuerySrv.resetBatchStatus(requestContent, historyLastsQuery);
 				}
 			} else if (unionpayBatchCollection.allowQuery()) {
 				cBatchQuerySrv.batchQuery(unionpayBatchCollection);

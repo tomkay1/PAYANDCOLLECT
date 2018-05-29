@@ -3,6 +3,7 @@ package com.mybank.pc.collection.trade;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -58,13 +59,49 @@ public class CBatchTradeSrv {
 		} catch (ValidateUnionpayRespException vure) {// 校验响应信息失败，需后续处理
 			vure.printStackTrace();
 			if (unionpayBatchCollection != null && isSaved) {
-				unionpayBatchCollection.setExceInfo(JsonKit.toJson(vure.getExceptionInfo()));
-				unionpayBatchCollection.update();
+				String result = JsonKit.toJson(sendProxy.getAcpResponse());
+				String exceInfo = JsonKit.toJson(vure.getExceptionInfo());
+
+				unionpayBatchCollection.setResult(result);
+				unionpayBatchCollection.setExceInfo(exceInfo);
+				unionpayBatchCollection.setMat(now);
+
+				if (sendProxy.isInvalidRequestOrURI()) {
+					unionpayBatchCollection.setFinalCode("2");// 失败
+					unionpayBatchCollection.update();
+					for (UnionpayCollection unionpayCollection : toBeSentOrder) {
+						try {
+							unionpayCollection.resetBatchStatus();
+							unionpayCollection.setResult(result);
+							unionpayCollection.setExceInfo(exceInfo);
+							unionpayCollection.setMat(now);
+							unionpayCollection.update();
+						} catch (Exception uce) {
+							uce.printStackTrace();
+						}
+					}
+				} else {
+					unionpayBatchCollection.setFinalCode("4");// 状态未明 需后续处理
+					unionpayBatchCollection.update();
+					for (UnionpayCollection unionpayCollection : toBeSentOrder) {
+						try {
+							unionpayCollection.setFinalCode("3");// 状态未明 需后续处理
+							unionpayCollection.setResult(result);
+							unionpayCollection.setExceInfo(exceInfo);
+							unionpayCollection.setMat(now);
+							unionpayCollection.update();
+						} catch (Exception uce) {
+							uce.printStackTrace();
+						}
+					}
+					Integer batchId = unionpayBatchCollection.getId();
+					SyncStatusExecutor.scheduleNotClearBatchQuery(batchId == null ? null : String.valueOf(batchId),
+							merId, unionpayBatchCollection.getBatchNo(), txnTime, 60, TimeUnit.SECONDS);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-
 			try {
 				if (count <= 0 || (!isSaved) && StringUtils.isNotBlank(txnTime) && StringUtils.isNotBlank(nextBatchNo)
 						&& nextBatchNo.length() == 4) {
@@ -78,24 +115,22 @@ public class CBatchTradeSrv {
 				if (count > 0 && CollectionUtils.isEmpty(toBeSentOrder)) {
 					toBeSentOrder = UnionpayCollection.findToBeSentUnionpayCollectionByBatchNo(kv);
 				}
-				if (CollectionUtils.isNotEmpty(toBeSentOrder) && sendProxy != null) {
-					String respCode = sendProxy.getRespCode();
+				if (CollectionUtils.isNotEmpty(toBeSentOrder)) {
+					String respCode = sendProxy == null ? null : sendProxy.getRespCode();
 					// 没有成功也没有最终失败需要更新订单状态为待发送
-					if (!isSuccessed(respCode) && !isFailed(respCode)) {
+					if ((!isSaved) || (!isSuccessed(respCode) && !isFailed(respCode))) {
+						String status = null;
 						for (UnionpayCollection unionpayCollection : toBeSentOrder) {
-							// 已成功，已失败或为待发送，已发送状态则不需要更新订单状态
-							if ("0".equals(unionpayCollection.getFinalCode())
-									|| "2".equals(unionpayCollection.getFinalCode())
-									|| "0".equals(unionpayCollection.getStatus())
-									|| "2".equals(unionpayCollection.getStatus())) {
-								continue;
-							}
-							try {
-								unionpayCollection.resetBatchStatus();
-								unionpayCollection.setMat(now);
-								unionpayCollection.update();
-							} catch (Exception uce) {
-								uce.printStackTrace();
+							status = unionpayCollection.getStatus();
+							// 已确认状态的订单
+							if ("1".equals(status)) {
+								try {
+									unionpayCollection.resetBatchStatus();
+									unionpayCollection.setMat(now);
+									unionpayCollection.update();
+								} catch (Exception uce) {
+									uce.printStackTrace();
+								}
 							}
 						}
 					}
@@ -121,7 +156,6 @@ public class CBatchTradeSrv {
 				: unionpayBatchCollection.getId().toString();
 		try {
 			unionpayBatchCollection.validateBatchOrderResp();
-
 			SendProxy sendProxy = unionpayBatchCollection.getSendProxy();
 			String respCode = sendProxy.getRespCode();
 			String respMsg = sendProxy.getRespMsg();
@@ -198,8 +232,8 @@ public class CBatchTradeSrv {
 	 */
 	public static boolean isFailed(String respCode) {
 		// 10：报文格式错误 11：验证签名失败 12：重复交易 13：报文交易要素缺失 14：批量文件格式错误
-		return !("10".equals(respCode) || "11".equals(respCode) || "12".equals(respCode) || "13".equals(respCode)
-				|| "14".equals(respCode));
+		return StringUtils.isNotBlank(respCode) && !("10".equals(respCode) || "11".equals(respCode)
+				|| "12".equals(respCode) || "13".equals(respCode) || "14".equals(respCode));
 	}
 
 	public void updateOrderStatusInSuccess(UnionpayCollection unionpayCollection) {

@@ -290,6 +290,14 @@ public abstract class BaseUnionpayCollectionQuery<M extends BaseUnionpayCollecti
 		return getStr("merchantID");
 	}
 
+	public void setReqReserved(java.lang.String reqReserved) {
+		set("reqReserved", reqReserved);
+	}
+
+	public java.lang.String getReqReserved() {
+		return getStr("reqReserved");
+	}
+
 	public void setReq(java.lang.String req) {
 		set("req", req);
 	}

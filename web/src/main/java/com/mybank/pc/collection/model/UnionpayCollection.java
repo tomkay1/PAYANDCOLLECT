@@ -96,6 +96,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 	public UnionpayCollectionQuery buildQuery(String operID) {
 		Date now = new Date();
 		this.query = new UnionpayCollectionQuery();
+		String reqReserved = JsonKit.toJson(Kv.by("from", "pac"));
 
 		query.setTxnType("00");
 		query.setTxnSubType("00");
@@ -112,6 +113,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 		query.setEncoding(SDKConstants.UTF_8_ENCODING);
 		query.setBatchNo(getBatchNo());
 		query.setMerchantID(getMerchantID());
+		query.setReqReserved(reqReserved);
 
 		query.setCat(now);
 		query.setMat(now);

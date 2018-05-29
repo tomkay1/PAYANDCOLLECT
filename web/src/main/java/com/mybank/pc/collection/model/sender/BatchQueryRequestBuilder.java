@@ -46,6 +46,8 @@ public class BatchQueryRequestBuilder implements SenderBuilder {
 		contentData.put("batchNo", unionpayBatchCollectionQuery.getBatchNo());
 		// 原批量代收请求的交易时间
 		contentData.put("txnTime", unionpayBatchCollectionQuery.getTxnTime());
+		// 请求方保留域
+		contentData.put("reqReserved", unionpayBatchCollectionQuery.getReqReserved());
 
 		sendProxy.setReqData(acpService.sign(contentData, SDKConstants.UTF_8_ENCODING));
 		// 交易请求url从配置文件读取对应属性文件acp_sdk.properties中的acpsdk.backTransUrl

@@ -7,6 +7,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.jfinal.aop.Duang;
+import com.mybank.pc.collection.model.UnionpayBatchCollection;
 import com.mybank.pc.collection.model.UnionpayCollection;
 
 public class SyncStatusExecutor {
@@ -14,6 +15,7 @@ public class SyncStatusExecutor {
 	private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4);
 
 	private static CTradeSrv cCTradeSrv = Duang.duang(CTradeSrv.class);
+	private static CBatchQuerySrv cBatchQuerySrv = Duang.duang(CBatchQuerySrv.class);
 
 	public static ScheduledFuture<UnionpayCollection> scheduleInProcessSingleQuery(String orderId, long delay,
 			TimeUnit unit) {
@@ -28,6 +30,11 @@ public class SyncStatusExecutor {
 	public static ScheduledFuture<UnionpayCollection> scheduleNotClearSingleQuery(String orderId, long delay,
 			TimeUnit unit) {
 		return schedule(new NotClearSingleQuery(orderId), delay, unit);
+	}
+
+	public static ScheduledFuture<UnionpayBatchCollection> scheduleNotClearBatchQuery(String batchId, String merId,
+			String batchNo, String txnTime, long delay, TimeUnit unit) {
+		return schedule(new NotClearBatchQuery(batchId, merId, batchNo, txnTime), delay, unit);
 	}
 
 	public static <T> ScheduledFuture<T> schedule(Callable<T> callable, long delay, TimeUnit unit) {
@@ -135,6 +142,67 @@ public class SyncStatusExecutor {
 				return false;
 			}
 			return "3".equals(unionpayCollection.getFinalCode());
+		}
+
+	}
+
+	public static class NotClearBatchQuery implements Callable<UnionpayBatchCollection> {
+
+		private static int maxAllowQueryCount = 2;
+
+		private int preQueryCount;
+		private String batchId;
+		private String merId;
+		private String batchNo;
+		private String txnTime;
+
+		public NotClearBatchQuery(String batchId, String merId, String batchNo, String txnTime) {
+			this.batchId = batchId;
+			this.merId = merId;
+			this.batchNo = batchNo;
+			this.txnTime = txnTime;
+			this.preQueryCount = 0;
+		}
+
+		private NotClearBatchQuery(String batchId, String merId, String batchNo, String txnTime, int preQueryCount) {
+			this.batchId = batchId;
+			this.merId = merId;
+			this.batchNo = batchNo;
+			this.txnTime = txnTime;
+			this.preQueryCount = preQueryCount;
+		}
+
+		@Override
+		public UnionpayBatchCollection call() {
+			UnionpayBatchCollection unionpayBatchCollection = UnionpayBatchCollection.findByIdOrBizColumn(batchId,
+					merId, batchNo, txnTime);
+			if (allowSync(unionpayBatchCollection)) {
+				try {
+					cBatchQuerySrv.batchQuery(unionpayBatchCollection);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				unionpayBatchCollection = UnionpayBatchCollection.findByIdOrBizColumn(batchId, merId, batchNo, txnTime);
+				if (allowSync(unionpayBatchCollection)) {
+					int currentQueryCount = preQueryCount + 1;
+					if (currentQueryCount == maxAllowQueryCount) {
+						return unionpayBatchCollection;
+					}
+
+					long currentDelay = UnionpayBatchCollection.TIMEOUT_MINUTE;
+					NotClearBatchQuery nextTask = new NotClearBatchQuery(batchId, merId, batchNo, txnTime,
+							currentQueryCount);
+					SyncStatusExecutor.schedule(nextTask, currentDelay, TimeUnit.MINUTES);
+				}
+			}
+			return unionpayBatchCollection;
+		}
+
+		private static boolean allowSync(UnionpayBatchCollection unionpayBatchCollection) {
+			if (unionpayBatchCollection == null) {
+				return false;
+			}
+			return "4".equals(unionpayBatchCollection.getFinalCode());
 		}
 
 	}

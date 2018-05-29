@@ -153,7 +153,7 @@ public class CBatchQuerySrv {
 				unionpayBatchCollection.setSuccessAmt(successAmount);
 
 				isSuccess = true;
-				unionpayBatchCollection.setFinalCode("0");
+				unionpayBatchCollection.setFinalCode("0");// 成功
 			} else {
 				// 其他应答码为失败请排查原因
 				isSuccess = false;
@@ -161,17 +161,18 @@ public class CBatchQuerySrv {
 				// 批次（xxxx）不存在
 				if ("34".equals(respCode)) {
 					if (unionpayBatchCollectionQuery.isTimeout(now)) {
+						unionpayBatchCollection.setFinalCode("2");// 失败
+
 						BatchCollectionRequest batchCollectionRequest = unionpayBatchCollection
 								.toBatchCollectionRequest();
 						if (batchCollectionRequest != null) {
 							List<RequestContent> requestContents = batchCollectionRequest.getContents();
 							for (RequestContent requestContent : requestContents) {
-								updateOrderStatusToFail(requestContent, unionpayBatchCollectionQuery);
+								resetBatchStatus(requestContent, unionpayBatchCollectionQuery);
 							}
 						}
 					}
 				}
-
 			}
 
 			unionpayBatchCollection.setQueryResultCount(queryCount + 1);
@@ -244,7 +245,7 @@ public class CBatchQuerySrv {
 		collectionTrade.update();
 	}
 
-	public void updateOrderStatusToFail(RequestContent requestContent,
+	public void resetBatchStatus(RequestContent requestContent,
 			UnionpayBatchCollectionQuery unionpayBatchCollectionQuery) {
 		String orderId = requestContent.getOrderId();
 		if (StringUtils.isBlank(orderId)) {
@@ -258,21 +259,12 @@ public class CBatchQuerySrv {
 		String respMsg = unionpayBatchCollectionQuery.getRespMsg();
 		Date now = new Date();
 
-		unionpayCollection.setFinalCode("2");// 失败
+		unionpayCollection.setFinalCode("1");// 处理中
+		unionpayCollection.resetBatchStatus();
 		unionpayCollection.setResultCode(respCode);
 		unionpayCollection.setResultMsg(respMsg);
 		unionpayCollection.setMat(now);
 		unionpayCollection.update();
-
-		CollectionTrade collectionTrade = CollectionTrade.findByTradeNo(unionpayCollection);
-		if (collectionTrade == null) {
-			return;
-		}
-		collectionTrade.setResultCode(respCode);
-		collectionTrade.setResultMsg(respMsg);
-		collectionTrade.setFinalCode("2");// 失败
-		collectionTrade.setMat(now);
-		collectionTrade.update();
 	}
 
 }

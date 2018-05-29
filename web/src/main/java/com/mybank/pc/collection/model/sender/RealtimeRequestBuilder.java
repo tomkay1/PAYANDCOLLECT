@@ -89,6 +89,8 @@ public class RealtimeRequestBuilder implements SenderBuilder {
 		// 5.后台通知地址如果上送了带有？的参数，例如：http://abc/web?a=b&c=d
 		// 在后台通知处理程序验证签名之前需要编写逻辑将这些字段去掉再验签，否则将会验签失败
 		contentData.put("backUrl", sdkConfig.getBackUrl());
+		// 请求方保留域
+		contentData.put("reqReserved", unionpayCollection.getReqReserved());
 
 		sendProxy.setReqData(acpService.sign(contentData, SDKConstants.UTF_8_ENCODING));
 		// 交易请求url从配置文件读取对应属性文件acp_sdk.properties中的acpsdk.backTransUrl

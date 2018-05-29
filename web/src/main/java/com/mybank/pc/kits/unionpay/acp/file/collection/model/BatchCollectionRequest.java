@@ -23,9 +23,9 @@ import com.mybank.pc.kits.unionpay.acp.file.UnionPayFileUtils;
 public class BatchCollectionRequest implements BatchTxtFile {
 
 	public static final String[] DEFAULT_TITLES = new String[] { "orderId", "currencyCode", "txnAmt", "accType",
-			"accNo", "customerNm", "bizType", "certifTp", "certifId", "phoneNo", "postscript" };
+			"accNo", "customerNm", "bizType", "certifTp", "certifId", "phoneNo", "postscript", "reqReserved1" };
 
-	public static final String DEFAULT_TITLES_LINE = "orderId|currencyCode|txnAmt|accType|accNo|customerNm|bizType|certifTp|certifId|phoneNo|postscript";
+	public static final String DEFAULT_TITLES_LINE = "orderId|currencyCode|txnAmt|accType|accNo|customerNm|bizType|certifTp|certifId|phoneNo|postscript|reqReserved1";
 
 	private RequestHead head;
 
@@ -133,7 +133,7 @@ public class BatchCollectionRequest implements BatchTxtFile {
 		this.contents.add(content);
 		this.orderIdReqContentPair.put(content.getOrderId(), content);
 	}
-	
+
 	public RequestContent getContentByOrderId(String orderId) {
 		return this.orderIdReqContentPair == null ? null : orderIdReqContentPair.get(orderId);
 	}
