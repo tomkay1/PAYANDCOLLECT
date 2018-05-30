@@ -15,7 +15,9 @@ import com.mybank.pc.collection.model.UnionpayBatchCollectionQuery;
 import com.mybank.pc.collection.model.UnionpayCallbackLog;
 import com.mybank.pc.collection.model.UnionpayCollection;
 import com.mybank.pc.collection.model.UnionpayCollectionQuery;
+import com.mybank.pc.collection.model.sender.SendProxy;
 import com.mybank.pc.exception.BaseCollectionRuntimeException;
+import com.mybank.pc.kits.unionpay.acp.AcpResponse;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.BatchCollectionRequest;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.BatchCollectionResponse;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.RequestContent;
@@ -197,15 +199,21 @@ public class StatusSynchronizer {
 	public void queryResult(UnionpayCollection unionpayCollection) throws Exception {
 		boolean isSaved = false;
 		UnionpayCollectionQuery query = null;
+		SendProxy sendProxy = null;
 		try {
 			query = unionpayCollection.buildQuery();
 			if (isSaved = query.save()) {
 				unionpayCollection.queryResult();
+				sendProxy = query.getSendProxy();
 				handlingQueryResult(unionpayCollection, query);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			if (query != null) {
+				AcpResponse acpResponse = sendProxy == null ? null : sendProxy.getAcpResponse();
+				if (acpResponse != null) {
+					query.setResp(JsonKit.toJson(acpResponse));
+				}
 				query.setExceInfo(JsonKit.toJson(BaseCollectionRuntimeException.getExceptionInfo(e)));
 			}
 			throw e;

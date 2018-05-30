@@ -96,7 +96,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 	public UnionpayCollectionQuery buildQuery(String operID) {
 		Date now = new Date();
 		this.query = new UnionpayCollectionQuery();
-		String reqReserved = JsonKit.toJson(Kv.by("from", "pac"));
+		String reqReserved = "from=pac";
 
 		query.setTxnType("00");
 		query.setTxnSubType("00");

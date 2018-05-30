@@ -42,6 +42,7 @@ import com.mybank.pc.interceptors.TradeExceptionInterceptor;
 import com.mybank.pc.kits.AppKit;
 import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.FeeKit;
+import com.mybank.pc.kits.unionpay.acp.AcpResponse;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.merchant.model.MerchantCust;
 import com.mybank.pc.merchant.model.MerchantInfo;
@@ -235,7 +236,7 @@ public class CTradeSrv {
 				collectionTrade.setMerFee(new BigDecimal(0));
 			}
 
-			String reqReserved = JsonKit.toJson(Kv.by("from", "pac"));
+			String reqReserved = "from=pac";
 
 			unionpayCollection.setCustomerNm(collectionEntrust.getCustomerNm());
 			unionpayCollection.setCertifTp(collectionEntrust.getCertifTp());
@@ -393,7 +394,7 @@ public class CTradeSrv {
 			} catch (ValidateUnionpayRespException vure) {
 				vure.printStackTrace();
 				SendProxy sendProxy = vure.getSendProxy();
-				unionpayCollection.setResult(JsonKit.toJson(sendProxy.getAcpResponse()));
+				unionpayCollection.setResp(JsonKit.toJson(sendProxy.getAcpResponse()));
 				unionpayCollection.setExceInfo(JsonKit.toJson(vure.getExceptionInfo()));
 				if (sendProxy.isInvalidRequestOrURI()) {
 					isSuccess = false;
@@ -539,6 +540,7 @@ public class CTradeSrv {
 				ex.printStackTrace();
 			}
 			try {
+				unionpayCollection.setExceInfo(JsonKit.toJson(e.getExceptionInfo()));
 				unionpayCollection.setFinalCode("2");// 失败
 				unionpayCollection.save();
 			} catch (Exception ex) {
@@ -552,6 +554,13 @@ public class CTradeSrv {
 				ex.printStackTrace();
 			}
 			try {
+				if (StringUtils.isBlank(unionpayCollection.getResp())) {
+					SendProxy sendProxy = unionpayCollection.getSendProxy();
+					AcpResponse acpResponse = sendProxy == null ? null : sendProxy.getAcpResponse();
+					if (acpResponse != null) {
+						unionpayCollection.setResp(JsonKit.toJson(acpResponse));
+					}
+				}
 				unionpayCollection.setExceInfo(JsonKit.toJson(e.getExceptionInfo()));
 				unionpayCollection.update();
 			} catch (Exception ex) {

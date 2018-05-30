@@ -18,6 +18,7 @@ import com.mybank.pc.collection.model.UnionpayBatchCollectionBatchno;
 import com.mybank.pc.collection.model.UnionpayCollection;
 import com.mybank.pc.collection.model.sender.SendProxy;
 import com.mybank.pc.exception.ValidateUnionpayRespException;
+import com.mybank.pc.kits.unionpay.acp.AcpResponse;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 
 public class CBatchTradeSrv {
@@ -62,7 +63,7 @@ public class CBatchTradeSrv {
 				String result = JsonKit.toJson(sendProxy.getAcpResponse());
 				String exceInfo = JsonKit.toJson(vure.getExceptionInfo());
 
-				unionpayBatchCollection.setResult(result);
+				unionpayBatchCollection.setResp(result);
 				unionpayBatchCollection.setExceInfo(exceInfo);
 				unionpayBatchCollection.setMat(now);
 
@@ -109,6 +110,18 @@ public class CBatchTradeSrv {
 				}
 			} catch (Exception e1) {
 				e1.printStackTrace();
+			}
+
+			try {
+				if (StringUtils.isBlank(unionpayBatchCollection.getResp())) {
+					AcpResponse acpResponse = sendProxy == null ? null : sendProxy.getAcpResponse();
+					if (acpResponse != null) {
+						unionpayBatchCollection.setResp(JsonKit.toJson(acpResponse));
+						unionpayBatchCollection.update();
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 			try {

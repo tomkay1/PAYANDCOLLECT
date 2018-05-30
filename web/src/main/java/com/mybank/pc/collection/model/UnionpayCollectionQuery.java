@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Db;
@@ -106,18 +107,18 @@ public class UnionpayCollectionQuery extends BaseUnionpayCollectionQuery<Unionpa
 	}
 
 	public boolean isTimeout(int timeoutMinute) {
-		return isTimeout(getTxnTime(), getMat(), getRespCode(),timeoutMinute);
+		return isTimeout(getTxnTime(), getMat(), getRespCode(), timeoutMinute);
 	}
 
-	public boolean isTimeout(Date queryDate,int timeoutMinute) {
-		return isTimeout(getTxnTime(), queryDate, getRespCode(),timeoutMinute);
+	public boolean isTimeout(Date queryDate, int timeoutMinute) {
+		return isTimeout(getTxnTime(), queryDate, getRespCode(), timeoutMinute);
 	}
 
-	public static boolean isTimeout(String time, Date queryTime, String respCode,int timeoutMinute) {
+	public static boolean isTimeout(String time, Date queryTime, String respCode, int timeoutMinute) {
 		try {
 			Date timeDate = new SimpleDateFormat("yyyyMMddHHmmss").parse(time);
-			return "34".equals(respCode) && DateUtil.between(timeDate, queryTime, DateUnit.MINUTE,
-					false) > timeoutMinute;
+			return "34".equals(respCode)
+					&& DateUtil.between(timeDate, queryTime, DateUnit.MINUTE, false) > timeoutMinute;
 		} catch (ParseException e) {
 			e.printStackTrace();
 			return false;
@@ -150,5 +151,10 @@ public class UnionpayCollectionQuery extends BaseUnionpayCollectionQuery<Unionpa
 	@Override
 	public void setSendProxy(SendProxy sendProxy) {
 		this.sendProxy = sendProxy;
+	}
+
+	@JSONField(serialize = false)
+	public SendProxy getSendProxy() {
+		return this.sendProxy;
 	}
 }

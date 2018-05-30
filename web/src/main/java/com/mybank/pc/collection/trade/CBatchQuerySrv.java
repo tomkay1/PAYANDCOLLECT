@@ -16,6 +16,7 @@ import com.mybank.pc.collection.model.UnionpayBatchCollectionQuery;
 import com.mybank.pc.collection.model.UnionpayCollection;
 import com.mybank.pc.collection.model.sender.SendProxy;
 import com.mybank.pc.exception.BaseCollectionRuntimeException;
+import com.mybank.pc.kits.unionpay.acp.AcpResponse;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDKConstants;
 import com.mybank.pc.kits.unionpay.acp.file.collection.model.BatchCollectionRequest;
@@ -64,9 +65,12 @@ public class CBatchQuerySrv {
 			if (ubcList != null) {
 				for (UnionpayBatchCollection unionpayBatchCollection : ubcList) {
 					try {
-						unionpayBatchCollection.setStatus("0");
-						unionpayBatchCollection.setSysQueryId("");
-						unionpayBatchCollection.update();
+						if (!("0".equals(unionpayBatchCollection.getStatus())
+								&& StringUtils.isBlank(unionpayBatchCollection.getSysQueryId()))) {
+							unionpayBatchCollection.setStatus("0");
+							unionpayBatchCollection.setSysQueryId("");
+							unionpayBatchCollection.update();
+						}
 					} catch (Exception ubce) {
 						ubce.printStackTrace();
 					}
@@ -97,6 +101,20 @@ public class CBatchQuerySrv {
 				}
 			}
 		} finally {
+			try {
+				if (unionpayBatchCollectionQuery != null
+						&& StringUtils.isBlank(unionpayBatchCollectionQuery.getResp())) {
+					SendProxy sendProxy = unionpayBatchCollectionQuery.getSendProxy();
+					AcpResponse acpResponse = sendProxy == null ? null : sendProxy.getAcpResponse();
+					if (acpResponse != null) {
+						unionpayBatchCollectionQuery.setResp(JsonKit.toJson(acpResponse));
+						unionpayBatchCollectionQuery.update();
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 			unionpayBatchCollection.setStatus("0");
 			unionpayBatchCollection.setSysQueryId("");
 			unionpayBatchCollection.update();
