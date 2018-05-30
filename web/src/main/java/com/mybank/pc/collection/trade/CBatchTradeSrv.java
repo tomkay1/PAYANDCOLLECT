@@ -113,7 +113,7 @@ public class CBatchTradeSrv {
 			}
 
 			try {
-				if (StringUtils.isBlank(unionpayBatchCollection.getResp())) {
+				if (unionpayBatchCollection != null && StringUtils.isBlank(unionpayBatchCollection.getResp())) {
 					AcpResponse acpResponse = sendProxy == null ? null : sendProxy.getAcpResponse();
 					if (acpResponse != null) {
 						unionpayBatchCollection.setResp(JsonKit.toJson(acpResponse));

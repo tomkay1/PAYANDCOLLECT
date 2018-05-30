@@ -236,6 +236,8 @@ public class CTradeApiSrv {
 				collectionTrade.setMerFee(new BigDecimal(0));
 			}
 
+			String reqReserved = "from=pac";
+
 			unionpayCollection.setCustomerNm(collectionEntrust.getCustomerNm());
 			unionpayCollection.setCertifTp(collectionEntrust.getCertifTp());
 			unionpayCollection.setCertifId(collectionEntrust.getCertifId());
@@ -249,6 +251,8 @@ public class CTradeApiSrv {
 			unionpayCollection.setTxnTime(txnTime);
 			unionpayCollection.setTxnAmt(txnAmt);
 			unionpayCollection.setMerchantID(merchantID);
+			unionpayCollection.setReqReserved(reqReserved);
+			unionpayCollection.setReqReserved1(reqReserved);
 			unionpayCollection.setFinalCode(finalCode);
 			unionpayCollection.setStatus("2".equals(bussType) ? "0" : null);
 			unionpayCollection.setCat(now);
