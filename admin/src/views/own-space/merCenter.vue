@@ -64,11 +64,9 @@
                             <div class="mc-label">负责人联系地址：</div>
                             <div class="mc-content">{{merInfo.address}}</div>
 
-                            <div class="mc-label">备用联系地址2：</div>
-                            <div class="mc-content">{{merInfo.mobile1}}</div>
+                            <div class="mc-label">备用联系地址1：</div>  <div class="mc-content">{{merInfo.mobile1}}</div>
+                            <div class="mc-label">备用联系地址2：</div>  <div class="mc-content">{{merInfo.mobile2}}</div>
 
-                            <div class="mc-label">备用联系地址2：</div>
-                            <div class="mc-content">{{merInfo.mobile2}}</div>
 
 
                         </Card>
@@ -178,11 +176,15 @@
         font-weight: bold;
         padding: 5px 10px;
         font-size: 13px;
+
     }
 
     .mc-content {
         font-size: 13px;
-        padding: 5px 5px;
+        padding: 5px 10px;
+        min-width: 100px;
+        height: 30px;
+
     }
     .mc-col{
         padding: 5px;
