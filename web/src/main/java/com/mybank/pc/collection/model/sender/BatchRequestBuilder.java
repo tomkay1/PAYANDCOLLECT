@@ -4,16 +4,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.mybank.pc.collection.model.UnionpayBatchCollection;
+import com.mybank.pc.collection.model.sender.SendProxy.SenderBuilder;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDKConfig;
 import com.mybank.pc.kits.unionpay.acp.SDKConstants;
 
 public class BatchRequestBuilder implements SenderBuilder {
 
-	@Override
-	public SendProxy buildTo(BaseUnionpayCollectionTrade unionpayCollectionTrade) {
-		UnionpayBatchCollection unionpayBatchCollection = (UnionpayBatchCollection) unionpayCollectionTrade;
+	private UnionpayBatchCollection unionpayBatchCollection;
 
+	public BatchRequestBuilder(UnionpayBatchCollection unionpayBatchCollection) {
+		this.unionpayBatchCollection = unionpayBatchCollection;
+	}
+
+	@Override
+	public SendProxy build() {
 		SendProxy sendProxy = new SendProxy(unionpayBatchCollection.getMerId());
 		SDKConfig sdkConfig = sendProxy.getSdkConfig();
 		AcpService acpService = sendProxy.getAcpService();
@@ -72,7 +77,6 @@ public class BatchRequestBuilder implements SenderBuilder {
 		// 交易请求url从配置文件读取对应属性文件acp_sdk.properties中的acpsdk.batchTransUrl
 		sendProxy.setReqUrl(sdkConfig.getBatchTransUrl());
 
-		unionpayBatchCollection.setSendProxy(sendProxy);
 		return sendProxy;
 	}
 

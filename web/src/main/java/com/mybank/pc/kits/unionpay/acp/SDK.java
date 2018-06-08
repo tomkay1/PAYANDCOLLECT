@@ -91,11 +91,17 @@ public class SDK {
 	}
 
 	public static boolean validate(Map<String, String> reqParam, String encoding) {
-		return TEST_SDK.getAcpService().validate(reqParam, encoding)
-				|| REALTIME_CH_SDK.getAcpService().validate(reqParam, encoding)
-				|| REALTIME_YS_2_SDK.getAcpService().validate(reqParam, encoding)
-				|| REALTIME_YS_4_SDK.getAcpService().validate(reqParam, encoding)
-				|| BATCH_CH_SDK.getAcpService().validate(reqParam, encoding);
+		String merId = reqParam.get("merId");
+		if (StringUtils.isNotBlank(merId)) {
+			SDK sdk = SDK.getByMerId(merId);
+			return sdk == null ? false : sdk.getAcpService().validate(reqParam, encoding);
+		} else {
+			return TEST_SDK.getAcpService().validate(reqParam, encoding)
+					|| REALTIME_CH_SDK.getAcpService().validate(reqParam, encoding)
+					|| REALTIME_YS_2_SDK.getAcpService().validate(reqParam, encoding)
+					|| REALTIME_YS_4_SDK.getAcpService().validate(reqParam, encoding)
+					|| BATCH_CH_SDK.getAcpService().validate(reqParam, encoding);
+		}
 	}
 
 	public static boolean validateResp(Map<String, String> rspData, String merid, String encoding)

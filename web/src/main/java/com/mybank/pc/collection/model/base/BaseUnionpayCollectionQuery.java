@@ -66,6 +66,22 @@ public abstract class BaseUnionpayCollectionQuery<M extends BaseUnionpayCollecti
 		return getStr("txnSubType");
 	}
 
+	public void setOrigTxnType(java.lang.String origTxnType) {
+		set("origTxnType", origTxnType);
+	}
+
+	public java.lang.String getOrigTxnType() {
+		return getStr("origTxnType");
+	}
+
+	public void setOrigTxnSubType(java.lang.String origTxnSubType) {
+		set("origTxnSubType", origTxnSubType);
+	}
+
+	public java.lang.String getOrigTxnSubType() {
+		return getStr("origTxnSubType");
+	}
+
 	public void setBizType(java.lang.String bizType) {
 		set("bizType", bizType);
 	}

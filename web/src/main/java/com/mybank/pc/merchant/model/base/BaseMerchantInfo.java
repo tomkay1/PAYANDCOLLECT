@@ -12,7 +12,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setId(java.lang.Integer id) {
 		set("id", id);
 	}
-	
+
 	public java.lang.Integer getId() {
 		return getInt("id");
 	}
@@ -20,7 +20,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setMerchantNo(java.lang.String merchantNo) {
 		set("merchantNo", merchantNo);
 	}
-	
+
 	public java.lang.String getMerchantNo() {
 		return getStr("merchantNo");
 	}
@@ -28,7 +28,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setMerchantName(java.lang.String merchantName) {
 		set("merchantName", merchantName);
 	}
-	
+
 	public java.lang.String getMerchantName() {
 		return getStr("merchantName");
 	}
@@ -36,7 +36,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setMerchantType(java.lang.String merchantType) {
 		set("merchantType", merchantType);
 	}
-	
+
 	public java.lang.String getMerchantType() {
 		return getStr("merchantType");
 	}
@@ -44,7 +44,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setPerName(java.lang.String perName) {
 		set("perName", perName);
 	}
-	
+
 	public java.lang.String getPerName() {
 		return getStr("perName");
 	}
@@ -52,7 +52,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setCardID(java.lang.String cardID) {
 		set("cardID", cardID);
 	}
-	
+
 	public java.lang.String getCardID() {
 		return getStr("cardID");
 	}
@@ -60,7 +60,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setMobile(java.lang.String mobile) {
 		set("mobile", mobile);
 	}
-	
+
 	public java.lang.String getMobile() {
 		return getStr("mobile");
 	}
@@ -68,7 +68,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setEmail(java.lang.String email) {
 		set("email", email);
 	}
-	
+
 	public java.lang.String getEmail() {
 		return getStr("email");
 	}
@@ -76,7 +76,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setAddress(java.lang.String address) {
 		set("address", address);
 	}
-	
+
 	public java.lang.String getAddress() {
 		return getStr("address");
 	}
@@ -84,7 +84,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setMobile1(java.lang.String mobile1) {
 		set("mobile1", mobile1);
 	}
-	
+
 	public java.lang.String getMobile1() {
 		return getStr("mobile1");
 	}
@@ -92,7 +92,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setMobile2(java.lang.String mobile2) {
 		set("mobile2", mobile2);
 	}
-	
+
 	public java.lang.String getMobile2() {
 		return getStr("mobile2");
 	}
@@ -100,15 +100,23 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setFeeAmount(java.math.BigDecimal feeAmount) {
 		set("feeAmount", feeAmount);
 	}
-	
+
 	public java.math.BigDecimal getFeeAmount() {
 		return get("feeAmount");
+	}
+
+	public void setFeeCollectType(java.lang.String feeCollectType) {
+		set("feeCollectType", feeCollectType);
+	}
+
+	public java.lang.String getFeeCollectType() {
+		return getStr("feeCollectType");
 	}
 
 	public void setCardImg(java.lang.String cardImg) {
 		set("cardImg", cardImg);
 	}
-	
+
 	public java.lang.String getCardImg() {
 		return getStr("cardImg");
 	}
@@ -116,7 +124,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setCardZ(java.lang.String cardZ) {
 		set("cardZ", cardZ);
 	}
-	
+
 	public java.lang.String getCardZ() {
 		return getStr("cardZ");
 	}
@@ -124,7 +132,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setCardF(java.lang.String cardF) {
 		set("cardF", cardF);
 	}
-	
+
 	public java.lang.String getCardF() {
 		return getStr("cardF");
 	}
@@ -132,7 +140,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setStatus(java.lang.String status) {
 		set("status", status);
 	}
-	
+
 	public java.lang.String getStatus() {
 		return getStr("status");
 	}
@@ -140,7 +148,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setCat(java.util.Date cat) {
 		set("cat", cat);
 	}
-	
+
 	public java.util.Date getCat() {
 		return get("cat");
 	}
@@ -148,7 +156,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setMat(java.util.Date mat) {
 		set("mat", mat);
 	}
-	
+
 	public java.util.Date getMat() {
 		return get("mat");
 	}
@@ -156,7 +164,7 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setDat(java.util.Date dat) {
 		set("dat", dat);
 	}
-	
+
 	public java.util.Date getDat() {
 		return get("dat");
 	}
@@ -164,10 +172,11 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public void setOperID(java.lang.String operID) {
 		set("operID", operID);
 	}
-	
+
 	public java.lang.String getOperID() {
 		return getStr("operID");
 	}
+
 	public void setBankNo(java.lang.String bankNo) {
 		set("bankNo", bankNo);
 	}
@@ -215,6 +224,5 @@ public abstract class BaseMerchantInfo<M extends BaseMerchantInfo<M>> extends Mo
 	public java.math.BigDecimal getMaxTradeAmount() {
 		return get("maxTradeAmount");
 	}
-
 
 }

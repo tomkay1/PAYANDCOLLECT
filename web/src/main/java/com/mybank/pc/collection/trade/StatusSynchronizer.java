@@ -203,8 +203,7 @@ public class StatusSynchronizer {
 		try {
 			query = unionpayCollection.buildQuery();
 			if (isSaved = query.save()) {
-				unionpayCollection.queryResult();
-				sendProxy = query.getSendProxy();
+				sendProxy = query.queryResult();
 				handlingQueryResult(unionpayCollection, query);
 			}
 		} catch (Exception e) {

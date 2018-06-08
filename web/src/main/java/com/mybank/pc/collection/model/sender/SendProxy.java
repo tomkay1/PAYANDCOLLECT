@@ -237,4 +237,10 @@ public class SendProxy {
 		this.respMsg = respMsg;
 	}
 
+	public interface SenderBuilder {
+
+		public SendProxy build();
+
+	}
+
 }

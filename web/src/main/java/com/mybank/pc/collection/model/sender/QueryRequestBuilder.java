@@ -4,16 +4,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.mybank.pc.collection.model.UnionpayCollectionQuery;
+import com.mybank.pc.collection.model.sender.SendProxy.SenderBuilder;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDKConfig;
 import com.mybank.pc.kits.unionpay.acp.SDKConstants;
 
 public class QueryRequestBuilder implements SenderBuilder {
 
-	@Override
-	public SendProxy buildTo(BaseUnionpayCollectionTrade unionpayCollectionTrade) {
-		UnionpayCollectionQuery unionpayCollectionQuery = (UnionpayCollectionQuery) unionpayCollectionTrade;
+	private UnionpayCollectionQuery unionpayCollectionQuery;
 
+	public QueryRequestBuilder(UnionpayCollectionQuery unionpayCollectionQuery) {
+		this.unionpayCollectionQuery = unionpayCollectionQuery;
+	}
+
+	@Override
+	public SendProxy build() {
 		SendProxy sendProxy = new SendProxy(unionpayCollectionQuery.getMerId());
 		SDKConfig sdkConfig = sendProxy.getSdkConfig();
 		AcpService acpService = sendProxy.getAcpService();
@@ -50,7 +55,6 @@ public class QueryRequestBuilder implements SenderBuilder {
 		// 交易请求url从配置文件读取对应属性文件acp_sdk.properties中的acpsdk.backTransUrl
 		sendProxy.setReqUrl(sdkConfig.getSingleQueryUrl());
 
-		unionpayCollectionQuery.setSendProxy(sendProxy);
 		return sendProxy;
 	}
 

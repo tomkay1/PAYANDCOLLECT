@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.mybank.pc.collection.model.UnionpayCollection;
+import com.mybank.pc.collection.model.sender.SendProxy.SenderBuilder;
 import com.mybank.pc.kits.unionpay.acp.AcpService;
 import com.mybank.pc.kits.unionpay.acp.SDK;
 import com.mybank.pc.kits.unionpay.acp.SDKConfig;
@@ -11,10 +12,14 @@ import com.mybank.pc.kits.unionpay.acp.SDKConstants;
 
 public class RealtimeRequestBuilder implements SenderBuilder {
 
-	@Override
-	public SendProxy buildTo(BaseUnionpayCollectionTrade unionpayCollectionTrade) {
-		UnionpayCollection unionpayCollection = (UnionpayCollection) unionpayCollectionTrade;
+	private UnionpayCollection unionpayCollection;
 
+	public RealtimeRequestBuilder(UnionpayCollection unionpayCollection) {
+		this.unionpayCollection = unionpayCollection;
+	}
+
+	@Override
+	public SendProxy build() {
 		SendProxy sendProxy = new SendProxy(unionpayCollection.getMerId());
 		SDK sdk = sendProxy.getSdk();
 		SDKConfig sdkConfig = sendProxy.getSdkConfig();
@@ -96,7 +101,6 @@ public class RealtimeRequestBuilder implements SenderBuilder {
 		// 交易请求url从配置文件读取对应属性文件acp_sdk.properties中的acpsdk.backTransUrl
 		sendProxy.setReqUrl(sdkConfig.getBackRequestUrl());
 
-		unionpayCollection.setSendProxy(sendProxy);
 		return sendProxy;
 	}
 

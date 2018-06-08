@@ -85,8 +85,8 @@ public class CBatchQuerySrv {
 		try {
 			unionpayBatchCollectionQuery = unionpayBatchCollection.buildQuery();
 			if (isSaved = unionpayBatchCollectionQuery.save()) {
-				unionpayBatchCollection.queryResult();
-				handlingBatchQueryResult(unionpayBatchCollection);
+				unionpayBatchCollectionQuery.queryResult();
+				handlingBatchQueryResult(unionpayBatchCollection, unionpayBatchCollectionQuery);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -121,13 +121,13 @@ public class CBatchQuerySrv {
 		}
 	}
 
-	private boolean handlingBatchQueryResult(UnionpayBatchCollection unionpayBatchCollection) throws Exception {
+	private boolean handlingBatchQueryResult(UnionpayBatchCollection unionpayBatchCollection,
+			UnionpayBatchCollectionQuery unionpayBatchCollectionQuery) throws Exception {
 		boolean isSuccess = false;
 		try {
 			Date now = new Date();
 			Integer queryCount = unionpayBatchCollection.getQueryResultCount();
 			queryCount = queryCount == null ? 0 : queryCount;
-			UnionpayBatchCollectionQuery unionpayBatchCollectionQuery = unionpayBatchCollection.getQuery();
 			unionpayBatchCollectionQuery.validateBatchQueryResp();
 
 			SendProxy sendProxy = unionpayBatchCollectionQuery.getSendProxy();

@@ -230,13 +230,26 @@ public class CTradeApiSrv {
 			collectionTrade.setBankFee(FeeKit.getBankFeeByYuan(originaltxnAmt, cardBin, merId));
 			// 商户手续费
 			if ("2".equals(merchantInfo.getMerchantType())) {// 外部商户
-				collectionTrade.setMerFee(
-						FeeKit.getMerchantFee(originaltxnAmt, Integer.valueOf(merchantID), merchantFeeTradeType));
+				// 实时按银行手续费加1 批量按银行手续费加0.5
+				if ("0".equals(merchantInfo.getFeeCollectType())) {
+					BigDecimal bankFee = collectionTrade.getBankFee();
+					if (bankFee == null) {
+						bankFee = FeeKit.getBankFeeByYuan(originaltxnAmt, cardBin, merId);
+					}
+					if (isRealtimeBuss) {
+						collectionTrade.setMerFee(bankFee.add(new BigDecimal(1)));
+					} else {
+						collectionTrade.setMerFee(bankFee.add(new BigDecimal(0.5)));
+					}
+				} else {
+					collectionTrade.setMerFee(
+							FeeKit.getMerchantFee(originaltxnAmt, Integer.valueOf(merchantID), merchantFeeTradeType));
+				}
 			} else if ("1".equals(merchantInfo.getMerchantType())) {// 内部商户
 				collectionTrade.setMerFee(new BigDecimal(0));
 			}
 
-			String reqReserved = "from=pac";
+			String reqReserved = "from|pac";
 
 			unionpayCollection.setCustomerNm(collectionEntrust.getCustomerNm());
 			unionpayCollection.setCertifTp(collectionEntrust.getCertifTp());
@@ -251,6 +264,7 @@ public class CTradeApiSrv {
 			unionpayCollection.setTxnTime(txnTime);
 			unionpayCollection.setTxnAmt(txnAmt);
 			unionpayCollection.setMerchantID(merchantID);
+			unionpayCollection.setMerFee(String.valueOf(collectionTrade.getMerFee().longValue() * 100));
 			unionpayCollection.setReqReserved(reqReserved);
 			unionpayCollection.setReqReserved1(reqReserved);
 			unionpayCollection.setFinalCode(finalCode);
