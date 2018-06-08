@@ -48,8 +48,10 @@ public class MerchantInfoCtr extends CoreController {
             page = MerchantInfo.dao.paginate(getPN(), getPS(), "select * ", where.toString());
         }
         List<Taxonomy> tlist =CacheKit.get(Consts.CACHE_NAMES.taxonomy.name(),"merTypeList");
+        List<Taxonomy> fList =CacheKit.get(Consts.CACHE_NAMES.taxonomy.name(),"feeCollectTypeList");
         Map map = new HashMap();
         map.put("tList" ,tlist);
+        map.put("fList" ,fList);
         map.put("page",page);
         renderJson(map);
 

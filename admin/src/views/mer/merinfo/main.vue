@@ -2,30 +2,30 @@
     <div>
         <Row>
             <Col span="24">
-            <Card>
-                <p slot="title">
-                    <Icon type="help-buoy"></Icon>
-                    商户列表
-                </p>
-                <Row>
-                    <Col span="8">
-                    <Button type="primary" icon="person-add" @click="add">新增商户</Button>
-                    </Col>
-                    <Col span="8" offset="8" align="right">
-                    <Input v-model="searchKey" placeholder="输入商户编号/名称/负责人名称" style="width: 200px"/>
-                    <span @click="search" >
+                <Card>
+                    <p slot="title">
+                        <Icon type="help-buoy"></Icon>
+                        商户列表
+                    </p>
+                    <Row>
+                        <Col span="8">
+                            <Button type="primary" icon="person-add" @click="add">新增商户</Button>
+                        </Col>
+                        <Col span="8" offset="8" align="right">
+                            <Input v-model="searchKey" placeholder="输入商户编号/名称/负责人名称" style="width: 200px"/>
+                            <span @click="search">
                         <Button type="primary" icon="search">搜索</Button></span>
-                    </Col>
-                </Row>
-                <Row class="margin-top-10">
-                    <Table :context="self" border :data="merInfoList" :columns="tableColums" stripe></Table>
-                </Row>
-                <Row class="margin-top-10">
-                    <Col span="24" align="right">
-                    <Page  :total="total" :current="pageNumber"  :page-size="pageSize" @on-change="search" show-total show-elevator ></Page>
-                    </Col>
-                </Row>
-            </Card>
+                        </Col>
+                    </Row>
+                    <Row class="margin-top-10">
+                        <Table :context="self" border :data="merInfoList" :columns="tableColums" stripe></Table>
+                    </Row>
+                    <Row class="margin-top-10">
+                        <Col span="24" align="right">
+                            <Page :total="total" :current="pageNumber" :page-size="pageSize" @on-change="search" show-total show-elevator></Page>
+                        </Col>
+                    </Row>
+                </Card>
             </Col>
         </Row>
         <Modal v-model="merInfoModal" @on-visible-change="vChange" :mask-closable="false">
@@ -42,6 +42,12 @@
                         <Option v-for="item in merchantTypeList" :value="item.text" :key="item.text">{{ item.title }}</Option>
                     </Select>
                 </FormItem>
+                <FormItem label="手续费计算方式" prop="feeCollectType">
+                    <Select v-model="merInfo.feeCollectType" style="width:300px">
+                        <Option v-for="item in feeCollectTypeList" :value="item.text" :key="item.text">{{ item.title }}</Option>
+                    </Select>
+                </FormItem>
+
                 <FormItem label="负责人名称" prop="perName">
                     <Input v-model="merInfo.perName" placeholder="请输入..." style="width: 300px"/>
                 </FormItem>
@@ -155,7 +161,7 @@
                 <Icon type="information-circled"></Icon>
                 <span>{{merFeeAddTitle}} {{merFeeAmount.merName}}</span>
             </p>
-            <Form ref="formFeeAmountValidate"  :label-width="150" :model="merFeeAmount"  :rules="feeAmountValidate">
+            <Form ref="formFeeAmountValidate" :label-width="150" :model="merFeeAmount" :rules="feeAmountValidate">
 
                 <FormItem label="手续费续存金额" prop="merFeeAmount" style="margin-top: 20px">
                     <Input v-model="merFeeAmount.merFeeAmount" placeholder="请输入..." style="width: 300px"/>
@@ -175,102 +181,102 @@
             </p>
             <Row>
                 <Col span="12" align="center">
-                <div style="font-size: 14px; font-weight: bold; background-color: #ccc; padding: 5px; ;margin: 5px; ">加急</div>
-                <table>
-                    <div v-for="item in merFeeListJ" class="feeList">
-                        <tr>
-                            <td width="230" align="center">
+                    <div style="font-size: 14px; font-weight: bold; background-color: #ccc; padding: 5px; ;margin: 5px; ">加急</div>
+                    <table>
+                        <div v-for="item in merFeeListJ" class="feeList">
+                            <tr>
+                                <td width="230" align="center">
 
-                                <span v-if="item.amountLower > '0'">{{ item.amountLower }}<</span>
-                                交易金额
-                                <span v-if="item.amountUpper > '0'"><={{ item.amountUpper }}</span>
-                            </td>
-                            <td width="80" align="center">
-                                <span v-if="item.feeType === '1'">每笔{{ item.amount }}元</span>
-                                <span v-else-if="item.feeType  === '2'">{{item.ratio*100}}%</span>
-                            </td>
-                            <td align="center" width="50">
-                                <Button type="error" shape="circle" size="small" @click="delFee(item.id)">删除</Button>
-                            </td>
-                        </tr>
-                    </div>
-                </table>
+                                    <span v-if="item.amountLower > '0'">{{ item.amountLower }}<</span>
+                                    交易金额
+                                    <span v-if="item.amountUpper > '0'"><={{ item.amountUpper }}</span>
+                                </td>
+                                <td width="80" align="center">
+                                    <span v-if="item.feeType === '1'">每笔{{ item.amount }}元</span>
+                                    <span v-else-if="item.feeType  === '2'">{{item.ratio*100}}%</span>
+                                </td>
+                                <td align="center" width="50">
+                                    <Button type="error" shape="circle" size="small" @click="delFee(item.id)">删除</Button>
+                                </td>
+                            </tr>
+                        </div>
+                    </table>
 
                 </Col>
                 <Col span="12" align="center">
-                <div style="font-size: 14px; font-weight: bold; background-color: #ccc; padding: 5px;margin: 5px;">标准</div>
-                <table>
-                    <div v-for="item in merFeeListB" class="feeList">
-                        <tr>
-                            <td width="230" align="center">
+                    <div style="font-size: 14px; font-weight: bold; background-color: #ccc; padding: 5px;margin: 5px;">标准</div>
+                    <table>
+                        <div v-for="item in merFeeListB" class="feeList">
+                            <tr>
+                                <td width="230" align="center">
 
-                                <span v-if="item.amountLower > '0'">{{ item.amountLower }}<</span>
-                                交易金额
-                                <span v-if="item.amountUpper > '0'"><={{ item.amountUpper }}</span>
-                            </td>
-                            <td width="80" align="center">
-                                <span v-if="item.feeType === '1'">每笔{{ item.amount }}元</span>
-                                <span v-else-if="item.feeType  === '2'">{{item.ratio*100}}%</span>
-                            </td>
-                            <td align="center" width="50">
-                                <Button type="error" shape="circle" size="small" @click="delFee(item.id)">删除</Button>
-                            </td>
-                        </tr>
-                    </div>
-                </table>
+                                    <span v-if="item.amountLower > '0'">{{ item.amountLower }}<</span>
+                                    交易金额
+                                    <span v-if="item.amountUpper > '0'"><={{ item.amountUpper }}</span>
+                                </td>
+                                <td width="80" align="center">
+                                    <span v-if="item.feeType === '1'">每笔{{ item.amount }}元</span>
+                                    <span v-else-if="item.feeType  === '2'">{{item.ratio*100}}%</span>
+                                </td>
+                                <td align="center" width="50">
+                                    <Button type="error" shape="circle" size="small" @click="delFee(item.id)">删除</Button>
+                                </td>
+                            </tr>
+                        </div>
+                    </table>
                 </Col>
             </Row>
             <Row>
                 <Col span="24" align="center">
-                <div style="margin-top: 30px;">
-                    <Form ref="formFeeValidate" :model="merFee" :rules="feeValidate">
+                    <div style="margin-top: 30px;">
+                        <Form ref="formFeeValidate" :model="merFee" :rules="feeValidate">
 
                             <Col span="5" align="center">
-                        <FormItem prop="tradeType" >
-                            <RadioGroup v-model="merFee.tradeType" type="button">
-                                <Radio label="1">
-                                    <span>加急</span>
-                                </Radio>
-                                <Radio label="2">
-                                    <span>标准</span>
-                                </Radio>
-                            </RadioGroup>
-                        </FormItem>
+                                <FormItem prop="tradeType">
+                                    <RadioGroup v-model="merFee.tradeType" type="button">
+                                        <Radio label="1">
+                                            <span>加急</span>
+                                        </Radio>
+                                        <Radio label="2">
+                                            <span>标准</span>
+                                        </Radio>
+                                    </RadioGroup>
+                                </FormItem>
                             </Col>
-                        <Col span="5" align="left">
-                        <FormItem prop="amountUpper" >
-                        <Tooltip placement="bottom">
-                                <Input v-model="merFee.amountUpper" placeholder="请输入金额上限" style="width: 140px"/>
-                            <div slot="content">
-                                <p>输入0表示基础手续费设定</p>
-                                <p>商户至少需要一个基础手续费</p>
-                            </div>
-                        </Tooltip>
-                        </FormItem>
-                        </Col>
-                        <Col span="5" align="center" >
-                        <FormItem prop="feeType" >
-                            <RadioGroup v-model="merFee.feeType" type="button">
-                                <Radio label="1">
-                                    <span>定额</span>
-                                </Radio>
-                                <Radio label="2">
-                                    <span>比例</span>
-                                </Radio>
-                            </RadioGroup>
-                        </FormItem>
-                        </Col>
-                        <Col span="6" align="left">
-                        <FormItem prop="amount" >
-                            <Input v-model="merFee.amount" placeholder="请输入手续费金额或比例" style="width: 160px"/>
-                        </FormItem>
-                        </Col>
-                        <Col span="2" align="left">
-                        <Button type="success" @click="addFee">增加</Button>
-                        </Col>
+                            <Col span="5" align="left">
+                                <FormItem prop="amountUpper">
+                                    <Tooltip placement="bottom">
+                                        <Input v-model="merFee.amountUpper" placeholder="请输入金额上限" style="width: 140px"/>
+                                        <div slot="content">
+                                            <p>输入0表示基础手续费设定</p>
+                                            <p>商户至少需要一个基础手续费</p>
+                                        </div>
+                                    </Tooltip>
+                                </FormItem>
+                            </Col>
+                            <Col span="5" align="center">
+                                <FormItem prop="feeType">
+                                    <RadioGroup v-model="merFee.feeType" type="button">
+                                        <Radio label="1">
+                                            <span>定额</span>
+                                        </Radio>
+                                        <Radio label="2">
+                                            <span>比例</span>
+                                        </Radio>
+                                    </RadioGroup>
+                                </FormItem>
+                            </Col>
+                            <Col span="6" align="left">
+                                <FormItem prop="amount">
+                                    <Input v-model="merFee.amount" placeholder="请输入手续费金额或比例" style="width: 160px"/>
+                                </FormItem>
+                            </Col>
+                            <Col span="2" align="left">
+                                <Button type="success" @click="addFee">增加</Button>
+                            </Col>
 
-                    </Form>
-                </div>
+                        </Form>
+                    </div>
                 </Col>
             </Row>
             <div slot="footer">
@@ -296,8 +302,8 @@
             },
             style: {
                 marginRight: '5px',
-                marginTop:'2px',
-                marginBottom:'2px',
+                marginTop: '2px',
+                marginBottom: '2px',
             },
             on: {
                 'on-ok': () => {
@@ -319,8 +325,8 @@
             },
             style: {
                 marginRight: '5px',
-                marginTop:'2px',
-                marginBottom:'2px',
+                marginTop: '2px',
+                marginBottom: '2px',
             },
             on: {
                 click: () => {
@@ -339,8 +345,8 @@
             },
             style: {
                 marginRight: '5px',
-                marginTop:'2px',
-                marginBottom:'2px',
+                marginTop: '2px',
+                marginBottom: '2px',
             },
             on: {
                 'on-ok': () => {
@@ -364,8 +370,8 @@
             },
             style: {
                 marginRight: '5px',
-                marginTop:'2px',
-                marginBottom:'2px',
+                marginTop: '2px',
+                marginBottom: '2px',
             },
             on: {
                 'on-ok': () => {
@@ -387,8 +393,8 @@
             },
             style: {
                 marginRight: '5px',
-                marginTop:'2px',
-                marginBottom:'2px',
+                marginTop: '2px',
+                marginBottom: '2px',
             },
             on: {
                 click: () => {
@@ -405,8 +411,8 @@
             },
             style: {
                 marginRight: '5px',
-                marginTop:'2px',
-                marginBottom:'2px',
+                marginTop: '2px',
+                marginBottom: '2px',
             },
             on: {
                 click: () => {
@@ -427,6 +433,7 @@
                 'total': state => state.merInfo.totalRow,
                 'merInfo': state => state.merInfo.merInfo,
                 'merchantTypeList': state => state.merInfo.merchantTypeList,
+                'feeCollectTypeList': state => state.merInfo.feeCollectTypeList,
                 'merFeeListJ': state => state.merInfo.merFeeListJ,
                 'merFeeListB': state => state.merInfo.merFeeListB,
             })
@@ -572,8 +579,8 @@
                     if (valid) {
                         //获取输入的手续费数据
                         this.$store.dispatch('add_merFee', this.merFee).then((res) => {
-                            vm.merFee.tradeType =''
-                            vm.merFee.feeType =''
+                            vm.merFee.tradeType = ''
+                            vm.merFee.feeType = ''
                             vm.merFee.amountUpper = null
                             vm.merFee.amount = null
                         })
@@ -589,8 +596,8 @@
             vFeeChange(b) {
                 if (!b) {
                     this.$refs['formFeeValidate'].resetFields()
-                    this.merFee.tradeType =''
-                    this.merFee.feeType =''
+                    this.merFee.tradeType = ''
+                    this.merFee.feeType = ''
                     this.merFee.amountUpper = null
                     this.merFee.amount = null
                 }
@@ -601,10 +608,10 @@
                 this.merFeeAmount.merIdFee = i.id
                 this.merFeeAddModal = true
             },
-            addFeeAmount(){
+            addFeeAmount() {
                 let vm = this
                 this.$refs['formFeeAmountValidate'].validate((valid) => {
-                        if (valid) {
+                    if (valid) {
                         //获取输入的手续费数据
                         this.$store.dispatch('add_merFeeAmount', vm.merFeeAmount).then((res) => {
                             if (res && res == 'success') {
@@ -614,13 +621,13 @@
                                 this.modalLoading = false;
                             }
                         })
-                        }
+                    }
                 })
             },
             vFeeAmountChange(b) {
                 if (!b) {
                     this.$refs['formFeeAmountValidate'].resetFields()
-                    this.merFeeAmount.merFeeAmount =''
+                    this.merFeeAmount.merFeeAmount = ''
                 }
             },
         },
@@ -650,9 +657,9 @@
                 modalTitle: '新增用户',
                 uploadAction: consts.env + '/cmn/act03',
                 modalLoading: false,
-                merFeeAddTitle:'手续费续存',
-                merFeeAddModal:false,
-                merFeeAmount:{},
+                merFeeAddTitle: '手续费续存',
+                merFeeAddModal: false,
+                merFeeAmount: {},
                 ruleValidate: {
                     merchantName: [
                         {type: 'string', required: true, message: '商户名称不能为空', trigger: 'blur'},
@@ -660,6 +667,9 @@
                     ],
                     merchantType: [
                         {type: 'string', required: true, message: '请选择商户类型', trigger: 'blur'}
+                    ],
+                    feeCollectType: [
+                        {type: 'string', required: true, message: '手续费计算方式', trigger: 'blur'}
                     ],
                     perName: [
                         {required: true, message: '负责人名称不能为空', trigger: 'blur'},
@@ -756,7 +766,6 @@
                             trigger: 'blur'
                         }
                     ],
-
 
 
                 },

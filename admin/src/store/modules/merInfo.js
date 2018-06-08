@@ -10,6 +10,7 @@ const merInfo = {
         totalRow:0,
         merInfo:{},
         merchantTypeList:[],
+        feeCollectTypeList:[],
         merFeeListJ:[],
         merFeeListB:[],
         feeAmountList:[],
@@ -22,7 +23,8 @@ const merInfo = {
             state.pageSize=page.page.pageSize
             state.pageNumber=page.page.pageNumber
             state.totalRow=page.page.totalRow
-            state.merchantTypeList =page.tList
+            state.merchantTypeList = page.tList
+            state.feeCollectTypeList = page.fList
         },
         merInfo_reset(state,param){
             if(param) {
