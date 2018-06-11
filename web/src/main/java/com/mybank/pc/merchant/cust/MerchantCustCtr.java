@@ -247,23 +247,28 @@ public class MerchantCustCtr extends CoreController {
             kv.set("expired", "");
             Kv[] resKv = cEntrustSrv.establishAll(kv);
 
-            for (int i = 0; i < resKv.length; i++) {
-                if (!resKv[i].getBoolean("isSuccess")) {
-                    String errMsg;
-                    if (ObjectUtil.isNotNull(resKv[i].get("unionpayEntrust"))) {
-                        errMsg = ((UnionpayEntrust) resKv[i].get("unionpayEntrust")).getRespMsg();
-                        if (ObjectUtil.isNull(errMsg)) {
-                            errMsg = "远程调用失败（系统内部异常）！";
-                        }
-                    } else {
-                        errMsg = "远程调用异常！";
+            boolean isSucc1 =resKv[0].getBoolean("isSuccess");
+            boolean isSucc2 =resKv[1].getBoolean("isSuccess");
+            boolean isSucc3 =resKv[2].getBoolean("isSuccess");
+            //只有三总情况都失败时，判断绑定失败，默认显示最后失败信息
+            if (!isSucc1 && !isSucc2 && !isSucc3) {
+                String errMsg;
+                if (ObjectUtil.isNotNull(resKv[2].get("unionpayEntrust"))) {
+                    errMsg = ((UnionpayEntrust) resKv[2].get("unionpayEntrust")).getRespMsg();
+                    if (ObjectUtil.isNull(errMsg)) {
+                        errMsg = "远程调用失败（系统内部异常）！";
                     }
-                    setAttr("resCode", "error");
-                    setAttr("resMsg", errMsg);
-                    render("/WEB-INF/template/www/cust-res.html");
-                    return;
+                } else {
+                    errMsg = "远程调用异常！";
                 }
+                setAttr("resCode", "error");
+                setAttr("resMsg", errMsg);
+                render("/WEB-INF/template/www/cust-res.html");
+                return;
             }
+
+
+
 
 
             //保存图片
