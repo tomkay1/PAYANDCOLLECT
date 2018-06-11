@@ -2,12 +2,15 @@ package com.mybank.pc.admin;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.jfinal.aop.Clear;
+import com.jfinal.aop.Duang;
 import com.jfinal.kit.JsonKit;
+import com.jfinal.kit.LogKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.render.JsonRender;
@@ -21,7 +24,9 @@ import com.mybank.pc.interceptors.AdminIAuthInterceptor;
 import com.mybank.pc.kits.CookieKit;
 import com.mybank.pc.kits.ResKit;
 import com.mybank.pc.kits.ext.BCrypt;
+import com.mybank.pc.merchant.info.MerchantInfoSrv;
 
+import java.sql.Struct;
 import java.util.*;
 
 /**
@@ -34,6 +39,7 @@ public class LoginCtr extends CoreController {
     public static final int LOGIN_PROTECTED_MIN = 15;//登陆失败保护时间
     public static final String LOGIN_RETRY_DATE = "LOGIN_RETRY_DATE";
     public static final String LOGIN_RETRY_COUNT = "LOGIN_RETRY_COUNT";
+    private MerchantInfoSrv merchantInfoSrv = Duang.duang(MerchantInfoSrv.class.getSimpleName(),MerchantInfoSrv.class);
 
     public void login() {
 
@@ -41,6 +47,10 @@ public class LoginCtr extends CoreController {
         String username = getPara("user");
         String password = getPara("password");
         String rm = getPara("rememberMe");
+        String from=getPara("from");
+
+
+
 
         DateTime reTryDate = (DateTime) CacheKit.get(Consts.CACHE_NAMES.login.name(), username + "LOGIN_RETRY_DATE");
         if (reTryDate != null) {
@@ -63,10 +73,19 @@ public class LoginCtr extends CoreController {
             renderFailJSON("密码不能为空");
             return;
         }
-        if (ResKit.getConfigBoolean("userAuth")) {
-            if (!validateCaptcha("checkCode")) {
-                renderFailJSON("验证码不正确");
-                return;
+
+
+
+        String mpId=CacheKit.get(Consts.CACHE_NAMES.paramCache.name(),"mpId");
+        String[] mpIds= StrUtil.isNotBlank(mpId)?mpId.split(";"):null;
+        if(StrUtil.isNotBlank(from)&&mpIds!=null&& ArrayUtil.contains(mpIds,from)) {
+            LogKit.info("通过小程序端登录，不需要使用验证码");
+        }else{
+            if (ResKit.getConfigBoolean("userAuth")) {
+                if (!validateCaptcha("checkCode")) {
+                    renderFailJSON("验证码不正确");
+                    return;
+                }
             }
         }
 
@@ -87,6 +106,7 @@ public class LoginCtr extends CoreController {
                 data.put("resList", resList);
                 data.put("username", user.getNickname());
                 data.put("loginname", user.getLoginname());
+                data.put("merInfo",merchantInfoSrv.getMerchantInfoByUserID(user.getId().intValue()));
                 user.setLogged(new Date());
                 user.update();
                 if (StrKit.notBlank(rm) && rm.equals("0"))

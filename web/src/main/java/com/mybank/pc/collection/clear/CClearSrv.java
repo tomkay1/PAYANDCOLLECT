@@ -153,7 +153,7 @@ public class CClearSrv  {
             }
             allAccountFee = allAccountFee.add(collectionClear.getAccountFee()!=null?collectionClear.getAccountFee():Consts.ZERO);
             allTradeFee = allTradeFee.add(collectionClear.getTradeFee()!=null?collectionClear.getTradeFee():Consts.ZERO);
-            allAmountOff = allAmount.add(collectionClear.getAmountOff()!=null?collectionClear.getAmountOff():Consts.ZERO);
+            allAmountOff = allAmountOff.add(collectionClear.getAmountOff()!=null?collectionClear.getAmountOff():Consts.ZERO);
             if(collectionClear.getAccountFee()==null)collectionClear.setAccountFee(Consts.ZERO);
             if(collectionClear.getTradeFee()==null)collectionClear.setTradeFee(Consts.ZERO);
             collectionClears.add(collectionClear);
