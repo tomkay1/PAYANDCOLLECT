@@ -24,6 +24,7 @@ import com.mybank.pc.merchant.model.MerchantInfo;
 public class CTradeCtr extends CoreController {
 
 	private static final String ADMIN_LIST_POWER = "#p/coll/trade/admin/list";
+	private static final String ADMIN_INITIATE_POWER = "#p/coll/trade/admin/initiate";
 
 	private CTradeSrv cCTradeSrv = Duang.duang(CTradeSrv.class);
 
@@ -123,16 +124,21 @@ public class CTradeCtr extends CoreController {
 	@ActionKey("/coll/trade/getMerCust")
 	public void merCust() {
 		MerchantInfo merInfo = getAttr(Consts.CURR_USER_MER);
-		if (merInfo == null || merInfo.getId() == null) {
+		Set<String> resSet = getAttr(Consts.CURR_USER_RESES);
+		boolean isAdmin = false;
+		if (resSet != null && resSet.contains(ADMIN_INITIATE_POWER)) {
+			isAdmin = true;
+		}
+		if (!isAdmin && merInfo == null) {
 			renderJson(new ArrayList<MerchantCust>());
 		} else {
 			String serach = getPara("search");
 
 			Kv kv = Kv.create();
-			kv.set("search", serach).set("merchantID", merInfo.getId());
+			kv.set("search", serach).set("merchantID", merInfo == null ? null : merInfo.getId());
 
 			SqlPara sqlPara = Db.getSqlPara("collection_trade.findMerchantCustListPage", kv);
-			renderJson(JSON.toJSONString(MerchantCust.dao.find(sqlPara),
+			renderJson(JSON.toJSONString(Kv.by("isAdmin", isAdmin).set("pageInfo", MerchantCust.dao.find(sqlPara)),
 					SerializerFeature.DisableCircularReferenceDetect));
 		}
 	}

@@ -20,6 +20,7 @@
                                 <div>
                                     <span style="font-weight:bold; margin-right: 10px;">{{option.custName}}</span>
                                     <span style="color:#ccc">{{option.cardID}}</span>
+                                    <span v-if="isAdminToInitiate" style="color:#ccc; float:right;">商户号:{{option.merNo}}</span>
                                 </div>
                                 <div>
                                     <span style="margin-right: 10px;">{{option.bankcardNo}}</span>
@@ -101,6 +102,20 @@
             disableConfirmButton: function(){
                 return this.feeResult.errorMessage ?true :false;
             },
+            merchantIDForSelected: function(){
+                if (this.custMap && this.trade.custID) {
+                    return this.custMap[this.trade.custID].merID;
+                } else {
+                    return '';
+                }
+            },
+            merchantNoForSelected: function(){
+                if (this.custMap && this.trade.custID) {
+                    return this.custMap[this.trade.custID].merNo;
+                } else {
+                    return '';
+                }
+            },
             custNameForSelected: function () {
                 if (this.custMap && this.trade.custID) {
                     return this.custMap[this.trade.custID].custName;
@@ -163,7 +178,8 @@
                         merSearchKey: this.merSearchKey,
                         clearStatus: this.clearStatus,
                         search: this.searchKey,
-                        ps: this.pageSize
+                        ps: this.pageSize,
+                        merchantID: this.merchantIDForSelected
                     }
                     this.$store.dispatch('trade_list', param)
                     this.close()
@@ -178,7 +194,8 @@
                 this.trade = {};
                 this.modalLoading = false;
                 this.$axios.post('/coll/trade/getMerCust').then((res) => {
-                    this.custIDOptionsList = res;
+                    this.isAdminToInitiate=res.isAdmin;
+                    this.custIDOptionsList = res.pageInfo;
                     for (var i in this.custIDOptionsList) {
                         var option = this.custIDOptionsList[i];
                         this.custMap[option.id] = option;
@@ -199,6 +216,9 @@
                 this.modalLoading = true;
                 this.$refs['formValidate'].validate((valid) => {
                     if (valid) {
+                        if(this.isAdminToInitiate){
+                            this.trade.merchantID=this.merchantIDForSelected;
+                        }
                         this.$axios.post('/coll/trade/fee', this.trade).then((res) => {
                             this.feeResult = res
                             this.collectionTrade = this.feeResult.collectionTrade;
@@ -239,6 +259,7 @@
         data() {
             return {
                 self: this,
+                isAdminToInitiate: false,
                 trade: {},
                 initiateTradeModal: false,
                 addConfirmModal: false,
