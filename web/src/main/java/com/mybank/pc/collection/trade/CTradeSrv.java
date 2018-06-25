@@ -245,7 +245,7 @@ public class CTradeSrv {
 							FeeKit.getMerchantFee(originaltxnAmt, Integer.valueOf(merchantID), merchantFeeTradeType));
 				}
 			} else if ("1".equals(merchantInfo.getMerchantType())) {// 内部商户
-				collectionTrade.setMerFee(new BigDecimal(0));
+				collectionTrade.setMerFee(collectionTrade.getBankFee());
 			}
 
 			String reqReserved = "from|pac";
