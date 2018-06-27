@@ -65,7 +65,7 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 	public UnionpayBatchCollectionQuery buildQuery() {
 		Date now = new Date();
 		UnionpayBatchCollectionQuery query = new UnionpayBatchCollectionQuery();
-		String reqReserved = "from|pac";
+		String reqReserved = "from=pac";
 
 		query.setVersion(getVersion());
 		query.setEncoding(getEncoding());
@@ -100,7 +100,7 @@ public class UnionpayBatchCollection extends BaseUnionpayBatchCollection<Unionpa
 
 		String finalCode = "3";// 最终处理结果：0成功 1处理中 2失败 3待初始化
 		String status = "0";// 0 待查询 1 查询中
-		String reqReserved = "from|pac";
+		String reqReserved = "from=pac";
 
 		UnionpayBatchCollection unionpayBatchCollection = new UnionpayBatchCollection();
 		unionpayBatchCollection.setVersion(sdkConfig.getVersion());

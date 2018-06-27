@@ -92,7 +92,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 	public UnionpayCollectionQuery buildQuery(String operID) {
 		UnionpayCollectionQuery query = new UnionpayCollectionQuery();
 		Date now = new Date();
-		String reqReserved = "from|pac";
+		String reqReserved = "from=pac";
 
 		query.setTxnType("00");
 		query.setTxnSubType("00");

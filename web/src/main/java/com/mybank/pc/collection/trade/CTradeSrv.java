@@ -248,7 +248,7 @@ public class CTradeSrv {
 				collectionTrade.setMerFee(collectionTrade.getBankFee());
 			}
 
-			String reqReserved = "from|pac";
+			String reqReserved = "from=pac";
 
 			unionpayCollection.setCustomerNm(collectionEntrust.getCustomerNm());
 			unionpayCollection.setCertifTp(collectionEntrust.getCertifTp());
@@ -373,7 +373,17 @@ public class CTradeSrv {
 	@TxnKey("realtime-sendOrder")
 	public boolean sendRealtimeOrder(UnionpayCollection unionpayCollection, CollectionTrade collectionTrade) {
 		try {
-			unionpayCollection.sendRealtimeOrder();
+
+			try {
+				unionpayCollection.sendRealtimeOrder();
+			} catch (Exception e) {
+				unionpayCollection.setMat(new Date());
+				unionpayCollection.setFinalCode("3");// 状态未明 需后续处理
+				unionpayCollection.update();
+				SyncStatusExecutor.scheduleNotClearSingleQuery(unionpayCollection.getOrderId(), 10, TimeUnit.SECONDS);
+				throw e;
+			}
+
 			return handlingTradeResult(unionpayCollection, collectionTrade);
 		} catch (TradeRuntimeException e) {
 			e.printStackTrace();

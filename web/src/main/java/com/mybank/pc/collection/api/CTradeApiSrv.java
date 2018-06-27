@@ -249,7 +249,7 @@ public class CTradeApiSrv {
 				collectionTrade.setMerFee(collectionTrade.getBankFee());
 			}
 
-			String reqReserved = "from|pac";
+			String reqReserved = "from=pac";
 
 			unionpayCollection.setCustomerNm(collectionEntrust.getCustomerNm());
 			unionpayCollection.setCertifTp(collectionEntrust.getCertifTp());
