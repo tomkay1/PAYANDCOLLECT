@@ -177,7 +177,11 @@ public class StatusSynchronizer {
 					unionpayCollection.setMat(now);
 					unionpayCollection.update();
 					if (collectionTrade != null) {
-						collectionTrade.setFinalCode("0");// 成功
+						if ("00".equals(origRespCode) || "A6".equals(origRespCode)) {// 成功
+							collectionTrade.setFinalCode("0");
+						} else if (origRespCodeIsNotBlank && (!isUnkonwOrigRespCode)) {// 失败
+							collectionTrade.setFinalCode("2");
+						}
 						collectionTrade.setResultCode(origRespCode);
 						collectionTrade.setResultMsg(origRespMsg);
 						collectionTrade.setMat(now);
