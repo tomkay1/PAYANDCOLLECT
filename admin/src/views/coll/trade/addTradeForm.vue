@@ -273,10 +273,6 @@
                 custMap: {},
                 bussTypeList: [
                     {
-                        value: '1',
-                        label: '加急'
-                    },
-                    {
                         value: '2',
                         label: '批量'
                     },
