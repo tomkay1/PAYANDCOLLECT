@@ -126,6 +126,7 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 		setBatchNo("");
 		setTxnTime("");
 		setStatus("0");
+		setFinalCode("1");
 	}
 
 	/**
@@ -156,8 +157,9 @@ public class UnionpayCollection extends BaseUnionpayCollection<UnionpayCollectio
 	}
 
 	public static boolean isFailCode(String resultCode) {
-		return StringUtils.isNotBlank(resultCode) && !("00".equals(resultCode) || "A6".equals(resultCode)
-				|| "03".equals(resultCode) || "04".equals(resultCode) || "05".equals(resultCode));
+		return StringUtils.isNotBlank(resultCode)
+				&& !("00".equals(resultCode) || "A6".equals(resultCode) || "03".equals(resultCode)
+						|| "04".equals(resultCode) || "05".equals(resultCode) || "34".equals(resultCode));
 	}
 
 	public static int updateToBeSentUnionpayCollectionBatchNo(Kv kv) {
