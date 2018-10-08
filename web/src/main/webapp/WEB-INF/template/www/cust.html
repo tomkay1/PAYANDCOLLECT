@@ -64,14 +64,14 @@
             <input type="checkbox" name="is"> <a href="/mer01/custAgree?merNo=#(merchantInfo.merchantNo)" >已阅读并同意《迈伴客用户使用协议》</a>
 
         </div>
-        <!--<div class="form-group">-->
-            <!--<label></label>-->
-            <!--<input type="text" class="form-control" style="width: 140px; float: left" placeholder="验证码" name="code">-->
-            <!--<button id="sendCode" type="button" class="btn btn-primary " style="height: 44px;width: 155px">发送验证码</button>-->
+        <div class="form-group">
+            <label></label>
+            <input type="text" class="form-control" style="width: 140px; float: left" placeholder="验证码" name="code">
+            <button id="sendCode" type="button" class="btn btn-primary " style="height: 44px;width: 155px">发送验证码</button>
 
-        <!--</div>-->
+        </div>
 
-        <!--<div id="sendCodeTxt" style="margin-bottom: 10px"></div>-->
+        <div id="sendCodeTxt" style="margin-bottom: 10px"></div>
         <button id="formBtn" name="formBtn" class="btn btn-lg btn-primary btn-block" type="submit">绑定</button>
     </form>
 </div> <!-- /container -->
@@ -167,14 +167,14 @@
                     }
 
                 },
-                // code: {
-                //     validators: {
-                //         notEmpty: {
-                //             message: '短信验证码不能为空'
-                //         },
-                //     }
-                //
-                // },
+                code: {
+                    validators: {
+                        notEmpty: {
+                            message: '短信验证码不能为空'
+                        },
+                    }
+
+                },
             },
 
 

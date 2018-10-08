@@ -209,7 +209,7 @@ public class MerchantCustCtr extends CoreController {
             String mobileBank = getPara("mobileBank");
             String bankcardNo = getPara("bankcardNo");
 
-            /*String code = getPara("code");
+            String code = getPara("code");
             String smsCode = CacheKit.get(Consts.CACHE_NAMES.smsCode.name(), mobileBank);
             if (ObjectUtil.isNotNull(code)) {
                 if (!code.equals(smsCode)) {
@@ -218,7 +218,7 @@ public class MerchantCustCtr extends CoreController {
                     render("/WEB-INF/template/www/cust-res.html");
                     return;
                 }
-            }*/
+            }
             MerchantInfo mf = MerchantInfo.dao.findFirst("select * from merchant_info mi where mi.merchantNo=? and mi.dat is null ", merNo);
 
             if (ObjectUtil.isNull(mf)) {
@@ -350,4 +350,6 @@ public class MerchantCustCtr extends CoreController {
 
         renderJson(flag);
     }
+
+
 }
