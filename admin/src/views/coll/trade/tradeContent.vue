@@ -6,7 +6,7 @@
                 <div>
                     <Row>
                         <Col span="4" align="left">
-                        <Button type="primary" icon="person-add" @click="initiate">发起交易</Button>
+                        <!-- <Button type="primary" icon="person-add" @click="initiate">发起交易</Button> -->
                         <Button type="primary" @click="refresh" icon="refresh">刷新</Button>
                         </Col>
                         <Col span="20" align="right">

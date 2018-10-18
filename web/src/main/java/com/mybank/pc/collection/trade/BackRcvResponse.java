@@ -17,6 +17,7 @@ import com.jfinal.aop.Duang;
 import com.jfinal.core.ActionKey;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.LogKit;
+import com.mybank.pc.advance.trade.ATradeSrv;
 import com.mybank.pc.collection.model.UnionpayCallbackLog;
 import com.mybank.pc.core.CoreController;
 import com.mybank.pc.interceptors.AdminIAuthInterceptor;
@@ -44,6 +45,7 @@ import com.mybank.pc.kits.unionpay.acp.SDKConstants;
 @Clear(AdminIAuthInterceptor.class)
 public class BackRcvResponse extends CoreController {
 
+	private ATradeSrv aTradeSrv = Duang.duang(ATradeSrv.class);
 	private CTradeSrv cTradeSrv = Duang.duang(CTradeSrv.class);
 	private CBatchQuerySrv cBatchQuerySrv = Duang.duang(CBatchQuerySrv.class);
 
@@ -57,6 +59,11 @@ public class BackRcvResponse extends CoreController {
 		Map<String, String> reqParam = getAllRequestParam(request);
 		UnionpayCallbackLog unionpayCallbackLog = log(reqParam, encoding);
 		if ("1".equals(unionpayCallbackLog.getValidate())) {// 验签成功
+
+			// 代付回调
+			if ("12".equals(unionpayCallbackLog.getTxnType()) && "00".equals(unionpayCallbackLog.getTxnSubType())) {
+				aTradeSrv.updateOrderStatus(reqParam);
+			}
 
 			// 实时代收回调
 			if ("11".equals(unionpayCallbackLog.getTxnType()) && ("02".equals(unionpayCallbackLog.getTxnSubType())

@@ -143,6 +143,17 @@ export const appRouter = [
             { path: 'batch', title: '批量交易管理', isCheck: 'yes', name: 'coll_batch_trade', component: resolve => { require(['@/views/coll/batch/main.vue'], resolve); } }
             // { path: 'reconciliation', title: '对账管理', isCheck: 'yes', name: 'coll_reconciliation', component: resolve => { require(['@/views/coll/reconciliation/main.vue'], resolve); } }
         ]
+    },
+    {
+        path: '/advance',
+        icon: 'monitor',
+        isCheck: 'no',
+        name: 'advance',
+        title: '代付交易管理',
+        component: Main,
+        children: [
+            { path: 'trade', title: '交易管理', isCheck: 'yes', name: 'advance_trade', component: resolve => { require(['@/views/advance/main.vue'], resolve); } }
+        ]
     }
 ];
 

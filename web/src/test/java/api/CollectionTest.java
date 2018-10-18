@@ -45,8 +45,8 @@ public class CollectionTest {
 		reqData.put("req", RSAKit.encrypt(JSON.toJSONString(data), CollAPIRSAKey.COLL_API.getPublicKey()));
 		// reqData.put("req", "123456");
 
-		String host = "http://localhost:8082";
-		// String host = "https://pac.mybank.cc";
+		// String host = "http://localhost:8082";
+		String host = "https://pac.mybank.cc";
 		String result = HttpClient.send(host + "/coll/api/entrust/establish", reqData, HttpClient.UTF_8_ENCODING, 50000,
 				50000);
 		System.out.println(result);
@@ -87,8 +87,8 @@ public class CollectionTest {
 		Map<String, String> reqData = new HashMap<String, String>();
 		reqData.put("req", RSAKit.encrypt(JSON.toJSONString(data), CollAPIRSAKey.COLL_API.getPublicKey()));
 
-		String host = "http://localhost:8082";
-		// String host = "https://pac.mybank.cc";
+		// String host = "http://localhost:8082";
+		String host = "https://pac.mybank.cc";
 		String result = HttpClient.send(host + "/coll/api/trade/initiate", reqData, HttpClient.UTF_8_ENCODING, 50000,
 				50000);
 
@@ -103,16 +103,16 @@ public class CollectionTest {
 
 	public static void queryTest() throws Exception {
 		Map<String, String> data = new HashMap<String, String>();
-		data.put("orderId", "20180510113720601");
-		data.put("merchantID", "20");
+		data.put("orderId", "2018090512154200001");
+		data.put("merchantID", "22");
 
 		Map<String, String> reqData = new HashMap<String, String>();
-		String jsonData=JSON.toJSONString(data);
+		String jsonData = JSON.toJSONString(data);
 		System.out.println(jsonData);
 		reqData.put("req", RSAKit.encrypt(jsonData, CollAPIRSAKey.COLL_API.getPublicKey()));
 
-		 String host = "http://localhost:8082";
-		//String host = "https://pac.mybank.cc";
+		// String host = "http://localhost:8082";
+		String host = "https://pac.mybank.cc";
 		String result = HttpClient.send(host + "/coll/api/trade/q", reqData, HttpClient.UTF_8_ENCODING, 50000, 50000);
 
 		System.out.println(result);
@@ -122,11 +122,12 @@ public class CollectionTest {
 		System.out.println(o);
 		String unionpayCollection = o.getString("unionpayCollection");
 		System.out.println(unionpayCollection);
+		System.out.println(JSON.parseObject(unionpayCollection));
 	}
 
 	public static void main(String[] args) throws Exception {
 		// establishTest();
-		// tradeTest();
-		queryTest();
+		tradeTest();
+		// queryTest();
 	}
 }

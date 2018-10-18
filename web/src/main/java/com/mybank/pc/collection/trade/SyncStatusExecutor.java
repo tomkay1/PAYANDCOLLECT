@@ -77,7 +77,7 @@ public class SyncStatusExecutor {
 							|| (queryResultCount != null && queryResultCount > maxAllowQueryCount)) {
 						return unionpayCollection;
 					}
-					long currentDelay = delay * 2;
+					long currentDelay = delay == 0 ? 5 : delay * 2;
 					InProcessSingleQuery nextTask = new InProcessSingleQuery(orderId, currentQueryCount, currentDelay);
 					SyncStatusExecutor.schedule(nextTask, currentDelay, TimeUnit.SECONDS);
 				}

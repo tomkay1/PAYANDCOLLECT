@@ -17,6 +17,7 @@ import com.mybank.pc.collection.model.UnionpayBatchCollection;
 import com.mybank.pc.collection.model.UnionpayBatchCollectionBatchno;
 import com.mybank.pc.collection.model.UnionpayCollection;
 import com.mybank.pc.collection.model.sender.SendProxy;
+import com.mybank.pc.exception.BaseCollectionRuntimeException;
 import com.mybank.pc.exception.ValidateUnionpayRespException;
 import com.mybank.pc.kits.unionpay.acp.AcpResponse;
 import com.mybank.pc.kits.unionpay.acp.SDK;
@@ -110,6 +111,17 @@ public class CBatchTradeSrv {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+
+			try {
+				if (unionpayBatchCollection != null && isSaved) {
+					String exceInfo = JsonKit.toJson(BaseCollectionRuntimeException.getExceptionInfo(e));
+					unionpayBatchCollection.setExceInfo(exceInfo);
+					unionpayBatchCollection.setMat(now);
+					unionpayBatchCollection.update();
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 		} finally {
 			try {
 				if (count <= 0 || (!isSaved) && StringUtils.isNotBlank(txnTime) && StringUtils.isNotBlank(nextBatchNo)

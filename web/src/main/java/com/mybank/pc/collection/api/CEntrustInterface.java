@@ -27,7 +27,7 @@ public class CEntrustInterface extends CoreController {
 		Kv reqParam = null;
 		boolean isValidateReq = false;
 		try {
-			String decryptReq = RSAKit.decrypt(req, CollAPIRSAKey.COLL_API.getPrivateKey());
+			String decryptReq = RSAKit.decrypt(req, CollAPIRSAKey.STOP_API.getPrivateKey());
 			JSONObject reqJson = JSON.parseObject(decryptReq);
 
 			String merCode = reqJson.getString("merCode");

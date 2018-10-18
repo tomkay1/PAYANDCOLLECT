@@ -14,6 +14,8 @@ import com.mybank.pc.admin.model.Taxonomy;
 import com.mybank.pc.admin.model.Ufile;
 import com.mybank.pc.admin.model.User;
 import com.mybank.pc.admin.model.UserRole;
+import com.mybank.pc.advance.model.UnionpayAdvance;
+import com.mybank.pc.advance.model.UnionpayAdvanceQuery;
 import com.mybank.pc.collection.model.CollectionClear;
 import com.mybank.pc.collection.model.CollectionCleartotle;
 import com.mybank.pc.collection.model.CollectionEntrust;
@@ -69,6 +71,8 @@ public class _MappingKit {
 		arp.addMapping("s_ufile", "id", Ufile.class);
 		arp.addMapping("s_user", "id", User.class);
 		arp.addMapping("s_user_role", "id", UserRole.class);
+		arp.addMapping("unionpay_advance", "id", UnionpayAdvance.class);
+		arp.addMapping("unionpay_advance_query", "id", UnionpayAdvanceQuery.class);
 		arp.addMapping("unionpay_batch_collection", "id", UnionpayBatchCollection.class);
 		arp.addMapping("unionpay_batch_collection_batchno", "id", UnionpayBatchCollectionBatchno.class);
 		arp.addMapping("unionpay_batch_collection_query", "id", UnionpayBatchCollectionQuery.class);

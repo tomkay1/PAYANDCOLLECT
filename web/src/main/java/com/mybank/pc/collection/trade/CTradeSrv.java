@@ -463,7 +463,7 @@ public class CTradeSrv {
 				// //解密卡号使用的证书是商户签名私钥证书acpsdk.signCert.path
 				// LogUtil.writeLog("解密后的卡号："+accNo2);
 				isSuccess = true;
-				SyncStatusExecutor.scheduleInProcessSingleQuery(unionpayCollection.getOrderId(), 5, TimeUnit.SECONDS);
+				SyncStatusExecutor.scheduleInProcessSingleQuery(unionpayCollection.getOrderId(), 0, TimeUnit.SECONDS);
 			} else {
 				isSuccess = false;
 				collectionTrade.setFinalCode("2");

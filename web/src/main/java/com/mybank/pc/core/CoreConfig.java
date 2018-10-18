@@ -3,7 +3,6 @@ package com.mybank.pc.core;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.mybank.pc.merchant.user.MerchantUserCtr;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.druid.filter.stat.StatFilter;
@@ -39,6 +38,7 @@ import com.mybank.pc.admin.res.ResCtr;
 import com.mybank.pc.admin.role.RoleCtr;
 import com.mybank.pc.admin.taxonomy.TaxCtr;
 import com.mybank.pc.admin.user.UserCtr;
+import com.mybank.pc.advance.trade.ATradeCtr;
 import com.mybank.pc.collection.api.CEntrustInterface;
 import com.mybank.pc.collection.api.CTradeInterface;
 import com.mybank.pc.collection.clear.CClearCtr;
@@ -53,6 +53,7 @@ import com.mybank.pc.kits.DateKit;
 import com.mybank.pc.kits.ResKit;
 import com.mybank.pc.merchant.cust.MerchantCustCtr;
 import com.mybank.pc.merchant.info.MerchantInfoCtr;
+import com.mybank.pc.merchant.user.MerchantUserCtr;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
@@ -163,6 +164,13 @@ public class CoreConfig extends JFinalConfig {
 				add("/coll/api/trade", CTradeInterface.class);
 			}
 		});
+
+		routes.add(new Routes() {
+			@Override
+			public void config() {
+				add("/advance", ATradeCtr.class);
+			}
+		});
 	}
 
 	@Override
@@ -199,15 +207,15 @@ public class CoreConfig extends JFinalConfig {
 		arp.getEngine().addSharedMethod(new StrUtil());
 		arp.setBaseSqlTemplatePath(PathKit.getRootClassPath() + "/sql");
 		arp.addSqlTemplate("all.sql");
-		arp.setShowSql(ResKit.getConfigBoolean("devMode")?true:false);
+		arp.setShowSql(ResKit.getConfigBoolean("devMode") ? true : false);
 		plugins.add(arp);
 		// 开启eheache缓存
 		plugins.add(new EhCachePlugin());
 		// 计划任务插件,开发模式默认关闭，如果需要测试自行打开，防止其他自动发起的对外界系统调用进行回掉
-//		if(!ResKit.getConfigBoolean("devMode")) {
-			Cron4jPlugin cron4jPlugin = new Cron4jPlugin("task.properties", "cron4j");
-			plugins.add(cron4jPlugin);
-//		}
+		// if(!ResKit.getConfigBoolean("devMode")) {
+		Cron4jPlugin cron4jPlugin = new Cron4jPlugin("task.properties", "cron4j");
+		plugins.add(cron4jPlugin);
+		// }
 		MongoJFinalPlugin jFinalPlugin = new MongoJFinalPlugin();
 		jFinalPlugin.add(ResKit.getConfig("mongodb.ip"), ResKit.getConfigInt("mongodb.port"));
 		jFinalPlugin.setDatabase(ResKit.getConfig("mongodb.db"));
